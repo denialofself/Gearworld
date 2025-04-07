@@ -1,0 +1,17 @@
+{
+  "id": "troll",
+  "name": "Troll",
+  "description": "A large, strong creature with regenerative abilities.",
+  "tileX": 5,
+  "tileY": 7,
+  "color": "#FF9696",
+  "health": 40,
+  "attack": 5,
+  "defense": 3,
+  "level": 3,
+  "xp": 15,
+  "aiType": "aggressive",
+  "tags": ["enemy", "humanoid"],
+  "blocksPath": true,
+  "spawnWeight": 5
+}

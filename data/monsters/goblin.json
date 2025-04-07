@@ -1,0 +1,17 @@
+{
+  "id": "goblin",
+  "name": "Goblin",
+  "description": "A small, green, mischievous creature with a nasty attitude.",
+  "tileX": 7,
+  "tileY": 6,
+  "color": "#00FF00",
+  "health": 20,
+  "attack": 3,
+  "defense": 1,
+  "level": 1,
+  "xp": 5,
+  "aiType": "aggressive",
+  "tags": ["enemy", "humanoid"],
+  "blocksPath": true,
+  "spawnWeight": 10
+}

@@ -1,0 +1,17 @@
+{
+  "id": "dragon",
+  "name": "Dragon",
+  "description": "An ancient, fearsome dragon with scales as hard as steel.",
+  "tileX": 10,
+  "tileY": 8,
+  "color": "#FF0000",
+  "health": 100,
+  "attack": 10,
+  "defense": 8,
+  "level": 7,
+  "xp": 50,
+  "aiType": "territorial",
+  "tags": ["enemy", "boss", "dragon"],
+  "blocksPath": true,
+  "spawnWeight": 1
+}

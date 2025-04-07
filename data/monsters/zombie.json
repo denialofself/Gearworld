@@ -1,0 +1,17 @@
+{
+  "id": "zombie",
+  "name": "Zombie",
+  "description": "A reanimated corpse that hungers for brains.",
+  "tileX": 10,
+  "tileY": 7,
+  "color": "#00FA00",
+  "health": 30,
+  "attack": 4,
+  "defense": 2,
+  "level": 2,
+  "xp": 10,
+  "aiType": "slow_chase",
+  "tags": ["enemy", "undead"],
+  "blocksPath": true,
+  "spawnWeight": 8
+}
