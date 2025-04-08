@@ -1,0 +1,20 @@
+{
+    "id": "scav_beetle",
+    "name": "Scavenger Beetle",
+    "description": "A large beetle with a hard shell, scavenging for scraps. It can be aggressive if provoked.",
+    "tileX": 2,
+    "tileY": 6,
+    "color": "#0000CD",
+    "health": 15,
+    "attack": 1,
+    "defense": 1,
+    "actionPoints": 6,
+    "maxActionPoints": 6,
+    "recovery": 3,
+    "level": 1,
+    "xp": 10,
+    "aiType": "slow_chase",
+    "tags": ["enemy", "insect", "ai"],
+    "blocksPath": true,
+    "spawnWeight": 8
+  }

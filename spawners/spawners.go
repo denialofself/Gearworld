@@ -9,20 +9,21 @@ import (
 	"ebiten-rogue/config"
 	"ebiten-rogue/data"
 	"ebiten-rogue/ecs"
-	"ebiten-rogue/systems"
 )
 
 // EntitySpawner manages the creation of game entities
 type EntitySpawner struct {
 	world           *ecs.World
 	templateManager *data.EntityTemplateManager
+	logMessage      func(string) // Function for logging messages
 }
 
 // NewEntitySpawner creates a new entity spawner
-func NewEntitySpawner(world *ecs.World, templateManager *data.EntityTemplateManager) *EntitySpawner {
+func NewEntitySpawner(world *ecs.World, templateManager *data.EntityTemplateManager, logFunc func(string)) *EntitySpawner {
 	return &EntitySpawner{
 		world:           world,
 		templateManager: templateManager,
+		logMessage:      logFunc,
 	}
 }
 
@@ -60,7 +61,9 @@ func (s *EntitySpawner) CreatePlayer(x, y int) *ecs.Entity {
 		Blocks: true,
 	})
 
-	systems.GetMessageLog().Add("Player created at " + strconv.Itoa(x) + "," + strconv.Itoa(y))
+	if s.logMessage != nil {
+		s.logMessage("Player created at " + strconv.Itoa(x) + "," + strconv.Itoa(y))
+	}
 
 	return playerEntity
 }
@@ -117,13 +120,15 @@ func (s *EntitySpawner) CreateEnemy(x, y int, enemyType string) (*ecs.Entity, er
 
 	// Use the template data for stats component
 	stats := &components.StatsComponent{
-		Health:    template.Health,
-		MaxHealth: template.Health,
-		Attack:    template.Attack,
-		Defense:   template.Defense,
-		Level:     template.Level,
-		Exp:       template.XP,
-		Recovery:  template.Recovery,
+		Health:          template.Health,
+		MaxHealth:       template.Health,
+		Attack:          template.Attack,
+		Defense:         template.Defense,
+		Level:           template.Level,
+		Exp:             template.XP,
+		ActionPoints:    template.ActionPoints,
+		MaxActionPoints: template.MaxActionPoints,
+		Recovery:        template.Recovery,
 	}
 
 	// Add any entity-specific tags from the template
@@ -135,11 +140,9 @@ func (s *EntitySpawner) CreateEnemy(x, y int, enemyType string) (*ecs.Entity, er
 	s.world.AddComponent(enemyEntity.ID, components.Renderable, renderable)
 	s.world.AddComponent(enemyEntity.ID, components.Stats, stats)
 	s.world.AddComponent(enemyEntity.ID, components.AI, &components.AIComponent{
-		Type:           template.AIType,
-		ActionPoints:   4,             // Initial action points 
-		MaxActionPoints: 4,            // Maximum action points
-		SightRange:     8,             // How far the zombie can see
-		Path:           []components.PathNode{}, // Initialize empty path
+		Type:       template.AIType,
+		SightRange: 8,                       // How far the zombie can see
+		Path:       []components.PathNode{}, // Initialize empty path
 	})
 
 	// Set collision based on template

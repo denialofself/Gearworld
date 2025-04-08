@@ -10,20 +10,34 @@ import (
 	"ebiten-rogue/ecs"
 )
 
-// AISystem handles AI behavior for entities
-type AISystem struct {
-	turnProcessed bool // Flag to track if AI turns have been processed this game turn
+// AIPathEvent is emitted when AI pathfinding completes
+type AIPathEvent struct {
+	EntityID   ecs.EntityID       // The AI entity
+	Path       []components.PathNode // The calculated path
+	TargetX    int               // Target X coordinate
+	TargetY    int               // Target Y coordinate
+	Visible    bool              // Whether the target is visible
 }
 
-// NewAISystem creates a new AI system
-func NewAISystem() *AISystem {
-	return &AISystem{
+// Type returns the event type
+func (e AIPathEvent) Type() ecs.EventType {
+	return "ai_path_event" // Define a constant for this elsewhere if desired
+}
+
+// AIPathfindingSystem handles AI vision and path calculation
+type AIPathfindingSystem struct {
+	turnProcessed bool // Flag to track if AI paths have been processed this game turn
+}
+
+// NewAIPathfindingSystem creates a new AI pathfinding system
+func NewAIPathfindingSystem() *AIPathfindingSystem {
+	return &AIPathfindingSystem{
 		turnProcessed: false,
 	}
 }
 
 // Initialize sets up event listeners for the AI system
-func (s *AISystem) Initialize(world *ecs.World) {
+func (s *AIPathfindingSystem) Initialize(world *ecs.World) {
 	// Subscribe to player movement events
 	world.GetEventManager().Subscribe(EventMovement, func(event ecs.Event) {
 		s.HandleEvent(world, event)
@@ -31,27 +45,27 @@ func (s *AISystem) Initialize(world *ecs.World) {
 }
 
 // HandleEvent processes events that the AI system is interested in
-func (s *AISystem) HandleEvent(world *ecs.World, event ecs.Event) {
+func (s *AIPathfindingSystem) HandleEvent(world *ecs.World, event ecs.Event) {
 	// Check if this is a player movement event
 	if moveEvent, ok := event.(PlayerMoveEvent); ok {
 		// Player has moved, so reset the turn flag to allow AI processing
 		s.turnProcessed = false
 
 		// Log for debugging using message system
-		GetMessageLog().Add("DEBUG: Player moved to: " + strconv.Itoa(moveEvent.ToX) + "," + strconv.Itoa(moveEvent.ToY) + " AI can now move")
+		GetMessageLog().Add("DEBUG: Player moved to: " + strconv.Itoa(moveEvent.ToX) + "," + strconv.Itoa(moveEvent.ToY) + " AI can now recalculate paths")
 	} else if entityMove, ok := event.(EntityMoveEvent); ok {
 		// Check if this is the player moving (not an AI entity)
 		playerEntities := world.GetEntitiesWithTag("player")
 		if len(playerEntities) > 0 && ecs.EntityID(playerEntities[0].ID) == entityMove.EntityID {
 			s.turnProcessed = false
 			// Log for debugging using message system
-			GetMessageLog().Add("DEBUG: Player entity moved, AI can now move")
+			GetMessageLog().Add("DEBUG: Player entity moved, AI can now recalculate paths")
 		}
 	}
 }
 
 // Update processes AI behavior for entities with AI components
-func (s *AISystem) Update(world *ecs.World, dt float64) {
+func (s *AIPathfindingSystem) Update(world *ecs.World, dt float64) {
 	// Do nothing if we've already processed AI this turn
 	if s.turnProcessed {
 		return
@@ -89,16 +103,6 @@ func (s *AISystem) Update(world *ecs.World, dt float64) {
 		aiComp, _ := world.GetComponent(entity.ID, components.AI)
 		ai := aiComp.(*components.AIComponent)
 
-		// Skip AI entities with no action points
-		if ai.ActionPoints <= 0 {
-			// Rest and regain some action points
-			ai.ActionPoints += 1
-			if ai.ActionPoints > ai.MaxActionPoints {
-				ai.ActionPoints = ai.MaxActionPoints
-			}
-			continue
-		}
-
 		// Get the entity's position
 		posComp, hasPos := world.GetComponent(entity.ID, components.Position)
 		if !hasPos {
@@ -109,7 +113,7 @@ func (s *AISystem) Update(world *ecs.World, dt float64) {
 		// Process AI based on type
 		switch ai.Type {
 		case "slow_chase":
-			s.handleSlowChase(world, uint64(entity.ID), ai, pos, playerPos, gameMap)
+			s.processPathfinding(world, entity.ID, ai, pos, playerPos, gameMap)
 			// Add other AI types here as needed
 		}
 	}
@@ -118,97 +122,48 @@ func (s *AISystem) Update(world *ecs.World, dt float64) {
 	s.turnProcessed = true
 }
 
-// handleSlowChase implements the slow_chase AI behavior
-func (s *AISystem) handleSlowChase(world *ecs.World, entityID uint64, ai *components.AIComponent, pos *components.PositionComponent, playerPos *components.PositionComponent, gameMap *components.MapComponent) {
-	// Cost for actions
-	const (
-		MoveCost = 2
-		WaitCost = 0
-	)
-
-	// Debug info
-	GetMessageLog().Add(fmt.Sprintf("DEBUG: AI at %d,%d checking for player at %d,%d AP:%d", pos.X, pos.Y, playerPos.X, playerPos.Y, ai.ActionPoints))
-
+// processPathfinding handles pathfinding for AI entities
+func (s *AIPathfindingSystem) processPathfinding(world *ecs.World, entityID ecs.EntityID, ai *components.AIComponent, pos *components.PositionComponent, playerPos *components.PositionComponent, gameMap *components.MapComponent) {
 	// Check if player is in sight
 	playerVisible := s.canSee(pos.X, pos.Y, playerPos.X, playerPos.Y, ai.SightRange, gameMap)
-	GetMessageLog().Add(fmt.Sprintf("DEBUG: Player visible: %v Sight range: %d", playerVisible, ai.SightRange))
+	GetMessageLog().Add(fmt.Sprintf("DEBUG: AI at %d,%d checking for player at %d,%d (visible: %v)", pos.X, pos.Y, playerPos.X, playerPos.Y, playerVisible))
 
+	var targetX, targetY int
+	
 	if playerVisible {
 		// Player is visible, update last known position
 		ai.LastKnownTargetX = playerPos.X
 		ai.LastKnownTargetY = playerPos.Y
+		targetX, targetY = playerPos.X, playerPos.Y
 		GetMessageLog().Add(fmt.Sprintf("DEBUG: Updated target pos to %d,%d", playerPos.X, playerPos.Y))
-
-		// Calculate path to player
-		ai.Path = s.findPath(pos.X, pos.Y, playerPos.X, playerPos.Y, gameMap)
-		GetMessageLog().Add(fmt.Sprintf("DEBUG: Path length: %d", len(ai.Path)))
-	}
-
-	// If we have a path, follow it
-	if len(ai.Path) > 0 {
-		// Get the next step in the path
-		nextStep := ai.Path[0]
-		GetMessageLog().Add(fmt.Sprintf("DEBUG: Next step: %d,%d", nextStep.X, nextStep.Y))
-
-		// Check if we can move there
-		canMove := s.isValidMove(world, nextStep.X, nextStep.Y, gameMap)
-		GetMessageLog().Add(fmt.Sprintf("DEBUG: Can move: %v", canMove))
-
-		if canMove && ai.ActionPoints >= MoveCost {
-			// Move to the next step
-			oldX, oldY := pos.X, pos.Y
-			pos.X = nextStep.X
-			pos.Y = nextStep.Y
-			GetMessageLog().Add(fmt.Sprintf("DEBUG: Moving from %d,%d to %d,%d", oldX, oldY, pos.X, pos.Y))
-
-			// Consume action points
-			ai.ActionPoints -= MoveCost
-			GetMessageLog().Add(fmt.Sprintf("DEBUG: AP remaining: %d", ai.ActionPoints))
-
-			// Remove this step from the path
-			ai.Path = ai.Path[1:]
-
-			// Emit movement event
-			world.EmitEvent(EntityMoveEvent{
-				EntityID: ecs.EntityID(entityID),
-				FromX:    oldX,
-				FromY:    oldY,
-				ToX:      pos.X,
-				ToY:      pos.Y,
-			})
-			GetMessageLog().Add("DEBUG: Emitted movement event")
-		} else if ai.ActionPoints >= WaitCost {
-			// Can't move but can wait (might be blocked by another entity)
-			ai.ActionPoints -= WaitCost
-			GetMessageLog().Add(fmt.Sprintf("DEBUG: Can't move, waiting. AP: %d", ai.ActionPoints))
-		} else {
-			// Not enough action points, just wait
-			statsComp, hasStats := world.GetComponent(ecs.EntityID(entityID), components.Stats)
-			if hasStats {
-				stats := statsComp.(*components.StatsComponent)
-				ai.ActionPoints += stats.Recovery
-				GetMessageLog().Add(fmt.Sprintf("DEBUG: Not enough AP, recovering %d points", stats.Recovery))
-			} else {
-				// Default recovery if no stats component
-				ai.ActionPoints += 1
-				GetMessageLog().Add("DEBUG: Not enough AP, recovering 1 point")
-			}
-			GetMessageLog().Add("DEBUG: Not enough AP, waiting")
-		}
-	} else if playerVisible {
-		// Player is visible but no path
-		// This could happen if player is surrounded or unreachable
-		ai.ActionPoints -= WaitCost
-		GetMessageLog().Add("DEBUG: Player visible but no path found")
+	} else if ai.LastKnownTargetX != 0 || ai.LastKnownTargetY != 0 {
+		// Use last known player position
+		targetX, targetY = ai.LastKnownTargetX, ai.LastKnownTargetY
 	} else {
-		// No path and no player visible, rest
-		ai.ActionPoints = 0
-		GetMessageLog().Add("DEBUG: No path and no player visible")
+		// No target
+		return
 	}
+
+	// Calculate path to player or last known position
+	path := s.findPath(pos.X, pos.Y, targetX, targetY, gameMap)
+	
+	// Store path in AI component for reference
+	ai.Path = path
+	
+	// Emit path event for the turn processor to handle
+	world.EmitEvent(AIPathEvent{
+		EntityID: entityID,
+		Path:     path,
+		TargetX:  targetX,
+		TargetY:  targetY,
+		Visible:  playerVisible,
+	})
+	
+	GetMessageLog().Add(fmt.Sprintf("DEBUG: AI path calculated, length: %d", len(path)))
 }
 
 // canSee checks if there's a clear line of sight between two points
-func (s *AISystem) canSee(x1, y1, x2, y2, sightRange int, gameMap *components.MapComponent) bool {
+func (s *AIPathfindingSystem) canSee(x1, y1, x2, y2, sightRange int, gameMap *components.MapComponent) bool {
 	// First check range
 	distance := int(math.Sqrt(float64((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1))))
 	if distance > sightRange {
@@ -232,7 +187,7 @@ func (s *AISystem) canSee(x1, y1, x2, y2, sightRange int, gameMap *components.Ma
 }
 
 // getLinePoints returns all points on a line between (x1,y1) and (x2,y2)
-func (s *AISystem) getLinePoints(x1, y1, x2, y2 int) []components.PathNode {
+func (s *AIPathfindingSystem) getLinePoints(x1, y1, x2, y2 int) []components.PathNode {
 	points := []components.PathNode{}
 
 	dx := abs(x2 - x1)
@@ -268,7 +223,7 @@ func (s *AISystem) getLinePoints(x1, y1, x2, y2 int) []components.PathNode {
 }
 
 // isValidMove checks if a position is a valid movement destination
-func (s *AISystem) isValidMove(world *ecs.World, x, y int, gameMap *components.MapComponent) bool {
+func (s *AIPathfindingSystem) isValidMove(world *ecs.World, x, y int, gameMap *components.MapComponent) bool {
 	// Check for walls
 	if gameMap.IsWall(x, y) {
 		return false
@@ -297,7 +252,7 @@ func (s *AISystem) isValidMove(world *ecs.World, x, y int, gameMap *components.M
 }
 
 // findPath uses A* pathfinding to find a path between two points
-func (s *AISystem) findPath(startX, startY, targetX, targetY int, gameMap *components.MapComponent) []components.PathNode {
+func (s *AIPathfindingSystem) findPath(startX, startY, targetX, targetY int, gameMap *components.MapComponent) []components.PathNode {
 	// A* Pathfinding implementation
 	openSet := make(PriorityQueue, 0)
 	heap.Init(&openSet)
@@ -379,7 +334,7 @@ func (s *AISystem) findPath(startX, startY, targetX, targetY int, gameMap *compo
 }
 
 // reconstructPath builds the path from start to goal
-func (s *AISystem) reconstructPath(cameFrom map[Point]Point, current Point) []components.PathNode {
+func (s *AIPathfindingSystem) reconstructPath(cameFrom map[Point]Point, current Point) []components.PathNode {
 	path := []components.PathNode{}
 
 	for {
@@ -400,7 +355,7 @@ func (s *AISystem) reconstructPath(cameFrom map[Point]Point, current Point) []co
 }
 
 // heuristic estimates the cost to reach the goal
-func (s *AISystem) heuristic(a, b Point) int {
+func (s *AIPathfindingSystem) heuristic(a, b Point) int {
 	// Manhattan distance
 	return abs(a.X-b.X) + abs(a.Y-b.Y)
 }
@@ -419,7 +374,7 @@ type Point struct {
 }
 
 // ResetTurn resets the turn processed flag to allow AI processing in the next turn
-func (s *AISystem) ResetTurn() {
+func (s *AIPathfindingSystem) ResetTurn() {
 	s.turnProcessed = false
 }
 

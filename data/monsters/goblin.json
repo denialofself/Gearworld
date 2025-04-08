@@ -1,6 +1,6 @@
 {
-  "id": "goblin",
-  "name": "Goblin",
+  "id": "gremlin",
+  "name": "Gremlin",
   "description": "A small, green, mischievous creature with a nasty attitude.",
   "tileX": 7,
   "tileY": 6,

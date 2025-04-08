@@ -61,13 +61,15 @@ type PlayerComponent struct{}
 
 // StatsComponent stores entity stats
 type StatsComponent struct {
-	Health    int
-	MaxHealth int
-	Attack    int
-	Defense   int
-	Level     int
-	Exp       int
-	Recovery  int // Recovery points for health regeneration
+	Health          int
+	MaxHealth       int
+	Attack          int
+	Defense         int
+	Level           int
+	Exp             int
+	Recovery        int // Recovery points for action point regeneration
+	ActionPoints    int // Current action points
+	MaxActionPoints int // Maximum action points
 }
 
 // CollisionComponent indicates entity can collide with other entities
@@ -78,8 +80,6 @@ type CollisionComponent struct {
 // AIComponent stores AI behavior information
 type AIComponent struct {
 	Type             string     // Type of AI: "random", "chase", "slow_chase", etc.
-	ActionPoints     int        // Current action points available
-	MaxActionPoints  int        // Maximum action points
 	SightRange       int        // How far the entity can see
 	Target           uint64     // Target entity ID (usually the player)
 	Path             []PathNode // Current path to target (if pathfinding)
