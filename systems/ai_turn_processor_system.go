@@ -2,6 +2,8 @@ package systems
 
 import (
 	"fmt"
+	"math"
+	"math/rand"
 
 	"ebiten-rogue/components"
 	"ebiten-rogue/ecs"
@@ -12,6 +14,13 @@ const EventAIPath ecs.EventType = "ai_path_event"
 
 // AITurnProcessorSystem handles AI movement based on calculated paths
 type AITurnProcessorSystem struct{}
+
+// Define action costs
+const (
+	MoveCost   = 2
+	WaitCost   = 1
+	AttackCost = 3
+)
 
 // NewAITurnProcessorSystem creates a new AI turn processor system
 func NewAITurnProcessorSystem() *AITurnProcessorSystem {
@@ -66,14 +75,35 @@ func (s *AITurnProcessorSystem) Update(world *ecs.World, dt float64) {
 	// The system is event-driven, no need for regular updates
 }
 
+// isAdjacentToPlayer checks if the given position is adjacent to the player
+func (s *AITurnProcessorSystem) isAdjacentToPlayer(world *ecs.World, x, y int) (bool, ecs.EntityID) {
+	// Get player entity
+	playerEntities := world.GetEntitiesWithTag("player")
+	if len(playerEntities) == 0 {
+		return false, 0
+	}
+
+	playerID := playerEntities[0].ID
+	playerPos, hasPos := world.GetComponent(playerID, components.Position)
+	if !hasPos {
+		return false, 0
+	}
+
+	pos := playerPos.(*components.PositionComponent)
+
+	// Check if adjacent (including diagonals)
+	dx := int(math.Abs(float64(pos.X - x)))
+	dy := int(math.Abs(float64(pos.Y - y)))
+
+	if dx <= 1 && dy <= 1 {
+		return true, playerID
+	}
+
+	return false, 0
+}
+
 // processTurn handles AI turn processing
 func (s *AITurnProcessorSystem) processTurn(world *ecs.World, entityID uint64, ai *components.AIComponent, pos *components.PositionComponent, path []components.PathNode, recoveryPoints int) {
-	// Cost for actions
-	const (
-		MoveCost = 2
-		WaitCost = 1
-	)
-
 	// Get stats component for action points
 	statsComp, hasStats := world.GetComponent(ecs.EntityID(entityID), components.Stats)
 	if !hasStats {
@@ -81,6 +111,22 @@ func (s *AITurnProcessorSystem) processTurn(world *ecs.World, entityID uint64, a
 		return
 	}
 	stats := statsComp.(*components.StatsComponent)
+
+	// Check if we're adjacent to the player and can attack
+	if adjacent, playerID := s.isAdjacentToPlayer(world, pos.X, pos.Y); adjacent && stats.ActionPoints >= AttackCost {
+		// Process attack based on AI type
+		switch ai.Type {
+		case "slow_chase":
+			// Slow chase type always attacks when adjacent
+			world.GetEventManager().Emit(CollisionEvent{
+				EntityID1: ecs.EntityID(entityID),
+				EntityID2: playerID,
+			})
+			stats.ActionPoints -= AttackCost
+			GetMessageLog().Add(fmt.Sprintf("DEBUG: AI attacked player (AP: %d)", stats.ActionPoints))
+			return
+		}
+	}
 
 	// Process movement or waiting based on action points and path
 	if len(path) > 0 {
@@ -92,6 +138,17 @@ func (s *AITurnProcessorSystem) processTurn(world *ecs.World, entityID uint64, a
 		canMove := s.isValidMove(world, nextStep.X, nextStep.Y)
 
 		if canMove && stats.ActionPoints >= MoveCost {
+			// Handle AI type specific movement
+			switch ai.Type {
+			case "slow_chase":
+				// 1 in 6 chance to skip movement
+				if rand.Intn(6) == 0 {
+					GetMessageLog().Add(fmt.Sprintf("DEBUG: Slow chase AI skipped movement"))
+					stats.ActionPoints -= WaitCost
+					return
+				}
+			}
+
 			// Move to the next step
 			oldX, oldY := pos.X, pos.Y
 			pos.X = nextStep.X

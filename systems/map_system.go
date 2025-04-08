@@ -3,6 +3,8 @@ package systems
 import (
 	"ebiten-rogue/components"
 	"ebiten-rogue/ecs"
+	"math/rand"
+	"time"
 )
 
 // MapSystem handles map-related operations and rendering
@@ -54,16 +56,39 @@ func (s *MapSystem) RepositionPlayer(world *ecs.World, mapEntity *ecs.Entity) {
 
 // FindEmptyPosition locates an unoccupied floor tile in the map
 func (s *MapSystem) FindEmptyPosition(mapComp *components.MapComponent) (int, int) {
-	// Simple implementation to find an empty position
-	// This could be enhanced with more sophisticated algorithms as needed
+	// Get a random position using a more robust approach
+	maxAttempts := 100
+
+	// Create a list of valid floor tiles
+	var floorTiles [][2]int
+
+	// First, collect all floor tiles
 	for y := 0; y < mapComp.Height; y++ {
 		for x := 0; x < mapComp.Width; x++ {
 			if mapComp.Tiles[y][x] == components.TileFloor {
-				return x, y
+				floorTiles = append(floorTiles, [2]int{x, y})
 			}
 		}
 	}
 
-	// Fallback - return center of map if no floor found
+	// If we found floor tiles, return a random one
+	if len(floorTiles) > 0 {
+		// Use time to seed the random number generator
+		r := rand.New(rand.NewSource(time.Now().UnixNano()))
+		randomIndex := r.Intn(len(floorTiles))
+		return floorTiles[randomIndex][0], floorTiles[randomIndex][1]
+	}
+
+	// Try a random approach as fallback
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	for i := 0; i < maxAttempts; i++ {
+		x := r.Intn(mapComp.Width)
+		y := r.Intn(mapComp.Height)
+		if mapComp.Tiles[y][x] == components.TileFloor {
+			return x, y
+		}
+	}
+
+	// Last resort fallback - return center of map if no floor found
 	return mapComp.Width / 2, mapComp.Height / 2
 }

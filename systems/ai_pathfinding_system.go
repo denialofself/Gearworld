@@ -12,11 +12,11 @@ import (
 
 // AIPathEvent is emitted when AI pathfinding completes
 type AIPathEvent struct {
-	EntityID   ecs.EntityID       // The AI entity
-	Path       []components.PathNode // The calculated path
-	TargetX    int               // Target X coordinate
-	TargetY    int               // Target Y coordinate
-	Visible    bool              // Whether the target is visible
+	EntityID ecs.EntityID          // The AI entity
+	Path     []components.PathNode // The calculated path
+	TargetX  int                   // Target X coordinate
+	TargetY  int                   // Target Y coordinate
+	Visible  bool                  // Whether the target is visible
 }
 
 // Type returns the event type
@@ -129,7 +129,7 @@ func (s *AIPathfindingSystem) processPathfinding(world *ecs.World, entityID ecs.
 	GetMessageLog().Add(fmt.Sprintf("DEBUG: AI at %d,%d checking for player at %d,%d (visible: %v)", pos.X, pos.Y, playerPos.X, playerPos.Y, playerVisible))
 
 	var targetX, targetY int
-	
+
 	if playerVisible {
 		// Player is visible, update last known position
 		ai.LastKnownTargetX = playerPos.X
@@ -146,10 +146,10 @@ func (s *AIPathfindingSystem) processPathfinding(world *ecs.World, entityID ecs.
 
 	// Calculate path to player or last known position
 	path := s.findPath(pos.X, pos.Y, targetX, targetY, gameMap)
-	
+
 	// Store path in AI component for reference
 	ai.Path = path
-	
+
 	// Emit path event for the turn processor to handle
 	world.EmitEvent(AIPathEvent{
 		EntityID: entityID,
@@ -158,7 +158,7 @@ func (s *AIPathfindingSystem) processPathfinding(world *ecs.World, entityID ecs.
 		TargetY:  targetY,
 		Visible:  playerVisible,
 	})
-	
+
 	GetMessageLog().Add(fmt.Sprintf("DEBUG: AI path calculated, length: %d", len(path)))
 }
 
@@ -190,8 +190,8 @@ func (s *AIPathfindingSystem) canSee(x1, y1, x2, y2, sightRange int, gameMap *co
 func (s *AIPathfindingSystem) getLinePoints(x1, y1, x2, y2 int) []components.PathNode {
 	points := []components.PathNode{}
 
-	dx := abs(x2 - x1)
-	dy := abs(y2 - y1)
+	dx := int(math.Abs(float64(x2 - x1)))
+	dy := int(math.Abs(float64(y2 - y1)))
 	sx := 1
 	if x1 > x2 {
 		sx = -1
@@ -357,15 +357,7 @@ func (s *AIPathfindingSystem) reconstructPath(cameFrom map[Point]Point, current 
 // heuristic estimates the cost to reach the goal
 func (s *AIPathfindingSystem) heuristic(a, b Point) int {
 	// Manhattan distance
-	return abs(a.X-b.X) + abs(a.Y-b.Y)
-}
-
-// abs returns the absolute value of an integer
-func abs(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
+	return int(math.Abs(float64(a.X-b.X)) + math.Abs(float64(a.Y-b.Y)))
 }
 
 // Point represents a 2D point with integer coordinates

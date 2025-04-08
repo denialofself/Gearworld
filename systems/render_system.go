@@ -156,11 +156,15 @@ func (s *RenderSystem) drawEntities(world *ecs.World, screen *ebiten.Image, came
 
 		if hasPos && hasRend {
 			pos := posComp.(*components.PositionComponent)
-			rend := rendComp.(*components.RenderableComponent)
-
-			// Convert world position to screen position
-			screenX := pos.X - cameraX
-			screenY := pos.Y - cameraY
+			rend := rendComp.(*components.RenderableComponent) // Use camera system to convert world position to screen position
+			var screenX, screenY int
+			if s.cameraSystem != nil {
+				screenX, screenY = s.cameraSystem.WorldToScreen(world, pos.X, pos.Y)
+			} else {
+				// Fallback if camera system is not available
+				screenX = pos.X - cameraX
+				screenY = pos.Y - cameraY
+			}
 
 			// Only draw entities within the visible game screen
 			if screenX >= 0 && screenX < config.GameScreenWidth &&

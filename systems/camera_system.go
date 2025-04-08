@@ -67,6 +67,7 @@ func (s *CameraSystem) updateCameraForStandardMap(world *ecs.World, playerPos *c
 	mapData := mapComp.(*components.MapComponent)
 
 	// Calculate ideal camera position (center player in viewport)
+	// Subtract half the screen width and height to center the player
 	idealCameraX := playerPos.X - config.GameScreenWidth/2
 	idealCameraY := playerPos.Y - config.GameScreenHeight/2
 
@@ -83,7 +84,8 @@ func (s *CameraSystem) updateCameraForStandardMap(world *ecs.World, playerPos *c
 		idealCameraY = mapData.Height - config.GameScreenHeight
 	}
 
-	// Update camera position
+	// Update camera position with smooth following
+	// Simple camera smoothing can be added here if desired
 	camera.X = idealCameraX
 	camera.Y = idealCameraY
 }

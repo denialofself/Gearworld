@@ -104,7 +104,7 @@ func NewGame() *Game {
 func (g *Game) initialize() {
 	// Create the tile mapping entity
 	g.entitySpawner.CreateTileMapping()
-	
+
 	// Create a dungeon themer
 	dungeonThemer := generation.NewDungeonThemer(
 		g.world,
@@ -112,15 +112,16 @@ func (g *Game) initialize() {
 		g.entitySpawner,
 		systems.GetMessageLog().Add, // Pass the logging function
 	)
-	
+
 	// Set a random seed for dungeon generation
 	dungeonThemer.SetSeed(time.Now().UnixNano())
-	
+
 	// Configure the dungeon (level 1, abandoned theme, large size)
 	config := generation.DungeonConfiguration{
 		Level:                 1,
 		Theme:                 generation.ThemeAbandoned,
 		Size:                  generation.SizeLarge,
+		Generator:             generation.GeneratorCellular,
 		DensityFactor:         .30,
 		HigherLevelChance:     0.05, // 5% chance for level 2 monsters
 		EvenHigherLevelChance: 0.01, // 1% chance for level 3 monsters
@@ -150,8 +151,6 @@ func (g *Game) initialize() {
 	systems.GetMessageLog().Add("Welcome to the abandoned dungeon!")
 	systems.GetMessageLog().Add("Use arrow keys to move.")
 }
-
-
 
 // Update updates the game state.
 func (g *Game) Update() error {

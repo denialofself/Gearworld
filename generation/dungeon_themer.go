@@ -1,8 +1,8 @@
 package generation
 
 import (
+	"fmt"
 	"math/rand"
-
 
 	"ebiten-rogue/components"
 	"ebiten-rogue/data"
@@ -10,14 +10,22 @@ import (
 	"ebiten-rogue/spawners"
 )
 
+type GeneratorType int
+
+const (
+	GeneratorBSP      GeneratorType = iota // Binary Space Partitioning generator
+	GeneratorCellular                      // Cellular Automata generator
+)
+
 // DungeonConfiguration defines a complete configuration for a dungeon
 type DungeonConfiguration struct {
-	Level                 int          // Dungeon depth/level
-	Theme                 DungeonTheme // Theme of the dungeon
-	Size                  DungeonSize  // Size of the dungeon
-	DensityFactor         float64      // Monster density (1.0 = standard)
-	HigherLevelChance     float64      // Chance of spawning higher level monsters (0.0-1.0)
-	EvenHigherLevelChance float64      // Chance of spawning even higher level monsters (0.0-1.0)
+	Level                 int           // Dungeon depth/level
+	Theme                 DungeonTheme  // Theme of the dungeon
+	Size                  DungeonSize   // Size of the dungeon
+	Generator             GeneratorType // Type of dungeon generator to use
+	DensityFactor         float64       // Monster density (1.0 = standard)
+	HigherLevelChance     float64       // Chance of spawning higher level monsters (0.0-1.0)
+	EvenHigherLevelChance float64       // Chance of spawning even higher level monsters (0.0-1.0)
 }
 
 // DungeonSize defines the size category of a dungeon
@@ -76,21 +84,39 @@ func (t *DungeonThemer) GenerateThemedDungeon(config DungeonConfiguration) *ecs.
 	mapComp := components.NewMapComponent(width, height)
 	t.world.AddComponent(mapEntity.ID, components.MapComponentID, mapComp)
 
-	// Generate different types of dungeons based on theme and size
-	switch config.Size {
-	case SizeSmall:
-		t.dungeonGen.GenerateSmallBSPDungeon(mapComp)
-	case SizeLarge:
-		t.dungeonGen.GenerateLargeBSPDungeon(mapComp)
-	case SizeHuge:
-		t.dungeonGen.GenerateLargeBSPDungeon(mapComp)
-	default: // SizeNormal
-		t.dungeonGen.GenerateSmallBSPDungeon(mapComp)
+	// Generate dungeon based on generator type and size
+	switch config.Generator {
+	case GeneratorCellular:
+		switch config.Size {
+		case SizeSmall:
+			t.dungeonGen.GenerateSmallCellularDungeon(mapComp)
+		case SizeLarge:
+			t.dungeonGen.GenerateLargeCellularDungeon(mapComp)
+		case SizeHuge:
+			t.dungeonGen.GenerateGiantCellularDungeon(mapComp)
+		default: // SizeNormal
+			t.dungeonGen.GenerateSmallCellularDungeon(mapComp)
+		}
+	default: // GeneratorBSP
+		switch config.Size {
+		case SizeSmall:
+			t.dungeonGen.GenerateSmallBSPDungeon(mapComp)
+		case SizeLarge:
+			t.dungeonGen.GenerateLargeBSPDungeon(mapComp)
+		case SizeHuge:
+			t.dungeonGen.GenerateGiantBSPDungeon(mapComp)
+		default: // SizeNormal
+			t.dungeonGen.GenerateSmallBSPDungeon(mapComp)
+		}
 	}
 
 	// Log the map generation
 	if t.logMessage != nil {
-		t.logMessage("Generated a " + string(config.Theme))
+		generatorName := "BSP"
+		if config.Generator == GeneratorCellular {
+			generatorName = "Cellular Automata"
+		}
+		t.logMessage(fmt.Sprintf("Generated a %s dungeon using %s generator", config.Theme, generatorName))
 	}
 
 	// Apply visual theming to the map
@@ -113,7 +139,7 @@ func (t *DungeonThemer) GenerateThemedDungeon(config DungeonConfiguration) *ecs.
 }
 
 // getDungeonDimensions returns the width and height for a dungeon of the given size
-func (t *DungeonThemer) getDungeonDimensions(size DungeonSize) (width int, height int) {
+func (t *DungeonThemer) getDungeonDimensions(size DungeonSize) (width, height int) {
 	switch size {
 	case SizeSmall:
 		return 40, 30
