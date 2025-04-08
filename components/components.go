@@ -67,6 +67,7 @@ type StatsComponent struct {
 	Defense   int
 	Level     int
 	Exp       int
+	Recovery  int // Recovery points for health regeneration
 }
 
 // CollisionComponent indicates entity can collide with other entities

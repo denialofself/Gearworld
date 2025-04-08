@@ -6,8 +6,8 @@ const (
 	TileSize = 16
 
 	// Window dimensions in tiles
-	ScreenWidth  = 64
-	ScreenHeight = 48
+	ScreenWidth  = 80
+	ScreenHeight = 60
 
 	// UI layout
 	GameScreenWidth  = 50 // Game area width in tiles (reduced from 54 to give more space to stats)

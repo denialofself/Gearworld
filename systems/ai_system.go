@@ -123,7 +123,7 @@ func (s *AISystem) handleSlowChase(world *ecs.World, entityID uint64, ai *compon
 	// Cost for actions
 	const (
 		MoveCost = 2
-		WaitCost = 1
+		WaitCost = 0
 	)
 
 	// Debug info
@@ -183,7 +183,16 @@ func (s *AISystem) handleSlowChase(world *ecs.World, entityID uint64, ai *compon
 			GetMessageLog().Add(fmt.Sprintf("DEBUG: Can't move, waiting. AP: %d", ai.ActionPoints))
 		} else {
 			// Not enough action points, just wait
-			ai.ActionPoints = 0
+			statsComp, hasStats := world.GetComponent(ecs.EntityID(entityID), components.Stats)
+			if hasStats {
+				stats := statsComp.(*components.StatsComponent)
+				ai.ActionPoints += stats.Recovery
+				GetMessageLog().Add(fmt.Sprintf("DEBUG: Not enough AP, recovering %d points", stats.Recovery))
+			} else {
+				// Default recovery if no stats component
+				ai.ActionPoints += 1
+				GetMessageLog().Add("DEBUG: Not enough AP, recovering 1 point")
+			}
 			GetMessageLog().Add("DEBUG: Not enough AP, waiting")
 		}
 	} else if playerVisible {

@@ -8,6 +8,7 @@
   "health": 30,
   "attack": 4,
   "defense": 2,
+  "recovery": 1,
   "level": 2,
   "xp": 10,
   "aiType": "slow_chase",

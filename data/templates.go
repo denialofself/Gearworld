@@ -21,11 +21,12 @@ type EntityTemplate struct {
 	Color string `json:"color"` // Color in hex format (e.g. "#00FF00")
 
 	// Stats
-	Health  int `json:"health"`
-	Attack  int `json:"attack"`
-	Defense int `json:"defense"`
-	Level   int `json:"level"`
-	XP      int `json:"xp"` // XP awarded when killed
+	Health   int `json:"health"`
+	Attack   int `json:"attack"`
+	Defense  int `json:"defense"`
+	Level    int `json:"level"`
+	XP       int `json:"xp"` // XP awarded when killed
+	Recovery int `json:"recovery"` // Recovery points for action point regeneration
 
 	// Behavior
 	AIType      string   `json:"aiType"`      // Type of AI behavior

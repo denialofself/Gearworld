@@ -119,11 +119,11 @@ func (g *Game) initialize() {
 	g.entitySpawner.CreateCamera(uint64(playerEntity.ID), playerX, playerY)
 
 	// Add some enemies near the player
-	if _, err := g.entitySpawner.CreateEnemy(playerX+3, playerY+1, "goblin"); err != nil {
+	if _, err := g.entitySpawner.CreateEnemy(playerX+1, playerY+1, "goblin"); err != nil {
 		systems.GetMessageLog().Add("Failed to create goblin: " + err.Error())
 	}
 
-	if _, err := g.entitySpawner.CreateEnemy(playerX-2, playerY+3, "rust_zombie"); err != nil {
+	if _, err := g.entitySpawner.CreateEnemy(playerX-1, playerY-1, "rust_zombie"); err != nil {
 		systems.GetMessageLog().Add("Failed to create zombie: " + err.Error())
 	}
 

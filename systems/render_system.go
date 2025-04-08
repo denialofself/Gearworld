@@ -287,12 +287,24 @@ func (s *RenderSystem) drawMessagesPanel(screen *ebiten.Image) {
 	// Get message log
 	messageLog := GetMessageLog()
 
-	// Draw messages
-	s.tileset.DrawString(screen, "Welcome to Ebiten Roguelike!", 1, config.GameScreenHeight+1, color.RGBA{255, 255, 255, 255})
-	s.tileset.DrawString(screen, "Use arrow keys to move.", 1, config.GameScreenHeight+2, color.RGBA{200, 200, 200, 255})
+	// Calculate how many messages can fit
+	messagesAreaHeight := config.ScreenHeight - config.GameScreenHeight - 1
+	maxMessages := messagesAreaHeight
 
-	// Draw messages from the log
-	for i, msg := range messageLog.RecentMessages(5) {
-		s.tileset.DrawString(screen, msg, 1, config.GameScreenHeight+3+i, color.RGBA{200, 200, 200, 255})
+	// Draw title for the message area
+	s.tileset.DrawString(screen, "MESSAGE LOG", 1, config.GameScreenHeight+1, color.RGBA{255, 230, 150, 255})
+
+	// Draw messages from the log (starting at line 2 to leave room for the title)
+	messages := messageLog.RecentMessages(maxMessages)
+	for i, msg := range messages {
+		// Color coding based on message content (optional)
+		msgColor := color.RGBA{200, 200, 200, 255} // Default gray
+
+		// Use white for important messages (if they contain certain keywords)
+		if len(msg) > 6 && (msg[:5] == "ERROR" || msg[:7] == "WARNING") {
+			msgColor = color.RGBA{255, 100, 100, 255} // Red for errors/warnings
+		}
+
+		s.tileset.DrawString(screen, msg, 1, config.GameScreenHeight+2+i, msgColor)
 	}
 }

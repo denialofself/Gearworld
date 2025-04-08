@@ -123,6 +123,7 @@ func (s *EntitySpawner) CreateEnemy(x, y int, enemyType string) (*ecs.Entity, er
 		Defense:   template.Defense,
 		Level:     template.Level,
 		Exp:       template.XP,
+		Recovery:  template.Recovery,
 	}
 
 	// Add any entity-specific tags from the template
