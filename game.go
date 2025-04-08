@@ -26,6 +26,7 @@ type Game struct {
 	cameraSystem    *systems.CameraSystem
 	templateManager *data.EntityTemplateManager
 	entitySpawner   *spawners.EntitySpawner
+	aiSystem        *systems.AISystem
 }
 
 // NewGame creates a new game instance
@@ -45,6 +46,7 @@ func NewGame() *Game {
 	combatSystem := systems.NewCombatSystem()
 	cameraSystem := systems.NewCameraSystem()
 	renderSystem := systems.NewRenderSystem(tileset)
+	aiSystem := systems.NewAISystem()
 
 	// Initialize the entity template manager
 	templateManager := data.NewEntityTemplateManager()
@@ -66,6 +68,7 @@ func NewGame() *Game {
 	world.AddSystem(combatSystem)
 	world.AddSystem(cameraSystem)
 	world.AddSystem(mapSystem)
+	world.AddSystem(aiSystem)
 
 	// Create the game instance
 	game := &Game{
@@ -84,6 +87,7 @@ func NewGame() *Game {
 
 	// Initialize event listeners
 	combatSystem.Initialize(world)
+	aiSystem.Initialize(world)
 
 	return game
 }
@@ -112,14 +116,14 @@ func (g *Game) initialize() {
 	playerEntity := g.entitySpawner.CreatePlayer(playerX, playerY)
 
 	// Create a camera entity for the player
-	g.entitySpawner.CreateCamera(playerEntity.ID, playerX, playerY)
+	g.entitySpawner.CreateCamera(uint64(playerEntity.ID), playerX, playerY)
 
 	// Add some enemies near the player
 	if _, err := g.entitySpawner.CreateEnemy(playerX+3, playerY+1, "goblin"); err != nil {
 		systems.GetMessageLog().Add("Failed to create goblin: " + err.Error())
 	}
 
-	if _, err := g.entitySpawner.CreateEnemy(playerX-2, playerY+3, "zombie"); err != nil {
+	if _, err := g.entitySpawner.CreateEnemy(playerX-2, playerY+3, "rust_zombie"); err != nil {
 		systems.GetMessageLog().Add("Failed to create zombie: " + err.Error())
 	}
 

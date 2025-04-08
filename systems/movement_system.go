@@ -6,8 +6,8 @@ import (
 
 	"ebiten-rogue/components"
 	"ebiten-rogue/ecs"
+	"fmt"
 )
-
 // Direction constants for movement
 const (
 	DirNone = iota
@@ -25,12 +25,21 @@ const (
 type MovementSystem struct {
 	// Map of keys to movement directions
 	movementKeys map[ebiten.Key]int
+	// Time tracking for continuous movement
+	moveDelayTimer      float64
+	initialMoveDelay    float64 // Delay before continuous movement starts
+	continuousMoveDelay float64 // Delay between continuous movements
+	lastDirection       int     // Last movement direction
 }
 
 // NewMovementSystem creates a new movement system
 func NewMovementSystem() *MovementSystem {
 	system := &MovementSystem{
-		movementKeys: make(map[ebiten.Key]int),
+		movementKeys:        make(map[ebiten.Key]int),
+		initialMoveDelay:    0.25, // Wait 0.25 seconds before continuous movement starts
+		continuousMoveDelay: 0.10, // Then move every 0.10 seconds
+		moveDelayTimer:      0,
+		lastDirection:       DirNone,
 	}
 
 	// Set up default key bindings
@@ -65,26 +74,47 @@ func NewMovementSystem() *MovementSystem {
 
 // Update handles entity movement
 func (s *MovementSystem) Update(world *ecs.World, dt float64) {
+	// Update movement timer
+	s.moveDelayTimer -= dt
+
 	// Process player movement
 	s.processPlayerMovement(world)
 
-	// Process AI movement (not implemented yet)
+	// No need to directly access the AI system - it will listen for player movement events
 }
 
 // processPlayerMovement handles player input and movement
-func (s *MovementSystem) processPlayerMovement(world *ecs.World) {
+// Returns true if the player moved
+func (s *MovementSystem) processPlayerMovement(world *ecs.World) bool {
 	// Get player entity
 	playerEntities := world.GetEntitiesWithTag("player")
 	if len(playerEntities) == 0 {
-		return
+		return false
 	}
 
 	playerID := playerEntities[0].ID
 
 	// Check for movement input
 	dir, moved := s.getMovementDirection()
-	if !moved {
-		return
+
+	// If no movement or timer is not ready, return
+	if !moved && s.moveDelayTimer > 0 {
+		return false
+	}
+
+	// If direction changed or movement just started, reset the timer with initial delay
+	if moved {
+		s.lastDirection = dir
+		s.moveDelayTimer = s.initialMoveDelay
+	}
+
+	// If a key is being held and timer is ready, process movement with continuous delay
+	if s.lastDirection != DirNone && s.moveDelayTimer <= 0 {
+		dir = s.lastDirection
+		s.moveDelayTimer = s.continuousMoveDelay
+	} else if !moved {
+		// No new key press and not ready for continuous movement
+		return false
 	}
 
 	// Get player position
@@ -92,7 +122,7 @@ func (s *MovementSystem) processPlayerMovement(world *ecs.World) {
 	if comp, exists := world.GetComponent(playerID, components.Position); exists {
 		position = comp.(*components.PositionComponent)
 	} else {
-		return
+		return false
 	}
 
 	// Calculate movement delta
@@ -132,6 +162,14 @@ func (s *MovementSystem) processPlayerMovement(world *ecs.World) {
 			ToX:      newX,
 			ToY:      newY,
 		})
+		// Log the movement
+		GetMessageLog().Add(fmt.Sprintf("Moved to (%d, %d)", newX, newY))
+
+		return true // The player moved
+	} else {
+		// If we can't move, clear the last direction to prevent continuous movement into walls
+		s.lastDirection = DirNone
+		return false // The player didn't move
 	}
 }
 
@@ -206,13 +244,29 @@ func (s *MovementSystem) isPositionBlocked(world *ecs.World, x, y int) bool {
 
 // getMovementDirection checks for pressed keys and returns the movement direction
 func (s *MovementSystem) getMovementDirection() (int, bool) {
-	// Check for any pressed keys in our movement map
+	// First check for newly pressed keys - these take priority
 	for key, dir := range s.movementKeys {
 		if inpututil.IsKeyJustPressed(key) {
 			return dir, true
 		}
 	}
 
+	// Then check for held keys - this is what enables continuous movement
+	for key, dir := range s.movementKeys {
+		if ebiten.IsKeyPressed(key) {
+			// If any key is currently pressed, check if it's a new direction
+			if dir != s.lastDirection {
+				return dir, true
+			}
+			// If it's the same direction as before, just notify that a key is being held
+			if dir == s.lastDirection {
+				return DirNone, false
+			}
+		}
+	}
+
+	// No movement key is pressed, reset the last direction
+	s.lastDirection = DirNone
 	return DirNone, false
 }
 

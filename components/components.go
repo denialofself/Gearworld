@@ -76,7 +76,19 @@ type CollisionComponent struct {
 
 // AIComponent stores AI behavior information
 type AIComponent struct {
-	Type string // Type of AI: "random", "chase", etc.
+	Type             string     // Type of AI: "random", "chase", "slow_chase", etc.
+	ActionPoints     int        // Current action points available
+	MaxActionPoints  int        // Maximum action points
+	SightRange       int        // How far the entity can see
+	Target           uint64     // Target entity ID (usually the player)
+	Path             []PathNode // Current path to target (if pathfinding)
+	LastKnownTargetX int        // Last known X position of target
+	LastKnownTargetY int        // Last known Y position of target
+}
+
+// PathNode represents a single point in a path
+type PathNode struct {
+	X, Y int
 }
 
 // MapComponent stores the game map data

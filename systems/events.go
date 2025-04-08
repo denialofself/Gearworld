@@ -75,3 +75,17 @@ type ItemPickupEvent struct {
 func (e ItemPickupEvent) Type() ecs.EventType {
 	return EventItemPickup
 }
+
+// EntityMoveEvent is emitted when any entity (including AI) moves
+type EntityMoveEvent struct {
+	EntityID ecs.EntityID // Entity that moved
+	FromX    int          // Starting X position
+	FromY    int          // Starting Y position
+	ToX      int          // Ending X position
+	ToY      int          // Ending Y position
+}
+
+// Type returns the event type
+func (e EntityMoveEvent) Type() ecs.EventType {
+	return EventMovement
+}

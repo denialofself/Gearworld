@@ -1,7 +1,7 @@
 {
-  "id": "zombie",
-  "name": "Zombie",
-  "description": "A reanimated corpse that hungers for brains.",
+  "id": "rust_zombie",
+  "name": "Rust Zombie",
+  "description": "A reanimated corpse adorned with wires and rust gears. It moves slowly but is relentless in its pursuit of the living.",
   "tileX": 10,
   "tileY": 7,
   "color": "#00FA00",
@@ -11,7 +11,7 @@
   "level": 2,
   "xp": 10,
   "aiType": "slow_chase",
-  "tags": ["enemy", "undead"],
+  "tags": ["enemy", "undead", "ai"],
   "blocksPath": true,
   "spawnWeight": 8
 }

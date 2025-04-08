@@ -139,7 +139,7 @@ func getEntityName(world *ecs.World, entityID ecs.EntityID) string {
 	// Try to get AI component to determine enemy type
 	if aiComp, hasAI := world.GetComponent(entityID, components.AI); hasAI {
 		ai := aiComp.(*components.AIComponent)
-		return capitalizeFirstLetter(ai.Type)
+		return capitalizeFirstLetter(ai.Type) 
 	}
 
 	// Fallback

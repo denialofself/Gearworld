@@ -99,6 +99,8 @@ func (s *EntitySpawner) CreateEnemy(x, y int, enemyType string) (*ecs.Entity, er
 	enemyEntity := s.world.CreateEntity()
 	enemyEntity.AddTag("enemy")
 	s.world.TagEntity(enemyEntity.ID, "enemy")
+	enemyEntity.AddTag("ai")
+	s.world.TagEntity(enemyEntity.ID, "ai")
 
 	// Add position component
 	s.world.AddComponent(enemyEntity.ID, components.Position, &components.PositionComponent{
@@ -131,20 +133,17 @@ func (s *EntitySpawner) CreateEnemy(x, y int, enemyType string) (*ecs.Entity, er
 	// Add components
 	s.world.AddComponent(enemyEntity.ID, components.Renderable, renderable)
 	s.world.AddComponent(enemyEntity.ID, components.Stats, stats)
+	s.world.AddComponent(enemyEntity.ID, components.AI, &components.AIComponent{
+		Type:           template.AIType,
+		ActionPoints:   4,             // Initial action points 
+		MaxActionPoints: 4,            // Maximum action points
+		SightRange:     8,             // How far the zombie can see
+		Path:           []components.PathNode{}, // Initialize empty path
+	})
 
 	// Set collision based on template
 	s.world.AddComponent(enemyEntity.ID, components.Collision, &components.CollisionComponent{
 		Blocks: template.BlocksPath,
-	})
-
-	// Set AI type based on template or default to enemy type
-	aiType := enemyType
-	if template.AIType != "" {
-		aiType = template.AIType
-	}
-
-	s.world.AddComponent(enemyEntity.ID, components.AI, &components.AIComponent{
-		Type: aiType,
 	})
 
 	return enemyEntity, nil
