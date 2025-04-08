@@ -3,6 +3,7 @@ package generation
 import (
 	"math/rand"
 
+
 	"ebiten-rogue/components"
 	"ebiten-rogue/data"
 	"ebiten-rogue/ecs"
@@ -32,9 +33,8 @@ const (
 // DungeonThemer handles creation of complete dungeons with themes
 type DungeonThemer struct {
 	world           *ecs.World
-	dunGen          *DungeonGenerator
+	dungeonGen      *DungeonGenerator
 	populator       *DungeonPopulator
-	mapGenerator    MapGenerator
 	templateManager *data.EntityTemplateManager
 	entitySpawner   *spawners.EntitySpawner
 	rng             *rand.Rand
@@ -42,12 +42,12 @@ type DungeonThemer struct {
 }
 
 // NewDungeonThemer creates a new dungeon theme manager
-func NewDungeonThemer(world *ecs.World, mapGenerator MapGenerator, templateManager *data.EntityTemplateManager, entitySpawner *spawners.EntitySpawner, logFunc func(string)) *DungeonThemer {
+func NewDungeonThemer(world *ecs.World, templateManager *data.EntityTemplateManager, entitySpawner *spawners.EntitySpawner, logFunc func(string)) *DungeonThemer {
+	dungeonGen := NewDungeonGenerator()
 	return &DungeonThemer{
 		world:           world,
-		dunGen:          NewDungeonGenerator(),
+		dungeonGen:      dungeonGen,
 		populator:       NewDungeonPopulator(world, entitySpawner, templateManager),
-		mapGenerator:    mapGenerator,
 		templateManager: templateManager,
 		entitySpawner:   entitySpawner,
 		rng:             rand.New(rand.NewSource(0)), // Will be seeded via SetSeed
@@ -58,38 +58,39 @@ func NewDungeonThemer(world *ecs.World, mapGenerator MapGenerator, templateManag
 // SetSeed sets a specific seed for reproducible generation
 func (t *DungeonThemer) SetSeed(seed int64) {
 	t.rng = rand.New(rand.NewSource(seed))
-	t.dunGen.SetSeed(seed)
+	t.dungeonGen.SetSeed(seed)
 	t.populator.SetSeed(seed)
 }
 
 // GenerateThemedDungeon generates a complete dungeon with a theme and appropriate monsters
 func (t *DungeonThemer) GenerateThemedDungeon(config DungeonConfiguration) *ecs.Entity {
-	var mapEntity *ecs.Entity
+	// Create map entity
+	mapEntity := t.world.CreateEntity()
+	mapEntity.AddTag("map")
+	t.world.TagEntity(mapEntity.ID, "map")
 
 	// Generate the appropriate dungeon type based on size
 	width, height := t.getDungeonDimensions(config.Size)
 
+	// Create map component
+	mapComp := components.NewMapComponent(width, height)
+	t.world.AddComponent(mapEntity.ID, components.MapComponentID, mapComp)
+
 	// Generate different types of dungeons based on theme and size
 	switch config.Size {
 	case SizeSmall:
-		mapEntity = t.mapGenerator.GenerateSmallBSPDungeon(t.world, width, height)
+		t.dungeonGen.GenerateSmallBSPDungeon(mapComp)
 	case SizeLarge:
-		mapEntity = t.mapGenerator.GenerateLargeBSPDungeon(t.world, width, height)
+		t.dungeonGen.GenerateLargeBSPDungeon(mapComp)
 	case SizeHuge:
-		mapEntity = t.mapGenerator.GenerateLargeBSPDungeon(t.world, width, height)
+		t.dungeonGen.GenerateLargeBSPDungeon(mapComp)
 	default: // SizeNormal
-		mapEntity = t.mapGenerator.GenerateSmallBSPDungeon(t.world, width, height)
+		t.dungeonGen.GenerateSmallBSPDungeon(mapComp)
 	}
 
-	// Get the map component
-	var mapComp *components.MapComponent
-	if comp, exists := t.world.GetComponent(mapEntity.ID, components.MapComponentID); exists {
-		mapComp = comp.(*components.MapComponent)
-	} else {
-		if t.logMessage != nil {
-			t.logMessage("Error: Failed to get map component")
-		}
-		return mapEntity
+	// Log the map generation
+	if t.logMessage != nil {
+		t.logMessage("Generated a " + string(config.Theme))
 	}
 
 	// Apply visual theming to the map

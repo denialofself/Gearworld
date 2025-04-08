@@ -104,24 +104,23 @@ func NewGame() *Game {
 func (g *Game) initialize() {
 	// Create the tile mapping entity
 	g.entitySpawner.CreateTileMapping()
-
-	// Create a dungeon themer using our map system as a MapGenerator implementation
+	
+	// Create a dungeon themer
 	dungeonThemer := generation.NewDungeonThemer(
 		g.world,
-		g.mapSystem,
 		g.templateManager,
 		g.entitySpawner,
 		systems.GetMessageLog().Add, // Pass the logging function
 	)
-
+	
 	// Set a random seed for dungeon generation
 	dungeonThemer.SetSeed(time.Now().UnixNano())
-
-	// Configure the dungeon (level 1, goblinoid theme, normal size)
+	
+	// Configure the dungeon (level 1, abandoned theme, large size)
 	config := generation.DungeonConfiguration{
 		Level:                 1,
 		Theme:                 generation.ThemeAbandoned,
-		Size:                  generation.SizeNormal,
+		Size:                  generation.SizeLarge,
 		DensityFactor:         .30,
 		HigherLevelChance:     0.05, // 5% chance for level 2 monsters
 		EvenHigherLevelChance: 0.01, // 1% chance for level 3 monsters
@@ -147,11 +146,12 @@ func (g *Game) initialize() {
 
 	// Create a camera entity for the player
 	g.entitySpawner.CreateCamera(uint64(playerEntity.ID), playerX, playerY)
-
 	// Add initial messages
-	systems.GetMessageLog().Add("Welcome to the " + string(config.Theme) + " dungeon!")
-	systems.GetMessageLog().Add("Use arrow keys to move. Press F2 to change dungeon type.")
+	systems.GetMessageLog().Add("Welcome to the abandoned dungeon!")
+	systems.GetMessageLog().Add("Use arrow keys to move.")
 }
+
+
 
 // Update updates the game state.
 func (g *Game) Update() error {

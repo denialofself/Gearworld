@@ -1,95 +1,46 @@
 package systems
 
 import (
-	"strconv"
-
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
-
 	"ebiten-rogue/components"
 	"ebiten-rogue/ecs"
-	"ebiten-rogue/generation"
 )
 
 // MapSystem handles map-related operations and rendering
 type MapSystem struct {
-	dungeonGenerator   *generation.DungeonGenerator
-	currentDungeonType generation.DungeonType
-	world              *ecs.World
+	world *ecs.World
 }
 
 // NewMapSystem creates a new map system
 func NewMapSystem() *MapSystem {
-	return &MapSystem{
-		dungeonGenerator:   generation.NewDungeonGenerator(),
-		currentDungeonType: generation.DungeonTypeSmallBSP, // Default to small BSP dungeon
-	}
+	return &MapSystem{}
 }
 
 // Update checks for map-related events and updates
 func (s *MapSystem) Update(world *ecs.World, dt float64) {
-	// Store world reference for regeneration
+	// Store world reference for operations that might need it
 	s.world = world
 
-	// Check for F2 key press to toggle dungeon type
-	if inpututil.IsKeyJustPressed(ebiten.KeyF2) {
-		s.ToggleDungeonType(world)
-	}
+	// Map system now focuses only on map management, not generation
+	// Key handling for map type switching is moved to Game
 }
 
-// ToggleDungeonType switches between different dungeon generation types
-func (s *MapSystem) ToggleDungeonType(world *ecs.World) {
-	// Cycle to the next dungeon type
-	switch s.currentDungeonType {
-	case generation.DungeonTypeRandom:
-		s.currentDungeonType = generation.DungeonTypeSmallBSP
-		GetMessageLog().Add("Switched to Small BSP dungeon")
-		s.RegenerateMap(world)
-	case generation.DungeonTypeSmallBSP:
-		s.currentDungeonType = generation.DungeonTypeLargeBSP
-		GetMessageLog().Add("Switched to Large BSP dungeon")
-		s.RegenerateMap(world)
-	case generation.DungeonTypeLargeBSP:
-		s.currentDungeonType = generation.DungeonTypeRandom
-		GetMessageLog().Add("Switched to Random dungeon")
-		s.RegenerateMap(world)
+// RepositionPlayer places the player at a new empty position on the map
+func (s *MapSystem) RepositionPlayer(world *ecs.World, mapEntity *ecs.Entity) {
+	// Get the map component
+	mapCompInterface, exists := world.GetComponent(mapEntity.ID, components.MapComponentID)
+	if !exists {
+		GetMessageLog().Add("Error: Map component not found")
+		return
 	}
-}
+	mapComp := mapCompInterface.(*components.MapComponent)
 
-// RegenerateMap recreates the map using the current dungeon type
-func (s *MapSystem) RegenerateMap(world *ecs.World) {
-	// Find and remove the old map entity if it exists
-	entities := world.GetEntitiesWithTag("map")
-	for _, e := range entities {
-		world.RemoveEntity(e.ID)
-	}
+	// Find empty position for player
+	x, y := s.FindEmptyPosition(mapComp)
 
-	// Generate new map based on current type
-	var mapEntity *ecs.Entity
-	switch s.currentDungeonType {
-	case generation.DungeonTypeRandom:
-		mapEntity = s.GenerateDungeon(world, 80, 50)
-	case generation.DungeonTypeSmallBSP:
-		mapEntity = s.GenerateSmallBSPDungeon(world, 80, 50)
-	case generation.DungeonTypeLargeBSP:
-		mapEntity = s.GenerateLargeBSPDungeon(world, 80*10, 50*10) // Large BSP dungeon (10x10 screens)
-	}
-
-	// Also regenerate player at a valid position
+	// Update player position
 	playerEntities := world.GetEntitiesWithTag("player")
 	if len(playerEntities) > 0 {
 		player := playerEntities[0]
-		mapCompInterface, exists := world.GetComponent(mapEntity.ID, components.MapComponentID)
-		if !exists {
-			GetMessageLog().Add("Error: Map component not found")
-			return
-		}
-		mapComp := mapCompInterface.(*components.MapComponent)
-
-		// Find empty position for player
-		x, y := s.FindEmptyPosition(mapComp)
-
-		// Update player position
 		posCompInterface, exists := world.GetComponent(player.ID, components.Position)
 		if !exists {
 			GetMessageLog().Add("Error: Player position component not found")
@@ -101,67 +52,18 @@ func (s *MapSystem) RegenerateMap(world *ecs.World) {
 	}
 }
 
-// GenerateDungeon creates a new procedural dungeon map (for standard non-chunked maps)
-func (s *MapSystem) GenerateDungeon(world *ecs.World, width, height int) *ecs.Entity {
-	// Create map entity
-	mapEntity := world.CreateEntity()
-	mapEntity.AddTag("map")
-	world.TagEntity(mapEntity.ID, "map")
-
-	// Create map component
-	mapComp := components.NewMapComponent(width, height)
-	world.AddComponent(mapEntity.ID, components.MapComponentID, mapComp)
-
-	// Use the DungeonGenerator to build the map
-	s.dungeonGenerator.GenerateRoomsAndCorridors(mapComp)
-
-	// Add debug message
-	GetMessageLog().Add("Map generated with dimensions " + strconv.Itoa(width) + "x" + strconv.Itoa(height))
-
-	return mapEntity
-}
-
-// GenerateSmallBSPDungeon creates a small dungeon using BSP partitioning
-func (s *MapSystem) GenerateSmallBSPDungeon(world *ecs.World, width, height int) *ecs.Entity {
-	// Create map entity
-	mapEntity := world.CreateEntity()
-	mapEntity.AddTag("map")
-	world.TagEntity(mapEntity.ID, "map")
-
-	// Create map component
-	mapComp := components.NewMapComponent(width, height)
-	world.AddComponent(mapEntity.ID, components.MapComponentID, mapComp)
-
-	// Use the DungeonGenerator to build the small BSP dungeon
-	s.dungeonGenerator.GenerateSmallBSPDungeon(mapComp)
-
-	// Add debug message
-	GetMessageLog().Add("Small BSP dungeon generated with dimensions " + strconv.Itoa(width) + "x" + strconv.Itoa(height))
-
-	return mapEntity
-}
-
-// GenerateLargeBSPDungeon creates a large dungeon using BSP partitioning
-func (s *MapSystem) GenerateLargeBSPDungeon(world *ecs.World, width, height int) *ecs.Entity {
-	// Create map entity
-	mapEntity := world.CreateEntity()
-	mapEntity.AddTag("map")
-	world.TagEntity(mapEntity.ID, "map")
-
-	// Create map component
-	mapComp := components.NewMapComponent(width, height)
-	world.AddComponent(mapEntity.ID, components.MapComponentID, mapComp)
-
-	// Use the DungeonGenerator to build the large BSP dungeon
-	s.dungeonGenerator.GenerateLargeBSPDungeon(mapComp)
-
-	// Add debug message
-	GetMessageLog().Add("Large BSP dungeon generated with dimensions " + strconv.Itoa(width) + "x" + strconv.Itoa(height))
-
-	return mapEntity
-}
-
 // FindEmptyPosition locates an unoccupied floor tile in the map
 func (s *MapSystem) FindEmptyPosition(mapComp *components.MapComponent) (int, int) {
-	return s.dungeonGenerator.FindEmptyPosition(mapComp)
+	// Simple implementation to find an empty position
+	// This could be enhanced with more sophisticated algorithms as needed
+	for y := 0; y < mapComp.Height; y++ {
+		for x := 0; x < mapComp.Width; x++ {
+			if mapComp.Tiles[y][x] == components.TileFloor {
+				return x, y
+			}
+		}
+	}
+
+	// Fallback - return center of map if no floor found
+	return mapComp.Width / 2, mapComp.Height / 2
 }
