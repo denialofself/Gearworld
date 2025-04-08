@@ -6,8 +6,8 @@ import (
 
 	"ebiten-rogue/components"
 	"ebiten-rogue/ecs"
-	"fmt"
 )
+
 // Direction constants for movement
 const (
 	DirNone = iota
@@ -163,7 +163,7 @@ func (s *MovementSystem) processPlayerMovement(world *ecs.World) bool {
 			ToY:      newY,
 		})
 		// Log the movement
-		GetMessageLog().Add(fmt.Sprintf("Moved to (%d, %d)", newX, newY))
+		// GetMessageLog().Add(fmt.Sprintf("Moved to (%d, %d)", newX, newY))
 
 		return true // The player moved
 	} else {

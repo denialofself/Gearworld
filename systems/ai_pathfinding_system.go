@@ -2,7 +2,6 @@ package systems
 
 import (
 	"container/heap"
-	"fmt"
 	"math"
 	"strconv"
 
@@ -126,7 +125,7 @@ func (s *AIPathfindingSystem) Update(world *ecs.World, dt float64) {
 func (s *AIPathfindingSystem) processPathfinding(world *ecs.World, entityID ecs.EntityID, ai *components.AIComponent, pos *components.PositionComponent, playerPos *components.PositionComponent, gameMap *components.MapComponent) {
 	// Check if player is in sight
 	playerVisible := s.canSee(pos.X, pos.Y, playerPos.X, playerPos.Y, ai.SightRange, gameMap)
-	GetMessageLog().Add(fmt.Sprintf("DEBUG: AI at %d,%d checking for player at %d,%d (visible: %v)", pos.X, pos.Y, playerPos.X, playerPos.Y, playerVisible))
+	// GetMessageLog().Add(fmt.Sprintf("DEBUG: AI at %d,%d checking for player at %d,%d (visible: %v)", pos.X, pos.Y, playerPos.X, playerPos.Y, playerVisible))
 
 	var targetX, targetY int
 
@@ -135,7 +134,7 @@ func (s *AIPathfindingSystem) processPathfinding(world *ecs.World, entityID ecs.
 		ai.LastKnownTargetX = playerPos.X
 		ai.LastKnownTargetY = playerPos.Y
 		targetX, targetY = playerPos.X, playerPos.Y
-		GetMessageLog().Add(fmt.Sprintf("DEBUG: Updated target pos to %d,%d", playerPos.X, playerPos.Y))
+		// GetMessageLog().Add(fmt.Sprintf("DEBUG: Updated target pos to %d,%d", playerPos.X, playerPos.Y))
 	} else if ai.LastKnownTargetX != 0 || ai.LastKnownTargetY != 0 {
 		// Use last known player position
 		targetX, targetY = ai.LastKnownTargetX, ai.LastKnownTargetY
@@ -159,7 +158,7 @@ func (s *AIPathfindingSystem) processPathfinding(world *ecs.World, entityID ecs.
 		Visible:  playerVisible,
 	})
 
-	GetMessageLog().Add(fmt.Sprintf("DEBUG: AI path calculated, length: %d", len(path)))
+	// GetMessageLog().Add(fmt.Sprintf("DEBUG: AI path calculated, length: %d", len(path)))
 }
 
 // canSee checks if there's a clear line of sight between two points

@@ -32,6 +32,12 @@ func (s *CombatSystem) Initialize(world *ecs.World) {
 		s.handleCollision(world, collisionEvent)
 	})
 
+	// Subscribe to enemy attack events
+	world.GetEventManager().Subscribe(EventEnemyAttack, func(event ecs.Event) {
+		attackEvent := event.(EnemyAttackEvent)
+		s.handleEnemyAttack(world, attackEvent)
+	})
+
 	s.initialized = true
 }
 
@@ -58,6 +64,16 @@ func (s *CombatSystem) handleCollision(world *ecs.World, event CollisionEvent) {
 		// Process combat
 		s.ProcessCombat(world, attackerID, defenderID)
 	}
+}
+
+// handleEnemyAttack processes an enemy attack event
+func (s *CombatSystem) handleEnemyAttack(world *ecs.World, event EnemyAttackEvent) {
+	// We already know the attacker and defender from the event
+	attackerID := event.AttackerID
+	defenderID := event.TargetID
+
+	// Process the combat with the enemy as the attacker
+	s.ProcessCombat(world, attackerID, defenderID)
 }
 
 // Update registers with event system if not already initialized
@@ -139,7 +155,7 @@ func getEntityName(world *ecs.World, entityID ecs.EntityID) string {
 	// Try to get AI component to determine enemy type
 	if aiComp, hasAI := world.GetComponent(entityID, components.AI); hasAI {
 		ai := aiComp.(*components.AIComponent)
-		return capitalizeFirstLetter(ai.Type) 
+		return capitalizeFirstLetter(ai.Type)
 	}
 
 	// Fallback

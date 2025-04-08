@@ -95,7 +95,8 @@ func (s *AITurnProcessorSystem) isAdjacentToPlayer(world *ecs.World, x, y int) (
 	dx := int(math.Abs(float64(pos.X - x)))
 	dy := int(math.Abs(float64(pos.Y - y)))
 
-	if dx <= 1 && dy <= 1 {
+	// Check if player is adjacent (distance of 1 in either or both directions)
+	if dx <= 1 && dy <= 1 && !(dx == 0 && dy == 0) {
 		return true, playerID
 	}
 
@@ -111,16 +112,17 @@ func (s *AITurnProcessorSystem) processTurn(world *ecs.World, entityID uint64, a
 		return
 	}
 	stats := statsComp.(*components.StatsComponent)
-
 	// Check if we're adjacent to the player and can attack
 	if adjacent, playerID := s.isAdjacentToPlayer(world, pos.X, pos.Y); adjacent && stats.ActionPoints >= AttackCost {
 		// Process attack based on AI type
 		switch ai.Type {
 		case "slow_chase":
 			// Slow chase type always attacks when adjacent
-			world.GetEventManager().Emit(CollisionEvent{
-				EntityID1: ecs.EntityID(entityID),
-				EntityID2: playerID,
+			world.GetEventManager().Emit(EnemyAttackEvent{
+				AttackerID: ecs.EntityID(entityID),
+				TargetID:   playerID,
+				X:          pos.X,
+				Y:          pos.Y,
 			})
 			stats.ActionPoints -= AttackCost
 			GetMessageLog().Add(fmt.Sprintf("DEBUG: AI attacked player (AP: %d)", stats.ActionPoints))

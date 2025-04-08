@@ -7,11 +7,12 @@ import (
 
 // Event type constants
 const (
-	EventCollision  ecs.EventType = "collision"
-	EventMovement   ecs.EventType = "movement"
-	EventCombat     ecs.EventType = "combat"
-	EventDeath      ecs.EventType = "death"
-	EventItemPickup ecs.EventType = "item_pickup"
+	EventCollision   ecs.EventType = "collision"
+	EventMovement    ecs.EventType = "movement"
+	EventCombat      ecs.EventType = "combat"
+	EventDeath       ecs.EventType = "death"
+	EventItemPickup  ecs.EventType = "item_pickup"
+	EventEnemyAttack ecs.EventType = "enemy_attack"
 )
 
 // CollisionEvent is emitted when entities collide
@@ -88,4 +89,17 @@ type EntityMoveEvent struct {
 // Type returns the event type
 func (e EntityMoveEvent) Type() ecs.EventType {
 	return EventMovement
+}
+
+// EnemyAttackEvent is emitted when an enemy attacks the player
+type EnemyAttackEvent struct {
+	AttackerID ecs.EntityID // Enemy entity performing the attack
+	TargetID   ecs.EntityID // Player entity being attacked
+	X          int          // X position where attack occurred
+	Y          int          // Y position where attack occurred
+}
+
+// Type returns the event type
+func (e EnemyAttackEvent) Type() ecs.EventType {
+	return EventEnemyAttack
 }
