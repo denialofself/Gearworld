@@ -58,7 +58,6 @@ func NewMovementSystem() *MovementSystem {
 	system.movementKeys[ebiten.KeyU] = DirUpRight
 	system.movementKeys[ebiten.KeyB] = DirDownLeft
 	system.movementKeys[ebiten.KeyN] = DirDownRight
-
 	// Numpad (if Num Lock is on)
 	system.movementKeys[ebiten.KeyNumpad8] = DirUp
 	system.movementKeys[ebiten.KeyNumpad2] = DirDown
@@ -68,6 +67,16 @@ func NewMovementSystem() *MovementSystem {
 	system.movementKeys[ebiten.KeyNumpad9] = DirUpRight
 	system.movementKeys[ebiten.KeyNumpad1] = DirDownLeft
 	system.movementKeys[ebiten.KeyNumpad3] = DirDownRight
+
+	// Regular number keys (following numpad layout)
+	system.movementKeys[ebiten.Key8] = DirUp
+	system.movementKeys[ebiten.Key2] = DirDown
+	system.movementKeys[ebiten.Key4] = DirLeft
+	system.movementKeys[ebiten.Key6] = DirRight
+	system.movementKeys[ebiten.Key7] = DirUpLeft
+	system.movementKeys[ebiten.Key9] = DirUpRight
+	system.movementKeys[ebiten.Key1] = DirDownLeft
+	system.movementKeys[ebiten.Key3] = DirDownRight
 
 	return system
 }

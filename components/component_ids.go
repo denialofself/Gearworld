@@ -1,0 +1,19 @@
+package components
+
+import (
+	"ebiten-rogue/ecs"
+)
+
+// Define component IDs for our game
+const (
+	Position ecs.ComponentID = iota
+	Renderable
+	Pl
+	Collision
+	AI
+	MapComponentID
+	Appearance // New component for custom tile appearances
+	Camera     // Camera component for viewport management
+	Player
+	Stats
+)

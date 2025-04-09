@@ -1,6 +1,7 @@
 package systems
 
 import (
+	"fmt"
 	"image/color"
 	"strconv"
 
@@ -13,21 +14,33 @@ import (
 
 // RenderSystem handles drawing entities to the screen
 type RenderSystem struct {
-	tileset      *Tileset
-	cameraSystem *CameraSystem // Reference to the camera system
+	tileset           *Tileset
+	cameraSystem      *CameraSystem // Reference to the camera system
+	debugWindowActive bool          // Whether the debug window is currently displayed
+	debugScrollOffset int           // Current scroll position in the debug log
 }
 
 // NewRenderSystem creates a new rendering system
 func NewRenderSystem(tileset *Tileset) *RenderSystem {
 	return &RenderSystem{
-		tileset:      tileset,
-		cameraSystem: nil, // Will be set via SetCameraSystem
+		tileset:           tileset,
+		cameraSystem:      nil, // Will be set via SetCameraSystem
+		debugWindowActive: false,
+		debugScrollOffset: 0,
 	}
 }
 
 // SetCameraSystem sets the camera system to be used for rendering
 func (s *RenderSystem) SetCameraSystem(cameraSystem *CameraSystem) {
 	s.cameraSystem = cameraSystem
+}
+
+// ToggleDebugWindow toggles the visibility of the debug message window
+func (s *RenderSystem) ToggleDebugWindow() {
+	s.debugWindowActive = !s.debugWindowActive
+	if s.debugWindowActive {
+		GetMessageLog().Add("Debug window activated")
+	}
 }
 
 // Update renders entities with Position and Renderable components
@@ -311,4 +324,167 @@ func (s *RenderSystem) drawMessagesPanel(screen *ebiten.Image) {
 
 		s.tileset.DrawString(screen, msg, 1, config.GameScreenHeight+2+i, msgColor)
 	}
+
+	// Draw debug window if active
+	if s.debugWindowActive {
+		s.drawDebugWindow(screen)
+	}
+}
+
+// drawDebugWindow draws the debug message window overlay
+func (s *RenderSystem) drawDebugWindow(screen *ebiten.Image) {
+	// Define debug window dimensions
+	windowWidth := config.ScreenWidth * 3 / 4
+	windowHeight := config.ScreenHeight * 3 / 4
+	startX := (config.ScreenWidth - windowWidth) / 2
+	startY := (config.ScreenHeight - windowHeight) / 2
+
+	// Instead of a semi-transparent overlay, draw a completely new background
+	// First, fill the entire screen with a solid dark blue-gray color
+	for y := 0; y < config.ScreenHeight; y++ {
+		for x := 0; x < config.ScreenWidth; x++ {
+			// Completely opaque dark background
+			s.tileset.DrawTile(screen, ' ', x, y, color.RGBA{20, 20, 30, 255})
+		}
+	}
+
+	// Create a subtle pattern in the background to make it look like a separate screen
+	for y := 0; y < config.ScreenHeight; y += 4 {
+		for x := 0; x < config.ScreenWidth; x += 8 {
+			s.tileset.DrawTile(screen, '·', x, y, color.RGBA{40, 40, 60, 255})
+		}
+	}
+
+	// Draw solid black window background that's clearly different from the patterned background
+	for y := 0; y < windowHeight; y++ {
+		for x := 0; x < windowWidth; x++ {
+			// Solid black background for the actual window
+			s.tileset.DrawTile(screen, ' ', startX+x, startY+y, color.RGBA{0, 0, 0, 255})
+		}
+	}
+
+	// Draw window border (white)
+	borderColor := color.RGBA{255, 255, 255, 255}
+	for x := 0; x < windowWidth; x++ {
+		s.tileset.DrawTile(screen, '═', startX+x, startY, borderColor)
+		s.tileset.DrawTile(screen, '═', startX+x, startY+windowHeight-1, borderColor)
+	}
+	for y := 0; y < windowHeight; y++ {
+		s.tileset.DrawTile(screen, '║', startX, startY+y, borderColor)
+		s.tileset.DrawTile(screen, '║', startX+windowWidth-1, startY+y, borderColor)
+	}
+
+	// Draw window corners (white)
+	s.tileset.DrawTile(screen, '╔', startX, startY, borderColor)
+	s.tileset.DrawTile(screen, '╗', startX+windowWidth-1, startY, borderColor)
+	s.tileset.DrawTile(screen, '╚', startX, startY+windowHeight-1, borderColor)
+	s.tileset.DrawTile(screen, '╝', startX+windowWidth-1, startY+windowHeight-1, borderColor)
+
+	// Draw window title (white text)
+	titleColor := color.RGBA{255, 255, 255, 255}
+	s.tileset.DrawString(screen, "DEBUG MESSAGES (ESC to close, ↑/↓ to scroll)", startX+2, startY+1, titleColor)
+
+	// Draw separator under title
+	for x := 0; x < windowWidth-2; x++ {
+		s.tileset.DrawTile(screen, '─', startX+1+x, startY+2, borderColor)
+	}
+
+	// Get debug messages
+	debugLog := GetDebugLog()
+	maxVisibleMessages := windowHeight - 6 // Account for borders, title, and scroll info
+
+	// Implement scrolling
+	totalMessages := len(debugLog.Messages)
+	scrollOffset := s.getDebugScrollOffset(totalMessages, maxVisibleMessages)
+
+	// Display visible messages with white text
+	visibleMessages := s.getVisibleDebugMessages(debugLog, scrollOffset, maxVisibleMessages)
+	messageColor := color.RGBA{255, 255, 255, 255}
+
+	for i, msg := range visibleMessages {
+		s.tileset.DrawString(screen, msg, startX+2, startY+3+i, messageColor)
+	}
+
+	// Draw scroll indicators if needed
+	if totalMessages > maxVisibleMessages {
+		if scrollOffset > 0 {
+			s.tileset.DrawTile(screen, '▲', startX+windowWidth-3, startY+3, messageColor)
+		}
+		if scrollOffset < totalMessages-maxVisibleMessages {
+			s.tileset.DrawTile(screen, '▼', startX+windowWidth-3, startY+windowHeight-3, messageColor)
+		}
+
+		// Draw scroll position indicator
+		scrollInfo := fmt.Sprintf("%d-%d/%d", scrollOffset+1,
+			min(scrollOffset+maxVisibleMessages, totalMessages),
+			totalMessages)
+		s.tileset.DrawString(screen, scrollInfo, startX+windowWidth-len(scrollInfo)-4, startY+windowHeight-2, messageColor)
+	}
+}
+
+// IsDebugWindowActive returns whether the debug window is currently displayed
+func (s *RenderSystem) IsDebugWindowActive() bool {
+	return s.debugWindowActive
+}
+
+// ScrollDebugUp scrolls the debug window up one line
+func (s *RenderSystem) ScrollDebugUp() {
+	if s.debugScrollOffset > 0 {
+		s.debugScrollOffset--
+	}
+}
+
+// ScrollDebugDown scrolls the debug window down one line
+func (s *RenderSystem) ScrollDebugDown() {
+	debugLog := GetDebugLog()
+	totalMessages := len(debugLog.Messages)
+	maxVisibleMessages := config.ScreenHeight*3/4 - 6 // Same calculation as in drawDebugWindow
+
+	if s.debugScrollOffset < totalMessages-maxVisibleMessages {
+		s.debugScrollOffset++
+	}
+}
+
+// getDebugScrollOffset returns the current scroll offset, ensuring it's in valid range
+func (s *RenderSystem) getDebugScrollOffset(totalMessages, maxVisibleMessages int) int {
+	// If there are fewer messages than can fit in the window, no scrolling needed
+	if totalMessages <= maxVisibleMessages {
+		return 0
+	}
+
+	// Ensure scroll offset is in valid range
+	maxOffset := totalMessages - maxVisibleMessages
+	if s.debugScrollOffset > maxOffset {
+		s.debugScrollOffset = maxOffset
+	}
+	if s.debugScrollOffset < 0 {
+		s.debugScrollOffset = 0
+	}
+
+	return s.debugScrollOffset
+}
+
+// getVisibleDebugMessages returns the slice of messages that should be visible
+func (s *RenderSystem) getVisibleDebugMessages(debugLog *MessageLog, scrollOffset, maxVisible int) []string {
+	if len(debugLog.Messages) == 0 {
+		return []string{"No debug messages yet"}
+	}
+
+	// Calculate which messages to show based on scroll offset
+	startIdx := len(debugLog.Messages) - maxVisible - scrollOffset
+	if startIdx < 0 {
+		startIdx = 0
+	}
+	endIdx := startIdx + maxVisible
+	if endIdx > len(debugLog.Messages) {
+		endIdx = len(debugLog.Messages)
+	}
+
+	// Extract the visible messages
+	visibleMessages := make([]string, endIdx-startIdx)
+	for i := 0; i < endIdx-startIdx; i++ {
+		visibleMessages[i] = debugLog.Messages[startIdx+i]
+	}
+
+	return visibleMessages
 }

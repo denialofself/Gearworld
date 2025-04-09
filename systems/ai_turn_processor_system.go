@@ -113,11 +113,10 @@ func (s *AITurnProcessorSystem) processTurn(world *ecs.World, entityID uint64, a
 	}
 	stats := statsComp.(*components.StatsComponent)
 	// Check if we're adjacent to the player and can attack
-	if adjacent, playerID := s.isAdjacentToPlayer(world, pos.X, pos.Y); adjacent && stats.ActionPoints >= AttackCost {
-		// Process attack based on AI type
+	if adjacent, playerID := s.isAdjacentToPlayer(world, pos.X, pos.Y); adjacent && stats.ActionPoints >= AttackCost { // Process attack based on AI type
 		switch ai.Type {
-		case "slow_chase":
-			// Slow chase type always attacks when adjacent
+		case "slow_chase", "slow_wander":
+			// Both slow_chase and slow_wander attack when adjacent to player
 			world.GetEventManager().Emit(EnemyAttackEvent{
 				AttackerID: ecs.EntityID(entityID),
 				TargetID:   playerID,
@@ -139,13 +138,12 @@ func (s *AITurnProcessorSystem) processTurn(world *ecs.World, entityID uint64, a
 		// Check if we can move there
 		canMove := s.isValidMove(world, nextStep.X, nextStep.Y)
 
-		if canMove && stats.ActionPoints >= MoveCost {
-			// Handle AI type specific movement
+		if canMove && stats.ActionPoints >= MoveCost { // Handle AI type specific movement
 			switch ai.Type {
-			case "slow_chase":
+			case "slow_chase", "slow_wander":
 				// 1 in 6 chance to skip movement
 				if rand.Intn(6) == 0 {
-					GetMessageLog().Add(fmt.Sprintf("DEBUG: Slow chase AI skipped movement"))
+					GetMessageLog().Add("DEBUG: AI skipped movement")
 					stats.ActionPoints -= WaitCost
 					return
 				}

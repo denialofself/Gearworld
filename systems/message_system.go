@@ -1,5 +1,9 @@
 package systems
 
+import (
+	"strings"
+)
+
 // MessageLog stores game messages
 type MessageLog struct {
 	Messages    []string
@@ -8,6 +12,7 @@ type MessageLog struct {
 
 // Global message log instance (singleton)
 var globalMessageLog *MessageLog
+var globalDebugLog *MessageLog
 
 // GetMessageLog returns the global message log instance
 func GetMessageLog() *MessageLog {
@@ -15,6 +20,14 @@ func GetMessageLog() *MessageLog {
 		globalMessageLog = NewMessageLog()
 	}
 	return globalMessageLog
+}
+
+// GetDebugLog returns the global debug log instance
+func GetDebugLog() *MessageLog {
+	if globalDebugLog == nil {
+		globalDebugLog = NewMessageLog()
+	}
+	return globalDebugLog
 }
 
 // NewMessageLog creates a new message log
@@ -27,6 +40,13 @@ func NewMessageLog() *MessageLog {
 
 // Add adds a message to the log
 func (ml *MessageLog) Add(message string) {
+	// If this is the main message log, check if it's a debug message
+	// and if so, route it to the debug log instead
+	if ml == globalMessageLog && strings.HasPrefix(message, "DEBUG:") {
+		GetDebugLog().Add(message)
+		return
+	}
+
 	ml.Messages = append(ml.Messages, message)
 
 	// Truncate if we have too many messages

@@ -8,6 +8,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 
 	"ebiten-rogue/components"
 	"ebiten-rogue/config"
@@ -121,7 +122,7 @@ func (g *Game) initialize() {
 		Level:                 1,
 		Theme:                 generation.ThemeAbandoned,
 		Size:                  generation.SizeLarge,
-		Generator:             generation.GeneratorCellular,
+		Generator:             generation.GeneratorBSP,
 		DensityFactor:         .30,
 		HigherLevelChance:     0.05, // 5% chance for level 2 monsters
 		EvenHigherLevelChance: 0.01, // 1% chance for level 3 monsters
@@ -153,7 +154,30 @@ func (g *Game) initialize() {
 }
 
 // Update updates the game state.
-func (g *Game) Update() error {
+func (g *Game) Update() error { // Toggle debug message window with F1 key
+	if inpututil.IsKeyJustPressed(ebiten.KeyF1) {
+		g.renderSystem.ToggleDebugWindow()
+	}
+	// If debug window is active
+	if g.renderSystem.IsDebugWindowActive() {
+		// ESC to close debug window
+		if ebiten.IsKeyPressed(ebiten.KeyEscape) {
+			g.renderSystem.ToggleDebugWindow()
+		}
+
+		// Handle scrolling through debug messages with arrow keys
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
+			g.renderSystem.ScrollDebugUp()
+		}
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) {
+			g.renderSystem.ScrollDebugDown()
+		}
+
+		// Only update the render system when debug window is active
+		g.renderSystem.Update(g.world, 1.0/60.0)
+		return nil
+	}
+
 	// Check if the user wants to view the tileset
 	if ebiten.IsKeyPressed(ebiten.KeyF12) {
 		go func() {

@@ -8,10 +8,13 @@
   "health": 20,
   "attack": 3,
   "defense": 1,
+  "actionPoints": 6,
+  "maxActionPoints": 6,
+  "recovery": 3,
   "level": 1,
   "xp": 5,
-  "aiType": "aggressive",
-  "tags": ["enemy", "humanoid"],
+  "aiType": "slow_wander",
+  "tags": ["enemy", "humanoid", "ai"],
   "blocksPath": true,
-  "spawnWeight": 10
+  "spawnWeight": 5
 }

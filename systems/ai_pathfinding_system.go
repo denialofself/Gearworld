@@ -2,7 +2,9 @@ package systems
 
 import (
 	"container/heap"
+	"fmt"
 	"math"
+	"math/rand"
 	"strconv"
 
 	"ebiten-rogue/components"
@@ -108,10 +110,9 @@ func (s *AIPathfindingSystem) Update(world *ecs.World, dt float64) {
 			continue
 		}
 		pos := posComp.(*components.PositionComponent)
-
 		// Process AI based on type
 		switch ai.Type {
-		case "slow_chase":
+		case "slow_chase", "slow_wander":
 			s.processPathfinding(world, entity.ID, ai, pos, playerPos, gameMap)
 			// Add other AI types here as needed
 		}
@@ -128,6 +129,7 @@ func (s *AIPathfindingSystem) processPathfinding(world *ecs.World, entityID ecs.
 	// GetMessageLog().Add(fmt.Sprintf("DEBUG: AI at %d,%d checking for player at %d,%d (visible: %v)", pos.X, pos.Y, playerPos.X, playerPos.Y, playerVisible))
 
 	var targetX, targetY int
+	var path []components.PathNode
 
 	if playerVisible {
 		// Player is visible, update last known position
@@ -135,16 +137,45 @@ func (s *AIPathfindingSystem) processPathfinding(world *ecs.World, entityID ecs.
 		ai.LastKnownTargetY = playerPos.Y
 		targetX, targetY = playerPos.X, playerPos.Y
 		// GetMessageLog().Add(fmt.Sprintf("DEBUG: Updated target pos to %d,%d", playerPos.X, playerPos.Y))
+
+		// Calculate path to player
+		path = s.findPath(pos.X, pos.Y, targetX, targetY, gameMap)
+	} else if ai.Type == "slow_wander" {
+		// For slow_wander AI, generate a random direction when player not visible
+		directions := []struct{ dx, dy int }{
+			{1, 0},  // Right
+			{-1, 0}, // Left
+			{0, 1},  // Down
+			{0, -1}, // Up
+		}
+
+		// Try to find a valid random direction
+		validMoves := []components.PathNode{}
+		for _, dir := range directions {
+			newX, newY := pos.X+dir.dx, pos.Y+dir.dy
+			if s.isValidMove(world, newX, newY, gameMap) {
+				validMoves = append(validMoves, components.PathNode{X: newX, Y: newY})
+			}
+		}
+
+		// If there are valid moves, choose one randomly
+		if len(validMoves) > 0 {
+			randomMove := validMoves[rand.Intn(len(validMoves))]
+			path = []components.PathNode{randomMove}
+			targetX, targetY = randomMove.X, randomMove.Y
+			GetMessageLog().Add(fmt.Sprintf("DEBUG: AI wandering to random direction: %d,%d", targetX, targetY))
+		} else {
+			// No valid moves, just stay in place
+			path = []components.PathNode{}
+		}
 	} else if ai.LastKnownTargetX != 0 || ai.LastKnownTargetY != 0 {
-		// Use last known player position
+		// Use last known player position (for slow_chase and default behavior)
 		targetX, targetY = ai.LastKnownTargetX, ai.LastKnownTargetY
+		path = s.findPath(pos.X, pos.Y, targetX, targetY, gameMap)
 	} else {
 		// No target
 		return
 	}
-
-	// Calculate path to player or last known position
-	path := s.findPath(pos.X, pos.Y, targetX, targetY, gameMap)
 
 	// Store path in AI component for reference
 	ai.Path = path
