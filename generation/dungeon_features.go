@@ -61,16 +61,28 @@ func (g *DungeonGenerator) addStairs(mapComp *components.MapComponent, rooms [][
 	stairsY := lastRoom[1] + g.rng.Intn(lastRoom[3])
 	mapComp.SetTile(stairsX, stairsY, components.TileStairsDown)
 
-	// Add stairs up (if not the first level) in the first room
-	if g.rng.Intn(100) < 50 { // 50% chance to add stairs up
-		firstRoom := rooms[0]
-		upX := firstRoom[0] + g.rng.Intn(firstRoom[2])
-		upY := firstRoom[1] + g.rng.Intn(firstRoom[3])
-		// Don't place on top of the down stairs
-		if upX != stairsX || upY != stairsY {
-			mapComp.SetTile(upX, upY, components.TileStairsUp)
-		}
+	// Always add stairs up in the first room (player starting area)
+	firstRoom := rooms[0]
+
+	// Calculate the center of the first room for player spawn area
+	centerX := firstRoom[0] + firstRoom[2]/2
+	centerY := firstRoom[1] + firstRoom[3]/2
+
+	// Place stairs up near the center (player starting position)
+	// but not exactly at center to avoid blocking player spawn
+	upX := centerX + (g.rng.Intn(3) - 1) // -1, 0, or +1 from center
+	upY := centerY + (g.rng.Intn(3) - 1) // -1, 0, or +1 from center
+
+	// Make sure stairs up don't overlap with stairs down
+	if upX == stairsX && upY == stairsY {
+		upX = centerX + 2 // Move it slightly away
 	}
+
+	// Ensure stairs are within room bounds
+	upX = max(firstRoom[0]+1, min(upX, firstRoom[0]+firstRoom[2]-2))
+	upY = max(firstRoom[1]+1, min(upY, firstRoom[1]+firstRoom[3]-2))
+
+	mapComp.SetTile(upX, upY, components.TileStairsUp)
 }
 
 // addVegetation adds trees and other plant life to the dungeon

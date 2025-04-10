@@ -2,12 +2,12 @@ package config
 
 // Screen layout configuration
 const (
-	// Tile size in pixels
-	TileSize = 16
+	// Tile size in pixels - source tiles are 12x12, this scales them up
+	TileSize = 12
 
 	// Window dimensions in tiles
-	ScreenWidth  = 80
-	ScreenHeight = 60
+	ScreenWidth  = 85
+	ScreenHeight = 65
 
 	// UI layout
 	GameScreenWidth  = 50 // Game area width in tiles (reduced from 54 to give more space to stats)
@@ -25,5 +25,5 @@ func GetScreenDimensions() (width, height int) {
 
 // GetWindowSize returns the recommended window size (may be different from actual screen dimensions)
 func GetWindowSize() (width, height int) {
-	return 1024, 768 // Can be adjusted if needed for UI scaling
+	return WindowWidth, WindowHeight // Return the actual calculated dimensions
 }

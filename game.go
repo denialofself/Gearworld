@@ -124,21 +124,27 @@ func (g *Game) initialize() {
 		Size:                  generation.SizeLarge,
 		Generator:             generation.GeneratorBSP,
 		DensityFactor:         .30,
-		HigherLevelChance:     0.05, // 5% chance for level 2 monsters
-		EvenHigherLevelChance: 0.01, // 1% chance for level 3 monsters
+		HigherLevelChance:     0.05,  // 5% chance for level 2 monsters
+		EvenHigherLevelChance: 0.01,  // 1% chance for level 3 monsters
+		AddStairsUp:           false, // No need for stairs up since we're removing world map
 	}
 
 	// Generate the themed dungeon with appropriate monsters
-	mapEntity := dungeonThemer.GenerateThemedDungeon(config)
+	dungeonEntity := dungeonThemer.GenerateThemedDungeon(config)
 
-	// Get the map component
+	// Get the map component from the dungeon entity
 	var mapComp *components.MapComponent
-	if comp, exists := g.world.GetComponent(mapEntity.ID, components.MapComponentID); exists {
+	if comp, exists := g.world.GetComponent(dungeonEntity.ID, components.MapComponentID); exists {
 		mapComp = comp.(*components.MapComponent)
-	} else {
+	}
+
+	if mapComp == nil {
 		systems.GetMessageLog().Add("Error: Failed to get map component")
 		return
 	}
+
+	// Set the active map in the map system
+	g.mapSystem.SetActiveMap(dungeonEntity)
 
 	// Find empty position for player
 	playerX, playerY := g.mapSystem.FindEmptyPosition(mapComp)
@@ -148,8 +154,11 @@ func (g *Game) initialize() {
 
 	// Create a camera entity for the player
 	g.entitySpawner.CreateCamera(uint64(playerEntity.ID), playerX, playerY)
-	// Add initial messages
+
+	// Add welcome message
 	systems.GetMessageLog().Add("Welcome to the abandoned dungeon!")
+
+	// Add instruction message
 	systems.GetMessageLog().Add("Use arrow keys to move.")
 }
 

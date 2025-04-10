@@ -26,6 +26,7 @@ type DungeonConfiguration struct {
 	DensityFactor         float64       // Monster density (1.0 = standard)
 	HigherLevelChance     float64       // Chance of spawning higher level monsters (0.0-1.0)
 	EvenHigherLevelChance float64       // Chance of spawning even higher level monsters (0.0-1.0)
+	AddStairsUp           bool          // Whether to add stairs up near the player's spawn point
 }
 
 // DungeonSize defines the size category of a dungeon
@@ -109,7 +110,6 @@ func (t *DungeonThemer) GenerateThemedDungeon(config DungeonConfiguration) *ecs.
 			t.dungeonGen.GenerateSmallBSPDungeon(mapComp)
 		}
 	}
-
 	// Log the map generation
 	if t.logMessage != nil {
 		generatorName := "BSP"
@@ -117,6 +117,11 @@ func (t *DungeonThemer) GenerateThemedDungeon(config DungeonConfiguration) *ecs.
 			generatorName = "Cellular Automata"
 		}
 		t.logMessage(fmt.Sprintf("Generated a %s dungeon using %s generator", config.Theme, generatorName))
+	}
+
+	// If configured, add stairs up near player spawn
+	if config.AddStairsUp {
+		t.addStairsUpNearPlayerSpawn(mapComp)
 	}
 
 	// Apply visual theming to the map
@@ -233,6 +238,101 @@ func (t *DungeonThemer) addWebs(mapComp *components.MapComponent) {
 func (t *DungeonThemer) addCampfires(mapComp *components.MapComponent) {
 	// This would add campfire decorations when we have campfire tiles
 	// For now, just a placeholder that does nothing
+}
+
+// addStairsUpNearPlayerSpawn adds a staircase up near where the player will spawn
+func (t *DungeonThemer) addStairsUpNearPlayerSpawn(mapComp *components.MapComponent) {
+	// Find the first room - this is typically where the player spawns
+	// We'll do a scan of the map to find a cluster of floor tiles that likely represents the first room
+	var roomCenterX, roomCenterY int
+	var roomFound bool
+
+	// Scan for a good-sized room (likely the first one)
+	for startY := 2; startY < mapComp.Height-10 && !roomFound; startY += 5 {
+		for startX := 2; startX < mapComp.Width-10 && !roomFound; startX += 5 {
+			// Check if this could be the center of a room
+			floorCount := 0
+			for y := startY - 2; y <= startY+2; y++ {
+				for x := startX - 2; x <= startX+2; x++ {
+					if y >= 0 && y < mapComp.Height && x >= 0 && x < mapComp.Width &&
+						mapComp.Tiles[y][x] == components.TileFloor {
+						floorCount++
+					}
+				}
+			}
+
+			// If we found a cluster of floor tiles, it's likely a room
+			if floorCount >= 20 { // At least 20 floor tiles in a 5x5 area
+				roomCenterX, roomCenterY = startX, startY
+				roomFound = true
+				break
+			}
+		}
+	}
+
+	// If we couldn't find a room center, fall back to a random position
+	if !roomFound {
+		roomCenterX = mapComp.Width / 4 // Use the first quarter of the map as it likely has the first room
+		roomCenterY = mapComp.Height / 4
+	}
+
+	// Look for a floor tile near the room center to place the stairs
+	var stairsX, stairsY int
+	stairsFound := false
+
+	// Try positions close to the center first, then expand outward
+	for radius := 1; radius < 10 && !stairsFound; radius++ {
+		for offsetY := -radius; offsetY <= radius && !stairsFound; offsetY++ {
+			for offsetX := -radius; offsetX <= radius && !stairsFound; offsetX++ {
+				x := roomCenterX + offsetX
+				y := roomCenterY + offsetY
+
+				// Make sure position is valid and is a floor tile
+				if x >= 0 && x < mapComp.Width && y >= 0 && y < mapComp.Height &&
+					mapComp.Tiles[y][x] == components.TileFloor {
+					stairsX, stairsY = x, y
+					stairsFound = true
+				}
+			}
+		}
+	}
+
+	// If we still couldn't find a position, fall back to findEmptyPosition
+	if !stairsFound {
+		stairsX, stairsY = t.findEmptyPosition(mapComp)
+	}
+
+	// Place the stairs up
+	mapComp.SetTile(stairsX, stairsY, components.TileStairsUp)
+
+	if t.logMessage != nil {
+		t.logMessage("Adding stairs up at " + fmt.Sprintf("(%d,%d)", stairsX, stairsY))
+	}
+}
+
+// findEmptyPosition finds an empty floor tile in the map
+func (t *DungeonThemer) findEmptyPosition(mapComp *components.MapComponent) (int, int) {
+	// Try to find a good spot (floor tile)
+	for attempts := 0; attempts < 100; attempts++ {
+		x := t.rng.Intn(mapComp.Width)
+		y := t.rng.Intn(mapComp.Height)
+
+		if mapComp.Tiles[y][x] == components.TileFloor {
+			return x, y
+		}
+	}
+
+	// Fallback: scan the map systematically
+	for y := 0; y < mapComp.Height; y++ {
+		for x := 0; x < mapComp.Width; x++ {
+			if mapComp.Tiles[y][x] == components.TileFloor {
+				return x, y
+			}
+		}
+	}
+
+	// Last resort: return the center of the map
+	return mapComp.Width / 2, mapComp.Height / 2
 }
 
 // GetDungeonThemeFromLevel returns a recommended theme for a dungeon level

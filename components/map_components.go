@@ -17,24 +17,32 @@ const (
 	TileWall
 	TileDoor
 	TileStairsDown
-	TileStairsUp
+	TileStairsUp 
 	TileWater
 	TileLava
 	TileGrass
 	TileTree
 
-	// Box drawing wall tiles
-	TileWallHorizontal  // ─
-	TileWallVertical    // │
-	TileWallTopLeft     // ┌
-	TileWallTopRight    // ┐
-	TileWallBottomLeft  // └
-	TileWallBottomRight // ┘
-	TileWallTeeLeft     // ├
-	TileWallTeeRight    // ┤
-	TileWallTeeTop      // ┬
-	TileWallTeeBottom   // ┴
-	TileWallCross       // ┼
+	// Box drawing wall tiles - restart iota sequence at 9
+	TileWallHorizontal  = iota + 1 // 9 ─
+	TileWallVertical               // 10 │
+	TileWallTopLeft                // 11 ┌
+	TileWallTopRight               // 12 ┐
+	TileWallBottomLeft             // 13 └
+	TileWallBottomRight            // 14 ┘
+	TileWallTeeLeft                // 15 ├
+	TileWallTeeRight               // 16 ┤
+	TileWallTeeTop                 // 17 ┬
+	TileWallTeeBottom              // 18 ┴
+	TileWallCross                  // 19 ┼
+
+	// World map biome tiles - explicitly assign values to avoid issues
+	TileWasteland     = 100
+	TileDesert        = 101
+	TileDarkForest    = 102
+	TileMountains     = 103
+	TileRuinedRailway = 104
+	TileSubstation    = 105
 )
 
 // TileDefinition describes the visual appearance of a tile type
@@ -87,15 +95,15 @@ func NewTileMappingComponent() *TileMappingComponent {
 	wallColor := color.RGBA{160, 160, 160, 255}
 	mapping.Definitions[TileWallHorizontal] = NewTileDefinitionByPos(4, 12, wallColor)
 	mapping.Definitions[TileWallVertical] = NewTileDefinitionByPos(3, 11, wallColor)
-	mapping.Definitions[TileWallTopLeft] = NewTileDefinition('┌', wallColor)
-	mapping.Definitions[TileWallTopRight] = NewTileDefinition('┐', wallColor)
-	mapping.Definitions[TileWallBottomLeft] = NewTileDefinition('└', wallColor)
-	mapping.Definitions[TileWallBottomRight] = NewTileDefinition('┘', wallColor)
-	mapping.Definitions[TileWallTeeLeft] = NewTileDefinition('├', wallColor)
-	mapping.Definitions[TileWallTeeRight] = NewTileDefinition('┤', wallColor)
-	mapping.Definitions[TileWallTeeTop] = NewTileDefinition('┬', wallColor)
-	mapping.Definitions[TileWallTeeBottom] = NewTileDefinition('┴', wallColor)
-	mapping.Definitions[TileWallCross] = NewTileDefinition('┼', wallColor)
+	mapping.Definitions[TileWallTopLeft] = NewTileDefinitionByPos(10, 13, wallColor)
+	mapping.Definitions[TileWallTopRight] = NewTileDefinitionByPos(15, 11, wallColor)
+	mapping.Definitions[TileWallBottomLeft] = NewTileDefinitionByPos(0, 12, wallColor)
+	mapping.Definitions[TileWallBottomRight] = NewTileDefinitionByPos(9, 13, wallColor)
+	mapping.Definitions[TileWallTeeLeft] = NewTileDefinitionByPos(3, 12, wallColor)
+	mapping.Definitions[TileWallTeeRight] = NewTileDefinitionByPos(4, 11, wallColor)
+	mapping.Definitions[TileWallTeeTop] = NewTileDefinitionByPos(2, 12, wallColor)
+	mapping.Definitions[TileWallTeeBottom] = NewTileDefinitionByPos(1, 12, wallColor)
+	mapping.Definitions[TileWallCross] = NewTileDefinitionByPos(5, 12, wallColor)
 
 	// Set up examples using position-based references
 	// These reference specific tiles in the tileset by x,y coordinates
@@ -108,9 +116,15 @@ func NewTileMappingComponent() *TileMappingComponent {
 
 	// Example: Use a nice grass symbol at position (5, 3) for grass
 	mapping.Definitions[TileGrass] = NewTileDefinitionByPos(0, 11, color.RGBA{0, 128, 0, 255}) // Green
-
 	// Example: Use a tree symbol at position (6, 4) for trees
 	mapping.Definitions[TileTree] = NewTileDefinitionByPos(8, 1, color.RGBA{0, 100, 0, 255}) // Dark green
+	// World map biome definitions - Using character-based references for testing
+	mapping.Definitions[TileWasteland] = NewTileDefinitionByPos(1, 11, color.RGBA{150, 140, 100, 255})     // Wasteland: brownish gray
+	mapping.Definitions[TileDesert] = NewTileDefinitionByPos(2, 11, color.RGBA{230, 210, 150, 255})        // Desert: light sand color
+	mapping.Definitions[TileDarkForest] = NewTileDefinitionByPos(8, 1, color.RGBA{40, 80, 40, 255})        // Dark Forest: deep green
+	mapping.Definitions[TileMountains] = NewTileDefinitionByPos(14, 1, color.RGBA{120, 120, 120, 255})     // Mountains: gray
+	mapping.Definitions[TileRuinedRailway] = NewTileDefinitionByPos(13, 3, color.RGBA{100, 100, 110, 255}) // Railway: rusty tracks
+	mapping.Definitions[TileSubstation] = NewTileDefinitionByPos(15, 0, color.RGBA{200, 200, 0, 255})      // Substation: industrial yellow
 
 	return mapping
 }

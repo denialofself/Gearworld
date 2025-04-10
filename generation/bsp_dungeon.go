@@ -847,7 +847,16 @@ func (g *DungeonGenerator) connectToMainDungeon(mapComp *components.MapComponent
 
 // applyWallTypes sets appropriate wall types for all walls in the dungeon
 func (g *DungeonGenerator) applyWallTypes(mapComp *components.MapComponent) {
-	// First pass: mark all walls that border floor tiles
+	// First pass: set all walls back to basic wall type to ensure clean processing
+	for y := 0; y < mapComp.Height; y++ {
+		for x := 0; x < mapComp.Width; x++ {
+			if IsAnyWallType(mapComp.Tiles[y][x]) {
+				mapComp.Tiles[y][x] = components.TileWall
+			}
+		}
+	}
+
+	// Second pass: mark all walls adjacent to non-wall tiles
 	wallTiles := make([][]bool, mapComp.Height)
 	for y := range wallTiles {
 		wallTiles[y] = make([]bool, mapComp.Width)
@@ -861,12 +870,14 @@ func (g *DungeonGenerator) applyWallTypes(mapComp *components.MapComponent) {
 		}
 	}
 
-	// Second pass: calculate and apply wall connection masks
+	// Third pass: calculate and apply wall connection masks
 	for y := 0; y < mapComp.Height; y++ {
 		for x := 0; x < mapComp.Width; x++ {
 			if wallTiles[y][x] {
 				mask := g.calculateWallConnectionMask(mapComp, x, y)
-				mapComp.Tiles[y][x] = WallTileLookup[mask]
+				if mask >= 0 && mask <= 15 { // Ensure mask is valid
+					mapComp.Tiles[y][x] = WallTileLookup[mask]
+				}
 			}
 		}
 	}
@@ -875,11 +886,18 @@ func (g *DungeonGenerator) applyWallTypes(mapComp *components.MapComponent) {
 // hasAdjacentNonWall checks if a tile has any adjacent non-wall tiles
 func (g *DungeonGenerator) hasAdjacentNonWall(mapComp *components.MapComponent, x, y int) bool {
 	// Check the four cardinal directions
-	if (y > 0 && !IsAnyWallType(mapComp.Tiles[y-1][x])) ||
-		(x < mapComp.Width-1 && !IsAnyWallType(mapComp.Tiles[y][x+1])) ||
-		(y < mapComp.Height-1 && !IsAnyWallType(mapComp.Tiles[y+1][x])) ||
-		(x > 0 && !IsAnyWallType(mapComp.Tiles[y][x-1])) {
-		return true
+	// Note: We consider ALL walls, not just basic walls
+	if y > 0 && !IsAnyWallType(mapComp.Tiles[y-1][x]) {
+		return true // Has floor/door/etc above
+	}
+	if x < mapComp.Width-1 && !IsAnyWallType(mapComp.Tiles[y][x+1]) {
+		return true // Has floor/door/etc to the right
+	}
+	if y < mapComp.Height-1 && !IsAnyWallType(mapComp.Tiles[y+1][x]) {
+		return true // Has floor/door/etc below
+	}
+	if x > 0 && !IsAnyWallType(mapComp.Tiles[y][x-1]) {
+		return true // Has floor/door/etc to the left
 	}
 	return false
 }
@@ -890,16 +908,17 @@ func (g *DungeonGenerator) calculateWallConnectionMask(mapComp *components.MapCo
 
 	// Check in which directions this wall connects to other walls
 	// We're treating out-of-bounds as wall tiles
-	if y == 0 || IsAnyWallType(mapComp.Tiles[y-1][x]) {
+	// We also treat ALL wall types as connected walls
+	if y == 0 || (y > 0 && IsAnyWallType(mapComp.Tiles[y-1][x])) {
 		mask |= WallConnectTop
 	}
-	if x == mapComp.Width-1 || IsAnyWallType(mapComp.Tiles[y][x+1]) {
+	if x == mapComp.Width-1 || (x < mapComp.Width-1 && IsAnyWallType(mapComp.Tiles[y][x+1])) {
 		mask |= WallConnectRight
 	}
-	if y == mapComp.Height-1 || IsAnyWallType(mapComp.Tiles[y+1][x]) {
+	if y == mapComp.Height-1 || (y < mapComp.Height-1 && IsAnyWallType(mapComp.Tiles[y+1][x])) {
 		mask |= WallConnectBottom
 	}
-	if x == 0 || IsAnyWallType(mapComp.Tiles[y][x-1]) {
+	if x == 0 || (x > 0 && IsAnyWallType(mapComp.Tiles[y][x-1])) {
 		mask |= WallConnectLeft
 	}
 
@@ -1142,8 +1161,7 @@ func abs(x int) int {
 
 // applyImprovedBoxDrawingWalls is an enhanced version of the box drawing wall application
 // that ensures all walls, including interior ones, are properly rendered with appropriate characters
-func (g *DungeonGenerator) applyImprovedBoxDrawingWalls(mapComp *components.MapComponent) {
-	// Phase 1: Apply initial wall types to all walls
+func (g *DungeonGenerator) applyImprovedBoxDrawingWalls(mapComp *components.MapComponent) {	// Phase 1: Apply initial wall types to all walls
 	for y := 0; y < mapComp.Height; y++ {
 		for x := 0; x < mapComp.Width; x++ {
 			// Only process basic wall tiles
@@ -1151,7 +1169,7 @@ func (g *DungeonGenerator) applyImprovedBoxDrawingWalls(mapComp *components.MapC
 				// Calculate the appropriate wall mask
 				maskValue := CalculateWallMask(mapComp, x, y)
 				// Convert to appropriate wall type based on connections
-				mapComp.Tiles[y][x] = WallTileLookup[maskValue]
+				mapComp.SetTile(x, y, WallTileLookup[maskValue])
 			}
 		}
 	}
@@ -1191,15 +1209,14 @@ func (g *DungeonGenerator) fixWallInconsistencies(mapComp *components.MapCompone
 		if !wallConnectsUp(currentType) && wallConnectsDown(mapComp.Tiles[y-1][x]) {
 			// Recalculate with forced connection upward
 			maskValue := CalculateWallMask(mapComp, x, y) | WallConnectTop
-			mapComp.Tiles[y][x] = WallTileLookup[maskValue]
+			mapComp.SetTile(x, y, WallTileLookup[maskValue])
 			return true
 		}
-
 		// If current wall connects upward but wall above doesn't connect downward
 		if wallConnectsUp(currentType) && !wallConnectsDown(mapComp.Tiles[y-1][x]) {
 			// Recalculate with forced disconnect upward
 			maskValue := CalculateWallMask(mapComp, x, y) & ^WallConnectTop
-			mapComp.Tiles[y][x] = WallTileLookup[maskValue]
+			mapComp.SetTile(x, y, WallTileLookup[maskValue])
 			return true
 		}
 	}
@@ -1209,14 +1226,13 @@ func (g *DungeonGenerator) fixWallInconsistencies(mapComp *components.MapCompone
 		// If current wall doesn't connect right but the wall to the right connects left
 		if !wallConnectsRight(currentType) && wallConnectsLeft(mapComp.Tiles[y][x+1]) {
 			maskValue := CalculateWallMask(mapComp, x, y) | WallConnectRight
-			mapComp.Tiles[y][x] = WallTileLookup[maskValue]
+			mapComp.SetTile(x, y, WallTileLookup[maskValue])
 			return true
 		}
-
 		// If current wall connects right but wall to the right doesn't connect left
 		if wallConnectsRight(currentType) && !wallConnectsLeft(mapComp.Tiles[y][x+1]) {
 			maskValue := CalculateWallMask(mapComp, x, y) & ^WallConnectRight
-			mapComp.Tiles[y][x] = WallTileLookup[maskValue]
+			mapComp.SetTile(x, y, WallTileLookup[maskValue])
 			return true
 		}
 	}
@@ -1226,14 +1242,13 @@ func (g *DungeonGenerator) fixWallInconsistencies(mapComp *components.MapCompone
 		// If current wall doesn't connect down but the wall below connects up
 		if !wallConnectsDown(currentType) && wallConnectsUp(mapComp.Tiles[y+1][x]) {
 			maskValue := CalculateWallMask(mapComp, x, y) | WallConnectBottom
-			mapComp.Tiles[y][x] = WallTileLookup[maskValue]
+			mapComp.SetTile(x, y, WallTileLookup[maskValue])
 			return true
 		}
-
 		// If current wall connects down but wall below doesn't connect up
 		if wallConnectsDown(currentType) && !wallConnectsUp(mapComp.Tiles[y+1][x]) {
 			maskValue := CalculateWallMask(mapComp, x, y) & ^WallConnectBottom
-			mapComp.Tiles[y][x] = WallTileLookup[maskValue]
+			mapComp.SetTile(x, y, WallTileLookup[maskValue])
 			return true
 		}
 	}
@@ -1243,14 +1258,14 @@ func (g *DungeonGenerator) fixWallInconsistencies(mapComp *components.MapCompone
 		// If current wall doesn't connect left but the wall to the left connects right
 		if !wallConnectsLeft(currentType) && wallConnectsRight(mapComp.Tiles[y][x-1]) {
 			maskValue := CalculateWallMask(mapComp, x, y) | WallConnectLeft
-			mapComp.Tiles[y][x] = WallTileLookup[maskValue]
+			mapComp.SetTile(x, y, WallTileLookup[maskValue])
 			return true
 		}
 
 		// If current wall connects left but wall to the left doesn't connect right
 		if wallConnectsLeft(currentType) && !wallConnectsRight(mapComp.Tiles[y][x-1]) {
 			maskValue := CalculateWallMask(mapComp, x, y) & ^WallConnectLeft
-			mapComp.Tiles[y][x] = WallTileLookup[maskValue]
+			mapComp.SetTile(x, y, WallTileLookup[maskValue])
 			return true
 		}
 	}

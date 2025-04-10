@@ -16,4 +16,5 @@ const (
 	Camera     // Camera component for viewport management
 	Player
 	Stats
+	MapType // Map type component for distinguishing between world map and dungeons
 )
