@@ -13,6 +13,7 @@ const (
 	EventDeath       ecs.EventType = "death"
 	EventItemPickup  ecs.EventType = "item_pickup"
 	EventEnemyAttack ecs.EventType = "enemy_attack"
+	EventRest        ecs.EventType = "rest"
 )
 
 // CollisionEvent is emitted when entities collide
@@ -102,4 +103,14 @@ type EnemyAttackEvent struct {
 // Type returns the event type
 func (e EnemyAttackEvent) Type() ecs.EventType {
 	return EventEnemyAttack
+}
+
+// RestEvent is emitted when an entity rests for a turn
+type RestEvent struct {
+	EntityID ecs.EntityID // Entity that is resting
+}
+
+// Type returns the event type
+func (e RestEvent) Type() ecs.EventType {
+	return EventRest
 }

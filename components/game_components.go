@@ -54,6 +54,7 @@ type StatsComponent struct {
 	Recovery        int // Recovery points for action point regeneration
 	ActionPoints    int // Current action points
 	MaxActionPoints int // Maximum action points
+	HealingFactor   int // Healing factor for health regeneration
 }
 
 // CollisionComponent indicates entity can collide with other entities

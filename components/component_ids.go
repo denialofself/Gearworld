@@ -17,4 +17,5 @@ const (
 	Player
 	Stats
 	MapType // Map type component for distinguishing between world map and dungeons
+	Name    // Name component for storing entity display names
 )

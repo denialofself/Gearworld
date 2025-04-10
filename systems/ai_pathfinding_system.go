@@ -43,6 +43,11 @@ func (s *AIPathfindingSystem) Initialize(world *ecs.World) {
 	world.GetEventManager().Subscribe(EventMovement, func(event ecs.Event) {
 		s.HandleEvent(world, event)
 	})
+
+	// Subscribe to rest events as well - AI should also act when player rests
+	world.GetEventManager().Subscribe(EventRest, func(event ecs.Event) {
+		s.HandleEvent(world, event)
+	})
 }
 
 // HandleEvent processes events that the AI system is interested in
@@ -62,6 +67,12 @@ func (s *AIPathfindingSystem) HandleEvent(world *ecs.World, event ecs.Event) {
 			// Log for debugging using message system
 			GetMessageLog().Add("DEBUG: Player entity moved, AI can now recalculate paths")
 		}
+	} else if _, ok := event.(RestEvent); ok {
+		// Player has rested, so reset the turn flag to allow AI processing
+		s.turnProcessed = false
+
+		// Log for debugging
+		GetDebugLog().Add("DEBUG: Player rested, AI will now take its turn")
 	}
 }
 

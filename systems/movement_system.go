@@ -1,6 +1,8 @@
 package systems
 
 import (
+	"strconv"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 
@@ -101,7 +103,31 @@ func (s *MovementSystem) processPlayerMovement(world *ecs.World) bool {
 		return false
 	}
 
-	playerID := playerEntities[0].ID
+	playerID := playerEntities[0].ID // Check for rest input (numpad 5 or '5' key or dot key)
+	// Adding dot key (.) as an alternative as it's commonly used in roguelikes
+	if inpututil.IsKeyJustPressed(ebiten.KeyNumpad5) ||
+		inpututil.IsKeyJustPressed(ebiten.Key5) ||
+		inpututil.IsKeyJustPressed(ebiten.KeyPeriod) {
+
+		// Debug message to confirm key press detection
+		GetDebugLog().Add("DEBUG: Rest key pressed")
+
+		// Emit rest event
+		world.EmitEvent(RestEvent{
+			EntityID: playerID,
+		})
+		GetMessageLog().Add("You take a moment to rest.")
+
+		// Also add a debug log for the player's stats
+		statsComp, hasStats := world.GetComponent(playerID, components.Stats)
+		if hasStats {
+			stats := statsComp.(*components.StatsComponent)
+			GetDebugLog().Add("DEBUG: Player health: " + strconv.Itoa(stats.Health) + "/" +
+				strconv.Itoa(stats.MaxHealth) + ", HealingFactor: " + strconv.Itoa(stats.HealingFactor))
+		}
+
+		return true // Count rest as an action that takes a turn
+	}
 
 	// Check for movement input
 	dir, moved := s.getMovementDirection()

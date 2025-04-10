@@ -29,6 +29,7 @@ type EntityTemplate struct {
 	Recovery        int `json:"recovery"` // Recovery points for action point regeneration
 	ActionPoints    int `json:"actionPoints"` // Action points for the entity
 	MaxActionPoints int `json:"maxActionPoints"` // Maximum action points
+	HealingFactor   int `json:"healingFactor"` // Healing factor for health regeneration
 
 	// Behavior
 	AIType      string   `json:"aiType"`      // Type of AI behavior

@@ -49,12 +49,13 @@ func (s *EntitySpawner) CreatePlayer(x, y int) *ecs.Entity {
 	s.world.AddComponent(playerEntity.ID, components.Player, &components.PlayerComponent{})
 
 	s.world.AddComponent(playerEntity.ID, components.Stats, &components.StatsComponent{
-		Health:    100,
-		MaxHealth: 100,
-		Attack:    5,
-		Defense:   2,
-		Level:     1,
-		Exp:       0,
+		Health:        100,
+		MaxHealth:     100,
+		Attack:        5,
+		Defense:       2,
+		Level:         1,
+		Exp:           0,
+		HealingFactor: 5,
 	})
 
 	s.world.AddComponent(playerEntity.ID, components.Collision, &components.CollisionComponent{
@@ -135,7 +136,6 @@ func (s *EntitySpawner) CreateEnemy(x, y int, enemyType string) (*ecs.Entity, er
 	for _, tag := range template.Tags {
 		s.world.TagEntity(enemyEntity.ID, tag)
 	}
-
 	// Add components
 	s.world.AddComponent(enemyEntity.ID, components.Renderable, renderable)
 	s.world.AddComponent(enemyEntity.ID, components.Stats, stats)
@@ -144,6 +144,8 @@ func (s *EntitySpawner) CreateEnemy(x, y int, enemyType string) (*ecs.Entity, er
 		SightRange: 8,                       // How far the zombie can see
 		Path:       []components.PathNode{}, // Initialize empty path
 	})
+	// Add name component for display in messages
+	s.world.AddComponent(enemyEntity.ID, components.Name, components.NewNameComponent(template.Name))
 
 	// Set collision based on template
 	s.world.AddComponent(enemyEntity.ID, components.Collision, &components.CollisionComponent{

@@ -152,13 +152,19 @@ func getEntityName(world *ecs.World, entityID ecs.EntityID) string {
 		return "Player"
 	}
 
-	// Try to get AI component to determine enemy type
+	// Try to get name component first
+	if nameComp, hasName := world.GetComponent(entityID, components.Name); hasName {
+		name := nameComp.(*components.NameComponent)
+		return name.Name
+	}
+
+	// Fallback to AI type if no name component
 	if aiComp, hasAI := world.GetComponent(entityID, components.AI); hasAI {
 		ai := aiComp.(*components.AIComponent)
 		return capitalizeFirstLetter(ai.Type)
 	}
 
-	// Fallback
+	// Last fallback
 	return "Entity #" + strconv.FormatUint(uint64(entityID), 10)
 }
 

@@ -31,6 +31,7 @@ type Game struct {
 	entitySpawner         *spawners.EntitySpawner
 	aiPathfindingSystem   *systems.AIPathfindingSystem
 	aiTurnProcessorSystem *systems.AITurnProcessorSystem
+	passiveEffectsSystem  *systems.PassiveEffectsSystem
 }
 
 // NewGame creates a new game instance
@@ -43,7 +44,6 @@ func NewGame() *Game {
 	if err != nil {
 		panic(err)
 	}
-
 	// Initialize all systems
 	mapSystem := systems.NewMapSystem()
 	movementSystem := systems.NewMovementSystem()
@@ -52,6 +52,7 @@ func NewGame() *Game {
 	renderSystem := systems.NewRenderSystem(tileset)
 	aiPathfindingSystem := systems.NewAIPathfindingSystem()
 	aiTurnProcessorSystem := systems.NewAITurnProcessorSystem()
+	passiveEffectsSystem := systems.NewPassiveEffectsSystem()
 
 	// Initialize the entity template manager
 	templateManager := data.NewEntityTemplateManager()
@@ -67,7 +68,6 @@ func NewGame() *Game {
 
 	// Connect the camera system to the render system
 	renderSystem.SetCameraSystem(cameraSystem)
-
 	// Register systems with the world that need to be updated during the game loop
 	world.AddSystem(movementSystem)
 	world.AddSystem(combatSystem)
@@ -75,7 +75,7 @@ func NewGame() *Game {
 	world.AddSystem(mapSystem)
 	world.AddSystem(aiPathfindingSystem)
 	world.AddSystem(aiTurnProcessorSystem)
-
+	world.AddSystem(passiveEffectsSystem)
 	// Create the game instance
 	game := &Game{
 		world:                 world,
@@ -88,15 +88,16 @@ func NewGame() *Game {
 		entitySpawner:         entitySpawner,
 		aiPathfindingSystem:   aiPathfindingSystem,
 		aiTurnProcessorSystem: aiTurnProcessorSystem,
+		passiveEffectsSystem:  passiveEffectsSystem,
 	}
 
 	// Initialize the game world
 	game.initialize()
-
 	// Initialize event listeners
 	combatSystem.Initialize(world)
 	aiPathfindingSystem.Initialize(world)
 	aiTurnProcessorSystem.Initialize(world)
+	passiveEffectsSystem.Initialize(world)
 
 	return game
 }
@@ -126,7 +127,7 @@ func (g *Game) initialize() {
 		DensityFactor:         .30,
 		HigherLevelChance:     0.05,  // 5% chance for level 2 monsters
 		EvenHigherLevelChance: 0.01,  // 1% chance for level 3 monsters
-		AddStairsUp:           false, // No need for stairs up since we're removing world map
+		AddStairsUp:           true, // No need for stairs up since we're removing world map
 	}
 
 	// Generate the themed dungeon with appropriate monsters
