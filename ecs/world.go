@@ -94,6 +94,7 @@ func (w *World) AddSystem(system System) {
 
 // Update updates all systems in the world
 func (w *World) Update(dt float64) {
+	// Run all systems - we'll handle map-specific processing in each system
 	for _, system := range w.systems {
 		system.Update(w, dt)
 	}
@@ -153,4 +154,28 @@ func (w *World) GetEventManager() *EventManager {
 // EmitEvent is a convenience method to emit an event
 func (w *World) EmitEvent(event Event) {
 	w.eventManager.Emit(event)
+}
+
+// GetEntity returns an entity by its ID
+func (w *World) GetEntity(entityID EntityID) *Entity {
+	entity, exists := w.entities[entityID]
+	if !exists {
+		return nil
+	}
+	return entity
+}
+
+// GetEntitiesWithComponent returns all entities that have a specific component
+func (w *World) GetEntitiesWithComponent(componentID ComponentID) []*Entity {
+	entities := make([]*Entity, 0)
+
+	for id, componentMap := range w.components {
+		if _, hasComponent := componentMap[componentID]; hasComponent {
+			if entity, ok := w.entities[id]; ok {
+				entities = append(entities, entity)
+			}
+		}
+	}
+
+	return entities
 }

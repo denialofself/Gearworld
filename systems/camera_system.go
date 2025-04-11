@@ -4,6 +4,7 @@ import (
 	"ebiten-rogue/components"
 	"ebiten-rogue/config"
 	"ebiten-rogue/ecs"
+	"fmt"
 )
 
 // CameraSystem handles viewport positioning and scrolling
@@ -49,12 +50,51 @@ func (s *CameraSystem) Update(world *ecs.World, dt float64) {
 		cameraComp = comp.(*components.CameraComponent)
 	}
 
-	// Find map entity
-	standardMapEntities := world.GetEntitiesWithTag("map")
+	// Find active map from MapRegistrySystem (preferred)
+	var activeMapID ecs.EntityID
+	var activeMapType string
+	for _, system := range world.GetSystems() {
+		if mapReg, ok := system.(interface{ GetActiveMap() *ecs.Entity }); ok {
+			if activeMap := mapReg.GetActiveMap(); activeMap != nil {
+				activeMapID = activeMap.ID
 
-	if len(standardMapEntities) > 0 {
-		// Handle standard map camera positioning
-		s.updateCameraForStandardMap(world, playerPos, cameraComp, standardMapEntities[0].ID)
+				// Get map type
+				if typeComp, exists := world.GetComponent(activeMap.ID, components.MapType); exists {
+					mapTypeComp := typeComp.(*components.MapTypeComponent)
+					activeMapType = mapTypeComp.MapType
+				}
+				break
+			}
+		}
+	}
+
+	// If no map found from registry, fall back to any map entity
+	if activeMapID == 0 {
+		standardMapEntities := world.GetEntitiesWithTag("map")
+		if len(standardMapEntities) > 0 {
+			activeMapID = standardMapEntities[0].ID
+		}
+	}
+
+	// If we have an active map, update camera
+	if activeMapID != 0 {
+		// Verify player's map context matches active map
+		if world.HasComponent(playerID, components.MapContextID) {
+			mapContextComp, _ := world.GetComponent(playerID, components.MapContextID)
+			mapContext := mapContextComp.(*components.MapContextComponent)
+
+			// Only log debug info when player is actually on the world map
+			// AND the map context matches (player is actually on the active map)
+			if activeMapType == "worldmap" && mapContext.MapID == activeMapID {
+				GetDebugLog().Add(fmt.Sprintf("CAMERA: Player position on worldmap: %d,%d (MapContextID: %d)",
+					playerPos.X, playerPos.Y, mapContext.MapID))
+			}
+
+			// Only update camera if player is on the active map
+			if mapContext.MapID == activeMapID {
+				s.updateCameraForStandardMap(world, playerPos, cameraComp, activeMapID)
+			}
+		}
 	}
 }
 
@@ -84,6 +124,11 @@ func (s *CameraSystem) updateCameraForStandardMap(world *ecs.World, playerPos *c
 		idealCameraY = mapData.Height - config.GameScreenHeight
 	}
 
+	// Set camera position directly to the ideal position without interpolation
+	// This is more appropriate for turn-based games to avoid stuttering
+	camera.X = idealCameraX
+	camera.Y = idealCameraY
+
 	// Update camera position with smooth following
 	// Simple camera smoothing can be added here if desired
 	camera.X = idealCameraX
@@ -92,6 +137,7 @@ func (s *CameraSystem) updateCameraForStandardMap(world *ecs.World, playerPos *c
 
 // WorldToScreen converts world coordinates to screen coordinates
 func (s *CameraSystem) WorldToScreen(world *ecs.World, worldX, worldY int) (screenX, screenY int) {
+	// Find camera entity
 	cameraEntities := world.GetEntitiesWithTag("camera")
 	if len(cameraEntities) == 0 {
 		// If no camera, just pass through the coordinates

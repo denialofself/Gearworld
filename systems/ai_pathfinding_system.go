@@ -97,13 +97,24 @@ func (s *AIPathfindingSystem) Update(world *ecs.World, dt float64) {
 		return
 	}
 
-	// Get map for pathfinding
-	mapEntities := world.GetEntitiesWithTag("map")
-	if len(mapEntities) == 0 {
+	// Get the active map ID from MapRegistrySystem (preferred)
+	var activeMapID ecs.EntityID
+	for _, system := range world.GetSystems() {
+		if mapReg, ok := system.(interface{ GetActiveMap() *ecs.Entity }); ok {
+			if activeMap := mapReg.GetActiveMap(); activeMap != nil {
+				activeMapID = activeMap.ID
+				break
+			}
+		}
+	}
+
+	// If we couldn't get an active map ID, we can't proceed
+	if activeMapID == 0 {
 		return
 	}
 
-	mapComp, exists := world.GetComponent(mapEntities[0].ID, components.MapComponentID)
+	// Get map for pathfinding
+	mapComp, exists := world.GetComponent(activeMapID, components.MapComponentID)
 	if !exists {
 		return
 	}
@@ -112,6 +123,20 @@ func (s *AIPathfindingSystem) Update(world *ecs.World, dt float64) {
 	// Process all entities with AI components
 	aiEntities := world.GetEntitiesWithTag("ai")
 	for _, entity := range aiEntities {
+		// Skip entities that aren't on the active map
+		if world.HasComponent(entity.ID, components.MapContextID) {
+			mapContextComp, _ := world.GetComponent(entity.ID, components.MapContextID)
+			mapContext := mapContextComp.(*components.MapContextComponent)
+
+			// Skip if not on the active map
+			if mapContext.MapID != activeMapID {
+				continue
+			}
+		} else {
+			// Skip entities without a map context
+			continue
+		}
+
 		aiComp, _ := world.GetComponent(entity.ID, components.AI)
 		ai := aiComp.(*components.AIComponent)
 
@@ -121,6 +146,7 @@ func (s *AIPathfindingSystem) Update(world *ecs.World, dt float64) {
 			continue
 		}
 		pos := posComp.(*components.PositionComponent)
+
 		// Process AI based on type
 		switch ai.Type {
 		case "slow_chase", "slow_wander":

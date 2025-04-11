@@ -85,6 +85,9 @@ func (t *DungeonThemer) GenerateThemedDungeon(config DungeonConfiguration) *ecs.
 	mapComp := components.NewMapComponent(width, height)
 	t.world.AddComponent(mapEntity.ID, components.MapComponentID, mapComp)
 
+	// Add map type component
+	t.world.AddComponent(mapEntity.ID, components.MapType, components.NewMapTypeComponent("dungeon", config.Level))
+
 	// Generate dungeon based on generator type and size
 	switch config.Generator {
 	case GeneratorCellular:
@@ -126,6 +129,13 @@ func (t *DungeonThemer) GenerateThemedDungeon(config DungeonConfiguration) *ecs.
 
 	// Apply visual theming to the map
 	t.applyMapTheming(mapComp, config.Theme)
+
+	// Important: Set the map's ID in the entity spawner before populating with monsters
+	// This ensures all monsters get the correct MapContext
+	if t.logMessage != nil {
+		t.logMessage(fmt.Sprintf("Setting spawn map ID to %d for monster creation", mapEntity.ID))
+	}
+	t.entitySpawner.SetSpawnMapID(mapEntity.ID)
 
 	// Populate the dungeon with monsters
 	options := PopulationOptions{

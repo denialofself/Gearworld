@@ -99,14 +99,36 @@ func (s *RenderSystem) drawGameScreen(world *ecs.World, screen *ebiten.Image) {
 		}
 	}
 
-	// Find the standard map entity
-	standardMapEntities := world.GetEntitiesWithTag("map")
-	if len(standardMapEntities) > 0 {
-		s.drawStandardMap(world, screen, standardMapEntities[0].ID, tileMapping, cameraX, cameraY)
-	} else {
-		GetMessageLog().Add("Error: No map entity found")
+	// Find the active map - always use MapRegistrySystem for consistency
+	var activeMap *ecs.Entity
+	var activeMapRegistrySystem interface {
+		GetActiveMap() *ecs.Entity
+	}
+
+	// Find the MapRegistrySystem
+	for _, system := range world.GetSystems() {
+		if mapRegistry, ok := system.(interface{ GetActiveMap() *ecs.Entity }); ok {
+			// Check if this is the MapRegistrySystem by checking the type name
+			if fmt.Sprintf("%T", system) == "*systems.MapRegistrySystem" {
+				activeMapRegistrySystem = mapRegistry
+				break
+			}
+		}
+	}
+
+	// Get the active map from the registry system
+	if activeMapRegistrySystem != nil {
+		activeMap = activeMapRegistrySystem.GetActiveMap()
+	}
+
+	// If still no active map, log an error
+	if activeMap == nil {
+		GetDebugLog().Add("RenderSystem: No active map found")
 		return
 	}
+
+	// Draw the active map
+	s.drawStandardMap(world, screen, activeMap.ID, tileMapping, cameraX, cameraY)
 
 	// Draw all entities
 	s.drawEntities(world, screen, cameraX, cameraY)
@@ -156,10 +178,80 @@ func (s *RenderSystem) drawStandardMap(world *ecs.World, screen *ebiten.Image, m
 
 // drawEntities draws all visible entities
 func (s *RenderSystem) drawEntities(world *ecs.World, screen *ebiten.Image, cameraX, cameraY int) {
+	// Find the active map - always use MapRegistrySystem for consistency
+	var activeMapID ecs.EntityID
+	var activeMapRegistrySystem interface {
+		GetActiveMap() *ecs.Entity
+	}
+
+	// Find the MapRegistrySystem
+	for _, system := range world.GetSystems() {
+		if mapRegistry, ok := system.(interface{ GetActiveMap() *ecs.Entity }); ok {
+			// Check if this is the MapRegistrySystem by checking the type name
+			if fmt.Sprintf("%T", system) == "*systems.MapRegistrySystem" {
+				activeMapRegistrySystem = mapRegistry
+				break
+			}
+		}
+	}
+
+	// Get the active map from the registry system
+	if activeMapRegistrySystem != nil {
+		if activeMap := activeMapRegistrySystem.GetActiveMap(); activeMap != nil {
+			activeMapID = activeMap.ID
+		}
+	}
+
+	// If no active map found, we can't properly filter entities
+	if activeMapID == 0 {
+		GetDebugLog().Add("RenderSystem: No active map found for entity rendering")
+		return
+	}
+
+	// Get active map type for additional filtering
+	var activeMapType string
+	activeMapEntity := world.GetEntity(activeMapID)
+	if activeMapEntity != nil && world.HasComponent(activeMapID, components.MapType) {
+		mapTypeComp, _ := world.GetComponent(activeMapID, components.MapType)
+		activeMapType = mapTypeComp.(*components.MapTypeComponent).MapType
+	}
+
+	// Track entities rendered for debugging
+	entitiesRendered := 0
+
 	// Get all entities to render
 	for _, entity := range world.GetAllEntities() {
 		// Skip map and tilemap entities since we handle those separately
 		if entity.HasTag("map") || entity.HasTag("tilemap") {
+			continue
+		}
+
+		// Check if entity has a map context component
+		if world.HasComponent(entity.ID, components.MapContextID) {
+			mapContextComp, _ := world.GetComponent(entity.ID, components.MapContextID)
+			mapContext := mapContextComp.(*components.MapContextComponent)
+
+			// Skip entities that don't belong to the active map
+			if mapContext.MapID != activeMapID {
+				// Debug logging for enemies on the wrong map context
+				if entity.HasTag("enemy") && world.HasComponent(entity.ID, components.Name) {
+					nameComp, _ := world.GetComponent(entity.ID, components.Name)
+					name := nameComp.(*components.NameComponent)
+					GetDebugLog().Add(fmt.Sprintf("DEBUG: Enemy '%s' (ID: %d) not rendered - wrong map context: %d vs active: %d",
+						name.Name, entity.ID, mapContext.MapID, activeMapID))
+				}
+				continue
+			}
+		} else {
+			// Debug log if entity doesn't have map context
+			if entity.HasTag("ai") || entity.HasTag("enemy") {
+				GetDebugLog().Add(fmt.Sprintf("Entity %d has no MapContext", entity.ID))
+			}
+			continue
+		}
+
+		// Extra safety - if we're on the world map, don't render enemies
+		if activeMapType == "worldmap" && entity.HasTag("enemy") {
 			continue
 		}
 
@@ -191,8 +283,14 @@ func (s *RenderSystem) drawEntities(world *ecs.World, screen *ebiten.Image, came
 					// Use character-based reference
 					s.tileset.DrawTile(screen, rend.Char, screenX, screenY, rend.FG)
 				}
+				entitiesRendered++
 			}
 		}
+	}
+
+	// Debug log for number of entities rendered
+	if activeMapType == "worldmap" {
+		GetDebugLog().Add(fmt.Sprintf("DEBUG: Rendered %d entities on world map", entitiesRendered))
 	}
 }
 

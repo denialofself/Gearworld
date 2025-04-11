@@ -7,8 +7,6 @@ import (
 	"ebiten-rogue/generation"
 	"math/rand"
 	"time"
-
-	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // MapSystem handles map-related operations and rendering
@@ -43,43 +41,9 @@ func (s *MapSystem) GetActiveMap() *ecs.Entity {
 
 // handleMapTransitions processes transitions between maps when player interacts with stairs
 func (s *MapSystem) handleMapTransitions(world *ecs.World) {
-	playerEntities := world.GetEntitiesWithTag("player")
-	if len(playerEntities) == 0 {
-		return
-	}
-
-	player := playerEntities[0]
-
-	// Get player position
-	posCompInterface, exists := world.GetComponent(player.ID, components.Position)
-	if !exists {
-		return
-	}
-	playerPos := posCompInterface.(*components.PositionComponent)
-
-	// Get currently active map
-	if s.activeMap == nil {
-		return
-	}
-
-	mapCompInterface, exists := world.GetComponent(s.activeMap.ID, components.MapComponentID)
-	if !exists {
-		return
-	}
-	mapComp := mapCompInterface.(*components.MapComponent)
-
-	// Check if player is standing on stairs
-	if playerPos.X < 0 || playerPos.Y < 0 || playerPos.X >= mapComp.Width || playerPos.Y >= mapComp.Height {
-		return
-	}
-
-	tileUnderPlayer := mapComp.Tiles[playerPos.Y][playerPos.X]
-
-	// If player is on stairs, check for transition input
-	if (tileUnderPlayer == components.TileStairsDown || tileUnderPlayer == components.TileStairsUp) &&
-		ebiten.IsKeyPressed(ebiten.KeyEnter) {
-		s.transitionBetweenMaps(world, tileUnderPlayer, playerPos)
-	}
+	// DISABLED - Transitions are now handled by MapRegistrySystem
+	// This stub is kept for compatibility purposes
+	return
 }
 
 // RepositionPlayer places the player at a new empty position on the map
@@ -150,6 +114,7 @@ func (s *MapSystem) FindEmptyPosition(mapComp *components.MapComponent) (int, in
 }
 
 // transitionBetweenMaps handles player movement between world map and dungeons
+// DEPRECATED: This function is no longer used. Map transitions are now handled by MapRegistrySystem.
 func (s *MapSystem) transitionBetweenMaps(world *ecs.World, tileType int, playerPos *components.PositionComponent) {
 	// Get the current map type
 	mapTypeInterface, exists := world.GetComponent(s.activeMap.ID, components.MapType)
@@ -188,13 +153,25 @@ func (s *MapSystem) transitionBetweenMaps(world *ecs.World, tileType int, player
 
 	// Find destination coordinates on the target map
 	targetX, targetY = s.findTransitionDestination(world, targetMapEntity, tileType)
-
 	// Set player position on the new map
 	playerPos.X = targetX
 	playerPos.Y = targetY
 
 	// Set the active map to the target map
 	s.SetActiveMap(targetMapEntity)
+
+	// Update player's map context to match the new map
+	playerEntities := world.GetEntitiesWithTag("player")
+	if len(playerEntities) > 0 {
+		playerEntity := playerEntities[0]
+		if world.HasComponent(playerEntity.ID, components.MapContextID) {
+			mapContextComp, _ := world.GetComponent(playerEntity.ID, components.MapContextID)
+			mapContext := mapContextComp.(*components.MapContextComponent)
+			mapContext.MapID = targetMapEntity.ID
+		} else {
+			world.AddComponent(playerEntity.ID, components.MapContextID, components.NewMapContextComponent(targetMapEntity.ID))
+		}
+	}
 
 	// Update camera to center on player
 	s.updateCameraPosition(world, targetX, targetY)

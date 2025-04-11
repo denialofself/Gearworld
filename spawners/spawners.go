@@ -16,6 +16,7 @@ type EntitySpawner struct {
 	world           *ecs.World
 	templateManager *data.EntityTemplateManager
 	logMessage      func(string) // Function for logging messages
+	spawnMapID      ecs.EntityID // ID of the map to spawn entities on
 }
 
 // NewEntitySpawner creates a new entity spawner
@@ -24,7 +25,13 @@ func NewEntitySpawner(world *ecs.World, templateManager *data.EntityTemplateMana
 		world:           world,
 		templateManager: templateManager,
 		logMessage:      logFunc,
+		spawnMapID:      0, // Initialize to 0 (no active map)
 	}
+}
+
+// SetSpawnMapID explicitly sets the map ID to use for spawning entities
+func (s *EntitySpawner) SetSpawnMapID(mapID ecs.EntityID) {
+	s.spawnMapID = mapID
 }
 
 // CreatePlayer creates a player entity at the given position
@@ -152,6 +159,27 @@ func (s *EntitySpawner) CreateEnemy(x, y int, enemyType string) (*ecs.Entity, er
 		Blocks: template.BlocksPath,
 	})
 
+	// Add map context component to associate the enemy with the map
+	var mapID ecs.EntityID
+	if s.spawnMapID != 0 {
+		mapID = s.spawnMapID
+		if s.logMessage != nil {
+			s.logMessage(fmt.Sprintf("DEBUG: Creating enemy with MapContext ID: %d", mapID))
+		}
+	} else {
+		// Fallback to getting the active map if spawnMapID not set
+		mapID = s.getActiveMap()
+		if s.logMessage != nil && mapID != 0 {
+			s.logMessage(fmt.Sprintf("DEBUG: Creating enemy with fallback MapContext ID: %d", mapID))
+		}
+	}
+
+	if mapID != 0 {
+		s.world.AddComponent(enemyEntity.ID, components.MapContextID, components.NewMapContextComponent(mapID))
+	} else if s.logMessage != nil {
+		s.logMessage("WARNING: Created enemy with no map context")
+	}
+
 	return enemyEntity, nil
 }
 
@@ -165,4 +193,44 @@ func (s *EntitySpawner) CreateTileMapping() *ecs.Entity {
 	s.world.AddComponent(tileMapEntity.ID, components.Appearance, components.NewTileMappingComponent())
 
 	return tileMapEntity
+}
+
+// getActiveMap returns the currently active map entity (if any)
+func (s *EntitySpawner) getActiveMap() ecs.EntityID {
+	// Try to find the map registry system first
+	for _, system := range s.world.GetSystems() {
+		// Check if it's a MapRegistrySystem (string comparison is a simple way to check the type)
+		if fmt.Sprintf("%T", system) == "*systems.MapRegistrySystem" {
+			// Use reflection to safely call the GetActiveMap method
+			if mapRegistry, ok := system.(interface {
+				GetActiveMap() *ecs.Entity
+			}); ok {
+				if activeMap := mapRegistry.GetActiveMap(); activeMap != nil {
+					return activeMap.ID
+				}
+			}
+		}
+	}
+
+	// Fallback: try to find a map system
+	for _, system := range s.world.GetSystems() {
+		if fmt.Sprintf("%T", system) == "*systems.MapSystem" {
+			if mapSys, ok := system.(interface {
+				GetActiveMap() *ecs.Entity
+			}); ok {
+				if activeMap := mapSys.GetActiveMap(); activeMap != nil {
+					return activeMap.ID
+				}
+			}
+		}
+	}
+
+	// As a last resort, look for any entity with the "map" tag
+	mapEntities := s.world.GetEntitiesWithTag("map")
+	if len(mapEntities) > 0 {
+		return mapEntities[0].ID
+	}
+
+	// No active map found
+	return 0
 }

@@ -24,6 +24,7 @@ type Game struct {
 	world                 *ecs.World
 	renderSystem          *systems.RenderSystem
 	mapSystem             *systems.MapSystem
+	mapRegistrySystem     *systems.MapRegistrySystem
 	movementSystem        *systems.MovementSystem
 	combatSystem          *systems.CombatSystem
 	cameraSystem          *systems.CameraSystem
@@ -43,9 +44,9 @@ func NewGame() *Game {
 	tileset, err := systems.NewTileset("Nice_curses_12x12.png", config.TileSize)
 	if err != nil {
 		panic(err)
-	}
-	// Initialize all systems
+	} // Initialize all systems
 	mapSystem := systems.NewMapSystem()
+	mapRegistrySystem := systems.NewMapRegistrySystem()
 	movementSystem := systems.NewMovementSystem()
 	combatSystem := systems.NewCombatSystem()
 	cameraSystem := systems.NewCameraSystem()
@@ -67,12 +68,13 @@ func NewGame() *Game {
 	entitySpawner := spawners.NewEntitySpawner(world, templateManager, systems.GetMessageLog().Add)
 
 	// Connect the camera system to the render system
-	renderSystem.SetCameraSystem(cameraSystem)
-	// Register systems with the world that need to be updated during the game loop
+	renderSystem.SetCameraSystem(cameraSystem) // Register systems with the world that need to be updated during the game loop
+	// Register systems with the world
+	world.AddSystem(mapSystem)
+	world.AddSystem(mapRegistrySystem)
 	world.AddSystem(movementSystem)
 	world.AddSystem(combatSystem)
 	world.AddSystem(cameraSystem)
-	world.AddSystem(mapSystem)
 	world.AddSystem(aiPathfindingSystem)
 	world.AddSystem(aiTurnProcessorSystem)
 	world.AddSystem(passiveEffectsSystem)
@@ -81,6 +83,7 @@ func NewGame() *Game {
 		world:                 world,
 		renderSystem:          renderSystem,
 		mapSystem:             mapSystem,
+		mapRegistrySystem:     mapRegistrySystem,
 		movementSystem:        movementSystem,
 		combatSystem:          combatSystem,
 		cameraSystem:          cameraSystem,
@@ -107,6 +110,29 @@ func (g *Game) initialize() {
 	// Create the tile mapping entity
 	g.entitySpawner.CreateTileMapping()
 
+	// Initialize the map registry system
+	g.mapRegistrySystem.Initialize(g.world)
+
+	// First, generate a world map
+	worldMapGenerator := generation.NewWorldMapGenerator(time.Now().UnixNano())
+	worldMapEntity := worldMapGenerator.CreateWorldMapEntity(g.world, 200, 200)
+
+	// Make sure the world map is properly tagged
+	worldMapEntity.AddTag("map")
+	worldMapEntity.AddTag("worldmap")
+	g.world.TagEntity(worldMapEntity.ID, "map")
+	g.world.TagEntity(worldMapEntity.ID, "worldmap")
+
+	// Add map type component to the world map
+	g.world.AddComponent(worldMapEntity.ID, components.MapType,
+		components.NewMapTypeComponent("worldmap", 0))
+
+	// Log the world map entity ID for debugging
+	systems.GetMessageLog().Add(fmt.Sprintf("DEBUG: Created world map with ID: %d", worldMapEntity.ID))
+
+	// Register the world map with the map registry
+	g.mapRegistrySystem.RegisterMap(worldMapEntity)
+
 	// Create a dungeon themer
 	dungeonThemer := generation.NewDungeonThemer(
 		g.world,
@@ -125,13 +151,46 @@ func (g *Game) initialize() {
 		Size:                  generation.SizeLarge,
 		Generator:             generation.GeneratorBSP,
 		DensityFactor:         .30,
-		HigherLevelChance:     0.05,  // 5% chance for level 2 monsters
-		EvenHigherLevelChance: 0.01,  // 1% chance for level 3 monsters
-		AddStairsUp:           true, // No need for stairs up since we're removing world map
+		HigherLevelChance:     0.05, // 5% chance for level 2 monsters
+		EvenHigherLevelChance: 0.01, // 1% chance for level 3 monsters
+		AddStairsUp:           true, // Add stairs up to return to the world map
 	}
 
 	// Generate the themed dungeon with appropriate monsters
 	dungeonEntity := dungeonThemer.GenerateThemedDungeon(config)
+
+	// Add map type component if it doesn't exist
+	if !g.world.HasComponent(dungeonEntity.ID, components.MapType) {
+		g.world.AddComponent(dungeonEntity.ID, components.MapType,
+			components.NewMapTypeComponent("dungeon", 1))
+	}
+
+	// Log the dungeon entity ID for debugging
+	systems.GetMessageLog().Add(fmt.Sprintf("DEBUG: Created dungeon with ID: %d", dungeonEntity.ID))
+
+	// Register the dungeon with the map registry
+	g.mapRegistrySystem.RegisterMap(dungeonEntity)
+
+	// Add a dungeon entrance on the world map
+	worldMapComp, exists := g.world.GetComponent(worldMapEntity.ID, components.MapComponentID)
+	if exists {
+		worldMap := worldMapComp.(*components.MapComponent)
+
+		// Find a suitable location for dungeon entrance (roughly center of map)
+		centerX, centerY := worldMap.Width/2, worldMap.Height/2
+
+		// Find an empty space near the center
+		for y := centerY - 5; y <= centerY+5; y++ {
+			for x := centerX - 5; x <= centerX+5; x++ {
+				if worldMap.Tiles[y][x] == components.TileGrass ||
+					worldMap.Tiles[y][x] == components.TileWasteland {
+					// Place dungeon entrance
+					worldMap.Tiles[y][x] = components.TileStairsDown
+					break
+				}
+			}
+		}
+	}
 
 	// Get the map component from the dungeon entity
 	var mapComp *components.MapComponent
@@ -144,8 +203,9 @@ func (g *Game) initialize() {
 		return
 	}
 
-	// Set the active map in the map system
-	g.mapSystem.SetActiveMap(dungeonEntity)
+	// We'll start in the dungeon
+	// Set the active map in the map registry system
+	g.mapRegistrySystem.SetActiveMap(dungeonEntity)
 
 	// Find empty position for player
 	playerX, playerY := g.mapSystem.FindEmptyPosition(mapComp)
@@ -153,38 +213,47 @@ func (g *Game) initialize() {
 	// Create the player entity
 	playerEntity := g.entitySpawner.CreatePlayer(playerX, playerY)
 
+	// Add map context component to the player
+	g.world.AddComponent(playerEntity.ID, components.MapContextID,
+		components.NewMapContextComponent(dungeonEntity.ID))
+
 	// Create a camera entity for the player
 	g.entitySpawner.CreateCamera(uint64(playerEntity.ID), playerX, playerY)
 
-	// Add welcome message
-	systems.GetMessageLog().Add("Welcome to the abandoned dungeon!")
+	// Print a summary of all maps and their IDs
+	g.printMapSummary()
 
-	// Add instruction message
-	systems.GetMessageLog().Add("Use arrow keys to move.")
+	// Add welcome message
+	systems.GetMessageLog().Add("Welcome to the dungeon! Use arrow keys to move.")
 }
+
+// Flag to track if we need to redraw the screen
+var needsRedraw = true
 
 // Update updates the game state.
 func (g *Game) Update() error { // Toggle debug message window with F1 key
 	if inpututil.IsKeyJustPressed(ebiten.KeyF1) {
 		g.renderSystem.ToggleDebugWindow()
+		needsRedraw = true
 	}
 	// If debug window is active
 	if g.renderSystem.IsDebugWindowActive() {
 		// ESC to close debug window
 		if ebiten.IsKeyPressed(ebiten.KeyEscape) {
 			g.renderSystem.ToggleDebugWindow()
+			needsRedraw = true
 		}
 
 		// Handle scrolling through debug messages with arrow keys
 		if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
 			g.renderSystem.ScrollDebugUp()
+			needsRedraw = true
 		}
 		if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) {
 			g.renderSystem.ScrollDebugDown()
+			needsRedraw = true
 		}
 
-		// Only update the render system when debug window is active
-		g.renderSystem.Update(g.world, 1.0/60.0)
 		return nil
 	}
 
@@ -195,29 +264,243 @@ func (g *Game) Update() error { // Toggle debug message window with F1 key
 			err := cmd.Start()
 			if err != nil {
 				systems.GetMessageLog().Add("Error launching tileset viewer: " + err.Error())
+				needsRedraw = true
 			}
 		}()
 	}
 
-	// Update all systems
-	g.world.Update(1.0 / 60.0) // passing approximate dt value
+	// Don't process input if a map transition is in progress
+	if g.mapRegistrySystem.IsTransitionInProgress() {
+		systems.GetDebugLog().Add("Update skipped: map transition in progress")
+		return nil
+	}
 
-	// Update render system separately (not part of world systems)
-	g.renderSystem.Update(g.world, 1.0/60.0)
+	// Check for player input before updating
+	playerMoved := false
+	if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) ||
+		inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) ||
+		inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) ||
+		inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) ||
+		inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+		playerMoved = true
+	}
+	// Only update game state if player has taken a turn
+	if playerMoved {
+		// Print debug info before updating systems
+		g.printMapDebugInfo()
+
+		// Update all systems
+		g.world.Update(1.0 / 60.0) // passing approximate dt value
+		needsRedraw = true
+	}
 
 	return nil
 }
 
+// Store the current rendered screen to avoid redrawing every frame
+var cachedScreen *ebiten.Image
+
 // Draw draws the game screen.
 func (g *Game) Draw(screen *ebiten.Image) {
-	// Use the render system to draw the game
-	g.renderSystem.Draw(g.world, screen)
+	// Only redraw if necessary
+	if needsRedraw || cachedScreen == nil {
+		// Create a new buffer image if we don't have one yet
+		if cachedScreen == nil {
+			cachedScreen = ebiten.NewImage(config.ScreenWidth*config.TileSize, config.ScreenHeight*config.TileSize)
+		}
 
-	// Print FPS for debugging
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS: %.1f", ebiten.ActualFPS()))
+		// Clear the cached screen before drawing
+		cachedScreen.Clear()
+
+		// Use the render system to draw to our cached image
+		g.renderSystem.Draw(g.world, cachedScreen)
+
+		// Add FPS counter to the cached image
+		ebitenutil.DebugPrintAt(cachedScreen, fmt.Sprintf("FPS: %.1f", ebiten.ActualFPS()), 0, 0)
+
+		// Reset the flag since we've redrawn
+		needsRedraw = false
+	}
+
+	// Draw the cached screen to the actual screen
+	op := &ebiten.DrawImageOptions{}
+	screen.DrawImage(cachedScreen, op)
 }
 
 // Layout implements ebiten.Game's Layout.
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return config.ScreenWidth * config.TileSize, config.ScreenHeight * config.TileSize
+}
+
+// printMapDebugInfo outputs debug information about the current map and player position
+func (g *Game) printMapDebugInfo() {
+	// Get the active map
+	activeMap := g.mapRegistrySystem.GetActiveMap()
+	if activeMap == nil {
+		systems.GetDebugLog().Add("ERROR: No active map found")
+		return
+	}
+
+	// Get player entity and position
+	playerEntities := g.world.GetEntitiesWithTag("player")
+	if len(playerEntities) == 0 {
+		systems.GetDebugLog().Add("ERROR: No player entity found")
+		return
+	}
+
+	playerEntity := playerEntities[0]
+	var playerX, playerY int
+	if posComp, exists := g.world.GetComponent(playerEntity.ID, components.Position); exists {
+		pos := posComp.(*components.PositionComponent)
+		playerX = pos.X
+		playerY = pos.Y
+	}
+
+	// Get player's map context
+	var playerMapID ecs.EntityID
+	if contextComp, exists := g.world.GetComponent(playerEntity.ID, components.MapContextID); exists {
+		mapContext := contextComp.(*components.MapContextComponent)
+		playerMapID = mapContext.MapID
+
+		// Just log if there's a mismatch, but don't auto-correct
+		if playerMapID != activeMap.ID {
+			systems.GetDebugLog().Add(fmt.Sprintf("MAP MISMATCH: Player is on map %d but active map is %d",
+				playerMapID, activeMap.ID))
+		}
+	}
+
+	// Get map type info
+	var mapType string
+	var mapLevel int
+	if typeComp, exists := g.world.GetComponent(activeMap.ID, components.MapType); exists {
+		mapTypeComp := typeComp.(*components.MapTypeComponent)
+		mapType = mapTypeComp.MapType
+		mapLevel = mapTypeComp.Level
+	} else {
+		mapType = "unknown"
+		mapLevel = -1
+	}
+
+	// Get tile info at player position
+	tileType := -1
+	if mapComp, exists := g.world.GetComponent(activeMap.ID, components.MapComponentID); exists {
+		mapData := mapComp.(*components.MapComponent)
+		if playerX >= 0 && playerX < mapData.Width && playerY >= 0 && playerY < mapData.Height {
+			tileType = mapData.Tiles[playerY][playerX]
+		}
+	}
+
+	// Get map entity counts
+	totalEntities := 0
+	entitiesWithMapContext := 0
+	entitiesOnActiveMap := 0
+	entitiesOnWrongMap := 0
+	enemiesOnWrongMap := 0
+	enemyMapContextIDs := make(map[ecs.EntityID]int) // Count of enemies per map context
+
+	for _, entity := range g.world.GetAllEntities() {
+		if entity.HasTag("map") || entity.HasTag("tilemap") {
+			continue // Skip map entities
+		}
+
+		totalEntities++
+
+		if g.world.HasComponent(entity.ID, components.MapContextID) {
+			entitiesWithMapContext++
+
+			contextComp, _ := g.world.GetComponent(entity.ID, components.MapContextID)
+			mapContext := contextComp.(*components.MapContextComponent)
+
+			if mapContext.MapID == activeMap.ID {
+				entitiesOnActiveMap++
+				if entity.HasTag("enemy") {
+					enemyMapContextIDs[mapContext.MapID]++
+				}
+			} else {
+				entitiesOnWrongMap++
+				if entity.HasTag("enemy") {
+					enemiesOnWrongMap++
+					enemyMapContextIDs[mapContext.MapID]++
+
+					// Log detailed info about misplaced enemies
+					if g.world.HasComponent(entity.ID, components.Name) {
+						nameComp, _ := g.world.GetComponent(entity.ID, components.Name)
+						name := nameComp.(*components.NameComponent)
+						systems.GetDebugLog().Add(fmt.Sprintf("MISPLACED: Enemy '%s' (ID: %d) on map %d instead of %d",
+							name.Name, entity.ID, mapContext.MapID, activeMap.ID))
+					}
+				}
+			}
+		}
+	}
+
+	// Convert enemy map context IDs map to a string for logging
+	var enemyContextsStr string
+	for mapID, count := range enemyMapContextIDs {
+		// Get map type for this ID if possible
+		mapType := "unknown"
+		mapEntity := g.world.GetEntity(mapID)
+		if mapEntity != nil && g.world.HasComponent(mapID, components.MapType) {
+			typeComp, _ := g.world.GetComponent(mapID, components.MapType)
+			mapTypeComp := typeComp.(*components.MapTypeComponent)
+			mapType = mapTypeComp.MapType
+		}
+
+		enemyContextsStr += fmt.Sprintf(" %s(%d):%d", mapType, mapID, count)
+	}
+
+	// Add all the debug info
+	systems.GetDebugLog().Add(fmt.Sprintf("--- MAP DEBUG INFO ---"))
+	systems.GetDebugLog().Add(fmt.Sprintf("Active Map: %s (Level: %d, ID: %d)", mapType, mapLevel, activeMap.ID))
+	systems.GetDebugLog().Add(fmt.Sprintf("Player Position: %d,%d (Tile: %d)", playerX, playerY, tileType))
+	systems.GetDebugLog().Add(fmt.Sprintf("Player MapContext ID: %d (Matches active: %v)", playerMapID, playerMapID == activeMap.ID))
+	systems.GetDebugLog().Add(fmt.Sprintf("Entity Counts - Total: %d, With MapContext: %d, On Active Map: %d",
+		totalEntities, entitiesWithMapContext, entitiesOnActiveMap))
+	systems.GetDebugLog().Add(fmt.Sprintf("Entities on wrong map: %d, Enemies on wrong map: %d",
+		entitiesOnWrongMap, enemiesOnWrongMap))
+	if len(enemyContextsStr) > 0 {
+		systems.GetDebugLog().Add(fmt.Sprintf("Enemy distribution by map context:%s", enemyContextsStr))
+	}
+}
+
+// printMapSummary outputs information about all maps in the registry
+func (g *Game) printMapSummary() {
+	systems.GetDebugLog().Add("--- MAP SUMMARY ---")
+
+	// Get all map entities
+	mapEntities := g.world.GetEntitiesWithTag("map")
+	worldMapEntities := g.world.GetEntitiesWithTag("worldmap")
+
+	// Combine both lists
+	allMapEntities := append(mapEntities, worldMapEntities...)
+
+	// Log each map's details
+	for _, mapEntity := range allMapEntities {
+		var mapType string = "unknown"
+		var mapLevel int = -1
+
+		// Get map type info
+		if typeComp, exists := g.world.GetComponent(mapEntity.ID, components.MapType); exists {
+			mapTypeComp := typeComp.(*components.MapTypeComponent)
+			mapType = mapTypeComp.MapType
+			mapLevel = mapTypeComp.Level
+		}
+
+		// Get map dimensions
+		var mapWidth, mapHeight int
+		if mapComp, exists := g.world.GetComponent(mapEntity.ID, components.MapComponentID); exists {
+			mc := mapComp.(*components.MapComponent)
+			mapWidth = mc.Width
+			mapHeight = mc.Height
+		}
+
+		systems.GetDebugLog().Add(fmt.Sprintf("Map: %s (Level %d, ID: %d, Size: %dx%d)",
+			mapType, mapLevel, mapEntity.ID, mapWidth, mapHeight))
+	}
+
+	// Log active map
+	activeMap := g.mapRegistrySystem.GetActiveMap()
+	if activeMap != nil {
+		systems.GetDebugLog().Add(fmt.Sprintf("Active map ID: %d", activeMap.ID))
+	}
 }

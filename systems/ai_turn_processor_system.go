@@ -41,6 +41,36 @@ func (s *AITurnProcessorSystem) HandlePathEvent(world *ecs.World, event ecs.Even
 		entityID := pathEvent.EntityID
 		path := pathEvent.Path
 
+		// Get the active map ID from MapRegistrySystem
+		var activeMapID ecs.EntityID
+		for _, system := range world.GetSystems() {
+			if mapReg, ok := system.(interface{ GetActiveMap() *ecs.Entity }); ok {
+				if activeMap := mapReg.GetActiveMap(); activeMap != nil {
+					activeMapID = activeMap.ID
+					break
+				}
+			}
+		}
+
+		// Skip processing if we couldn't find the active map
+		if activeMapID == 0 {
+			return
+		}
+
+		// Skip entities that aren't on the active map
+		if world.HasComponent(entityID, components.MapContextID) {
+			mapContextComp, _ := world.GetComponent(entityID, components.MapContextID)
+			mapContext := mapContextComp.(*components.MapContextComponent)
+
+			// Skip if not on the active map
+			if mapContext.MapID != activeMapID {
+				return
+			}
+		} else {
+			// Skip entities without a map context
+			return
+		}
+
 		// Get AI component
 		aiComp, hasAI := world.GetComponent(entityID, components.AI)
 		if !hasAI {
@@ -190,13 +220,24 @@ func (s *AITurnProcessorSystem) processTurn(world *ecs.World, entityID uint64, a
 
 // isValidMove checks if a position is a valid movement destination
 func (s *AITurnProcessorSystem) isValidMove(world *ecs.World, x, y int) bool {
-	// Get map for checking walls
-	mapEntities := world.GetEntitiesWithTag("map")
-	if len(mapEntities) == 0 {
+	// Get the active map from MapRegistrySystem
+	var activeMapID ecs.EntityID
+	for _, system := range world.GetSystems() {
+		if mapReg, ok := system.(interface{ GetActiveMap() *ecs.Entity }); ok {
+			if activeMap := mapReg.GetActiveMap(); activeMap != nil {
+				activeMapID = activeMap.ID
+				break
+			}
+		}
+	}
+
+	// Skip if we couldn't find the active map
+	if activeMapID == 0 {
 		return false
 	}
 
-	mapComp, exists := world.GetComponent(mapEntities[0].ID, components.MapComponentID)
+	// Get map component
+	mapComp, exists := world.GetComponent(activeMapID, components.MapComponentID)
 	if !exists {
 		return false
 	}
@@ -207,8 +248,18 @@ func (s *AITurnProcessorSystem) isValidMove(world *ecs.World, x, y int) bool {
 		return false
 	}
 
-	// Check for entity collision
+	// Check for entity collision, only on the active map
 	for _, entity := range world.GetAllEntities() {
+		// Skip entities not on the active map
+		if world.HasComponent(entity.ID, components.MapContextID) {
+			mapContextComp, _ := world.GetComponent(entity.ID, components.MapContextID)
+			mapContext := mapContextComp.(*components.MapContextComponent)
+
+			if mapContext.MapID != activeMapID {
+				continue
+			}
+		}
+
 		posComp, hasPos := world.GetComponent(entity.ID, components.Position)
 		if !hasPos {
 			continue

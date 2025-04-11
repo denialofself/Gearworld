@@ -1,7 +1,11 @@
 package systems
 
 import (
+	"fmt"
+	"io"
+	"os"
 	"strings"
+	"time"
 )
 
 // MessageLog stores game messages
@@ -13,6 +17,14 @@ type MessageLog struct {
 // Global message log instance (singleton)
 var globalMessageLog *MessageLog
 var globalDebugLog *MessageLog
+
+// Debug log file writer
+var debugLogWriter io.Writer
+
+// SetDebugLogWriter sets a writer for debug log messages (typically a file)
+func SetDebugLogWriter(writer io.Writer) {
+	debugLogWriter = writer
+}
 
 // GetMessageLog returns the global message log instance
 func GetMessageLog() *MessageLog {
@@ -45,6 +57,20 @@ func (ml *MessageLog) Add(message string) {
 	if ml == globalMessageLog && strings.HasPrefix(message, "DEBUG:") {
 		GetDebugLog().Add(message)
 		return
+	}
+
+	// Add timestamp for debug log messages if it's the debug log
+	if ml == globalDebugLog && debugLogWriter != nil {
+		// Format with timestamp for file logging
+		timestamp := time.Now().Format("15:04:05.000")
+		formattedMsg := fmt.Sprintf("[%s] %s\n", timestamp, message)
+
+		// Write to the debug log file
+		_, err := fmt.Fprint(debugLogWriter, formattedMsg)
+		if err != nil {
+			// If we can't write to file, print the error to console
+			fmt.Fprintf(os.Stderr, "Error writing to debug log: %v\n", err)
+		}
 	}
 
 	ml.Messages = append(ml.Messages, message)
