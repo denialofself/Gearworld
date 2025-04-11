@@ -114,3 +114,38 @@ type RestEvent struct {
 func (e RestEvent) Type() ecs.EventType {
 	return EventRest
 }
+
+// StatsChangedEvent is emitted when an entity's stats change
+type StatsChangedEvent struct {
+	EntityID ecs.EntityID
+}
+
+// EntityDeathEvent is emitted when an entity dies
+type EntityDeathEvent struct {
+	EntityID ecs.EntityID
+}
+
+// PlayerMoveAttemptEvent is emitted when a player attempts to move
+type PlayerMoveAttemptEvent struct {
+	EntityID  ecs.EntityID
+	FromX     int
+	FromY     int
+	ToX       int
+	ToY       int
+	Direction int
+}
+
+// Type returns the event type
+func (e PlayerMoveAttemptEvent) Type() ecs.EventType {
+	return "player_move_attempt"
+}
+
+// TurnCompletedEvent is emitted when a player completes a turn
+type TurnCompletedEvent struct {
+	EntityID ecs.EntityID
+}
+
+// Type returns the event type
+func (e TurnCompletedEvent) Type() ecs.EventType {
+	return "turn_completed"
+}

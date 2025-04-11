@@ -1,6 +1,7 @@
 package components
 
 import (
+	"fmt"
 	"image/color"
 )
 
@@ -17,7 +18,7 @@ const (
 	TileWall
 	TileDoor
 	TileStairsDown
-	TileStairsUp 
+	TileStairsUp
 	TileWater
 	TileLava
 	TileGrass
@@ -163,20 +164,27 @@ func NewMapComponent(width, height int) *MapComponent {
 }
 
 // IsWall returns true if the tile at (x, y) is a wall
-// This is implemented in generation/mapping_helper.go to avoid import cycles
+// Uses IsWallFunc from generation/mapping_helper.go
 func (m *MapComponent) IsWall(x, y int) bool {
+	// Out of bounds is always considered a wall
 	if x < 0 || x >= m.Width || y < 0 || y >= m.Height {
-		return true // Out of bounds is considered a wall
+		return true
 	}
-	// This will be replaced by a reference to the function in mapping_helper.go
+
+	tileType := m.Tiles[y][x]
+
+	// Use the function pointer from mapping_helper.go if available
 	if IsWallFunc != nil {
-		return IsWallFunc(m.Tiles[y][x])
+		return IsWallFunc(tileType)
 	}
-	return false
+
+	// Fallback to basic wall detection if IsWallFunc isn't set yet
+	// This should only happen during early initialization
+	return tileType == TileWall
 }
 
-// IsWallFunc is a function pointer to hold the reference to the generation package's implementation
-// This will be set by the generation package to avoid import cycles
+// IsWallFunc is a function pointer set by generation/mapping_helper.go
+// It implements full wall tile type detection to avoid import cycles
 var IsWallFunc func(tileType int) bool
 
 // SetTile sets the tile at the given position
@@ -206,3 +214,44 @@ var ApplyBoxDrawingWallsFunc func(*MapComponent)
 // IsFloorType is a function pointer to hold the reference to the generation package's implementation
 // This will be set by the generation package to avoid import cycles
 var IsFloorTypeFunc func(tileType int) bool
+
+// DebugWallDetection tests wall detection on all tile types
+// This can help verify that wall detection works properly during initialization
+func DebugWallDetection() {
+	fmt.Println("DEBUG: Testing wall detection on all tile types")
+
+	// Test if a tile is correctly identified as a wall
+	testWallType := func(name string, tileType int) {
+		// First test the direct IsWallFunc if available
+		var result bool
+		var method string
+
+		if IsWallFunc != nil {
+			result = IsWallFunc(tileType)
+			method = "IsWallFunc"
+		} else {
+			// Use our fallback logic
+			result = tileType == TileWall
+			method = "fallback"
+		}
+
+		fmt.Printf("%s (%d): %v using %s\n", name, tileType, result, method)
+	}
+
+	// Test basic types
+	testWallType("TileWall", TileWall)
+	testWallType("TileFloor", TileFloor)
+
+	// Test wall variant types
+	testWallType("TileWallHorizontal", TileWallHorizontal)
+	testWallType("TileWallVertical", TileWallVertical)
+	testWallType("TileWallTopLeft", TileWallTopLeft)
+	testWallType("TileWallTopRight", TileWallTopRight)
+	testWallType("TileWallBottomLeft", TileWallBottomLeft)
+	testWallType("TileWallBottomRight", TileWallBottomRight)
+	testWallType("TileWallTeeLeft", TileWallTeeLeft)
+	testWallType("TileWallTeeRight", TileWallTeeRight)
+	testWallType("TileWallTeeTop", TileWallTeeTop)
+	testWallType("TileWallTeeBottom", TileWallTeeBottom)
+	testWallType("TileWallCross", TileWallCross)
+}

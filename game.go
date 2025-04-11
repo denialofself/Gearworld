@@ -21,18 +21,19 @@ import (
 
 // Game implements ebiten.Game interface.
 type Game struct {
-	world                 *ecs.World
-	renderSystem          *systems.RenderSystem
-	mapSystem             *systems.MapSystem
-	mapRegistrySystem     *systems.MapRegistrySystem
-	movementSystem        *systems.MovementSystem
-	combatSystem          *systems.CombatSystem
-	cameraSystem          *systems.CameraSystem
-	templateManager       *data.EntityTemplateManager
-	entitySpawner         *spawners.EntitySpawner
-	aiPathfindingSystem   *systems.AIPathfindingSystem
-	aiTurnProcessorSystem *systems.AITurnProcessorSystem
-	passiveEffectsSystem  *systems.PassiveEffectsSystem
+	world                     *ecs.World
+	renderSystem              *systems.RenderSystem
+	mapSystem                 *systems.MapSystem
+	mapRegistrySystem         *systems.MapRegistrySystem
+	movementSystem            *systems.MovementSystem
+	playerTurnProcessorSystem *systems.PlayerTurnProcessorSystem
+	combatSystem              *systems.CombatSystem
+	cameraSystem              *systems.CameraSystem
+	templateManager           *data.EntityTemplateManager
+	entitySpawner             *spawners.EntitySpawner
+	aiPathfindingSystem       *systems.AIPathfindingSystem
+	aiTurnProcessorSystem     *systems.AITurnProcessorSystem
+	passiveEffectsSystem      *systems.PassiveEffectsSystem
 }
 
 // NewGame creates a new game instance
@@ -48,6 +49,7 @@ func NewGame() *Game {
 	mapSystem := systems.NewMapSystem()
 	mapRegistrySystem := systems.NewMapRegistrySystem()
 	movementSystem := systems.NewMovementSystem()
+	playerTurnProcessorSystem := systems.NewPlayerTurnProcessorSystem()
 	combatSystem := systems.NewCombatSystem()
 	cameraSystem := systems.NewCameraSystem()
 	renderSystem := systems.NewRenderSystem(tileset)
@@ -73,6 +75,7 @@ func NewGame() *Game {
 	world.AddSystem(mapSystem)
 	world.AddSystem(mapRegistrySystem)
 	world.AddSystem(movementSystem)
+	world.AddSystem(playerTurnProcessorSystem)
 	world.AddSystem(combatSystem)
 	world.AddSystem(cameraSystem)
 	world.AddSystem(aiPathfindingSystem)
@@ -80,27 +83,34 @@ func NewGame() *Game {
 	world.AddSystem(passiveEffectsSystem)
 	// Create the game instance
 	game := &Game{
-		world:                 world,
-		renderSystem:          renderSystem,
-		mapSystem:             mapSystem,
-		mapRegistrySystem:     mapRegistrySystem,
-		movementSystem:        movementSystem,
-		combatSystem:          combatSystem,
-		cameraSystem:          cameraSystem,
-		templateManager:       templateManager,
-		entitySpawner:         entitySpawner,
-		aiPathfindingSystem:   aiPathfindingSystem,
-		aiTurnProcessorSystem: aiTurnProcessorSystem,
-		passiveEffectsSystem:  passiveEffectsSystem,
+		world:                     world,
+		renderSystem:              renderSystem,
+		mapSystem:                 mapSystem,
+		mapRegistrySystem:         mapRegistrySystem,
+		movementSystem:            movementSystem,
+		playerTurnProcessorSystem: playerTurnProcessorSystem,
+		combatSystem:              combatSystem,
+		cameraSystem:              cameraSystem,
+		templateManager:           templateManager,
+		entitySpawner:             entitySpawner,
+		aiPathfindingSystem:       aiPathfindingSystem,
+		aiTurnProcessorSystem:     aiTurnProcessorSystem,
+		passiveEffectsSystem:      passiveEffectsSystem,
 	}
 
 	// Initialize the game world
 	game.initialize()
 	// Initialize event listeners
+	movementSystem.Initialize(world)
 	combatSystem.Initialize(world)
 	aiPathfindingSystem.Initialize(world)
 	aiTurnProcessorSystem.Initialize(world)
 	passiveEffectsSystem.Initialize(world)
+
+	// Call the map debug function
+	components.DebugWallDetection()
+
+	systems.GetDebugLog().Add("Game initialization complete")
 
 	return game
 }
@@ -231,11 +241,13 @@ func (g *Game) initialize() {
 var needsRedraw = true
 
 // Update updates the game state.
-func (g *Game) Update() error { // Toggle debug message window with F1 key
+func (g *Game) Update() error {
+	// Toggle debug message window with F1 key
 	if inpututil.IsKeyJustPressed(ebiten.KeyF1) {
 		g.renderSystem.ToggleDebugWindow()
 		needsRedraw = true
 	}
+
 	// If debug window is active
 	if g.renderSystem.IsDebugWindowActive() {
 		// ESC to close debug window
@@ -275,24 +287,11 @@ func (g *Game) Update() error { // Toggle debug message window with F1 key
 		return nil
 	}
 
-	// Check for player input before updating
-	playerMoved := false
-	if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) ||
-		inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) ||
-		inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) ||
-		inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) ||
-		inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-		playerMoved = true
-	}
-	// Only update game state if player has taken a turn
-	if playerMoved {
-		// Print debug info before updating systems
-		g.printMapDebugInfo()
+	// Update all systems - player input will be handled by PlayerTurnProcessorSystem
+	g.world.Update(1.0 / 60.0)
 
-		// Update all systems
-		g.world.Update(1.0 / 60.0) // passing approximate dt value
-		needsRedraw = true
-	}
+	// Always redraw after updating systems
+	needsRedraw = true
 
 	return nil
 }

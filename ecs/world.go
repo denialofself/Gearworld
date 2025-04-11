@@ -1,5 +1,8 @@
 package ecs
 
+// GenericEventListener is a function that handles all types of events
+type GenericEventListener func(*World, interface{})
+
 // World manages all entities and components
 type World struct {
 	entities map[EntityID]*Entity
@@ -11,16 +14,19 @@ type World struct {
 	entityTags map[string]map[EntityID]bool
 	// Event manager for system communication
 	eventManager *EventManager
+	// Generic event listeners
+	genericListeners []GenericEventListener
 }
 
 // NewWorld creates a new ECS world
 func NewWorld() *World {
 	return &World{
-		entities:     make(map[EntityID]*Entity),
-		components:   make(map[EntityID]ComponentMap),
-		systems:      make([]System, 0),
-		entityTags:   make(map[string]map[EntityID]bool),
-		eventManager: NewEventManager(),
+		entities:         make(map[EntityID]*Entity),
+		components:       make(map[EntityID]ComponentMap),
+		systems:          make([]System, 0),
+		entityTags:       make(map[string]map[EntityID]bool),
+		eventManager:     NewEventManager(),
+		genericListeners: make([]GenericEventListener, 0),
 	}
 }
 
@@ -151,9 +157,22 @@ func (w *World) GetEventManager() *EventManager {
 	return w.eventManager
 }
 
-// EmitEvent is a convenience method to emit an event
-func (w *World) EmitEvent(event Event) {
-	w.eventManager.Emit(event)
+// RegisterEventListener registers a function to receive all events
+func (w *World) RegisterEventListener(listener GenericEventListener) {
+	w.genericListeners = append(w.genericListeners, listener)
+}
+
+// EmitEvent sends an event to all registered listeners
+func (w *World) EmitEvent(event interface{}) {
+	// Forward to typed event listeners if it's a typed event
+	if typedEvent, ok := event.(Event); ok {
+		w.eventManager.Emit(typedEvent)
+	}
+
+	// Broadcast to all generic listeners
+	for _, listener := range w.genericListeners {
+		listener(w, event)
+	}
 }
 
 // GetEntity returns an entity by its ID

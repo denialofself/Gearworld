@@ -826,7 +826,7 @@ func isWalkable(tileType int) bool {
 // connectToMainDungeon connects a disconnected region to the main dungeon
 func (g *DungeonGenerator) connectToMainDungeon(mapComp *components.MapComponent, x, y int, visited [][]bool) {
 	// Find the closest floor tile that is part of the main dungeon
-	minDist := mapComp.Width + mapComp.Height
+	minDist := mapComp.Width + mapComp.Height // max possible distance
 	var targetX, targetY int
 
 	for cy := 0; cy < mapComp.Height; cy++ {
@@ -1161,7 +1161,7 @@ func abs(x int) int {
 
 // applyImprovedBoxDrawingWalls is an enhanced version of the box drawing wall application
 // that ensures all walls, including interior ones, are properly rendered with appropriate characters
-func (g *DungeonGenerator) applyImprovedBoxDrawingWalls(mapComp *components.MapComponent) {	// Phase 1: Apply initial wall types to all walls
+func (g *DungeonGenerator) applyImprovedBoxDrawingWalls(mapComp *components.MapComponent) { // Phase 1: Apply initial wall types to all walls
 	for y := 0; y < mapComp.Height; y++ {
 		for x := 0; x < mapComp.Width; x++ {
 			// Only process basic wall tiles
@@ -1275,37 +1275,37 @@ func (g *DungeonGenerator) fixWallInconsistencies(mapComp *components.MapCompone
 
 // Helper functions to check wall connections in different directions
 func wallConnectsUp(wallType int) bool {
-	return wallType == components.TileWallVertical ||
-		wallType == components.TileWallTeeLeft ||
-		wallType == components.TileWallTeeRight ||
-		wallType == components.TileWallCross ||
-		wallType == components.TileWallBottomLeft ||
-		wallType == components.TileWallBottomRight
+	return wallType == components.TileWallVertical || // 10 │
+		wallType == components.TileWallTeeLeft || // 15 ├
+		wallType == components.TileWallTeeRight || // 16 ┤
+		wallType == components.TileWallCross || // 19 ┼
+		wallType == components.TileWallBottomLeft || // 13 └
+		wallType == components.TileWallBottomRight // 14 ┘
 }
 
 func wallConnectsRight(wallType int) bool {
-	return wallType == components.TileWallHorizontal ||
-		wallType == components.TileWallTeeTop ||
-		wallType == components.TileWallTeeBottom ||
-		wallType == components.TileWallCross ||
-		wallType == components.TileWallTopLeft ||
-		wallType == components.TileWallBottomLeft
+	return wallType == components.TileWallHorizontal || // 9 ─
+		wallType == components.TileWallTeeTop || // 17 ┬
+		wallType == components.TileWallTeeBottom || // 18 ┴
+		wallType == components.TileWallCross || // 19 ┼
+		wallType == components.TileWallTopLeft || // 11 ┌
+		wallType == components.TileWallBottomLeft // 13 └
 }
 
 func wallConnectsDown(wallType int) bool {
-	return wallType == components.TileWallVertical ||
-		wallType == components.TileWallTeeLeft ||
-		wallType == components.TileWallTeeRight ||
-		wallType == components.TileWallCross ||
-		wallType == components.TileWallTopLeft ||
-		wallType == components.TileWallTopRight
+	return wallType == components.TileWallVertical || // 10 │
+		wallType == components.TileWallTeeLeft || // 15 ├
+		wallType == components.TileWallTeeRight || // 16 ┤
+		wallType == components.TileWallCross || // 19 ┼
+		wallType == components.TileWallTopLeft || // 11 ┌
+		wallType == components.TileWallTopRight // 12 ┐
 }
 
 func wallConnectsLeft(wallType int) bool {
-	return wallType == components.TileWallHorizontal ||
-		wallType == components.TileWallTeeTop ||
-		wallType == components.TileWallTeeBottom ||
-		wallType == components.TileWallCross ||
-		wallType == components.TileWallTopRight ||
-		wallType == components.TileWallBottomRight
+	return wallType == components.TileWallHorizontal || // 9 ─
+		wallType == components.TileWallTeeTop || // 17 ┬
+		wallType == components.TileWallTeeBottom || // 18 ┴
+		wallType == components.TileWallCross || // 19 ┼
+		wallType == components.TileWallTopRight || // 12 ┐
+		wallType == components.TileWallBottomRight // 14 ┘
 }
