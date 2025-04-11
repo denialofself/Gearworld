@@ -60,11 +60,6 @@ func (g *DungeonGenerator) GenerateBSPDungeon(mapComp *components.MapComponent) 
 	// Verify room connectivity and fix orphaned rooms
 	g.ensureRoomConnectivity(root, mapComp)
 
-	// Add features (water, lava, stairs, trees, etc.)
-	var rooms [][4]int
-	g.collectRooms(root, &rooms)
-	g.AddFeatures(mapComp, rooms)
-
 	// Apply box drawing characters to the walls
 	g.applyImprovedBoxDrawingWalls(mapComp)
 }
@@ -397,9 +392,6 @@ func (g *DungeonGenerator) GenerateLargeBSPDungeon(mapComp *components.MapCompon
 
 	// Verify connectivity and fix orphaned rooms
 	g.verifyGlobalConnectivity(mapComp)
-
-	// Add features to the dungeon
-	g.AddFeatures(mapComp, allRooms)
 
 	// Apply box drawing characters to all walls
 	g.applyWallTypes(mapComp)
@@ -1008,13 +1000,6 @@ func (g *DungeonGenerator) GenerateGiantBSPDungeon(mapComp *components.MapCompon
 	for i := 0; i < len(allSectionNodes); i++ {
 		g.ensureRoomConnectivity(allSectionNodes[i], mapComp)
 	}
-
-	// Add features to the dungeon
-	var allRooms [][4]int
-	for _, node := range allSectionNodes {
-		g.collectRooms(node, &allRooms)
-	}
-	g.AddFeatures(mapComp, allRooms)
 
 	// Apply improved box drawing characters to the walls
 	g.applyImprovedBoxDrawingWalls(mapComp)

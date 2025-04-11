@@ -1,6 +1,7 @@
 package generation
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -66,6 +67,17 @@ func (p *DungeonPopulator) PopulateDungeon(mapComp *components.MapComponent, opt
 	// Get suitable monster templates for this dungeon level and theme
 	monsterTemplates := p.getEligibleMonsters(options)
 
+	// Log monster template information for debugging
+	if len(monsterTemplates) == 0 {
+		fmt.Printf("Warning: No eligible monster templates found for theme. PreferredTags: %v, ExcludeTags: %v\n",
+			options.PreferredTags, options.ExcludeTags)
+	} else {
+		fmt.Printf("Eligible monsters for spawning:\n")
+		for _, template := range monsterTemplates {
+			fmt.Printf("  - %s (weight: %d, level: %d)\n", template.ID, template.Weight, template.Level)
+		}
+	}
+
 	// Place monsters throughout the dungeon
 	monstersPlaced := 0
 	maxAttempts := totalMonsters * 5 // Limit attempts to avoid infinite loop
@@ -91,6 +103,8 @@ func (p *DungeonPopulator) PopulateDungeon(mapComp *components.MapComponent, opt
 			monstersPlaced++
 		}
 	}
+
+	fmt.Printf("Placed %d monsters out of %d planned\n", monstersPlaced, totalMonsters)
 }
 
 // countRooms estimates the number of rooms in the dungeon
@@ -229,12 +243,18 @@ func (p *DungeonPopulator) getEligibleMonsters(options PopulationOptions) []mons
 
 // matchesTheme checks if a monster matches the dungeon theme
 func (p *DungeonPopulator) matchesTheme(template *data.EntityTemplate, options PopulationOptions) bool {
+	// If we have preferred tags from JSON theme, use those as the primary filter
+	if len(options.PreferredTags) > 0 {
+		// Monster must match at least one of the preferred tags
+		return p.hasPreferredTags(template, options.PreferredTags)
+	}
+
 	// Standard theme accepts all monsters
 	if options.Theme == ThemeStandard {
 		return true
 	}
 
-	// Check for specific theme matches
+	// For legacy enum themes, check for specific theme matches
 	switch options.Theme {
 	case ThemeUndead:
 		return p.hasTag(template, "undead")
@@ -244,6 +264,10 @@ func (p *DungeonPopulator) matchesTheme(template *data.EntityTemplate, options P
 		return p.hasTag(template, "insect") || p.hasTag(template, "vermin")
 	case ThemeDemonic:
 		return p.hasTag(template, "demon") || p.hasTag(template, "devil")
+	case ThemeAbandoned:
+		// Abandoned theme uses a mix of monsters but primarily vermin
+		return p.hasTag(template, "vermin") || p.hasTag(template, "insect") ||
+			p.hasTag(template, "undead")
 	}
 
 	// Default to allowing the monster if theme handling is not implemented

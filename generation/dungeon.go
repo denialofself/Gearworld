@@ -102,3 +102,103 @@ func (g *DungeonGenerator) FindEmptyPosition(mapComp *components.MapComponent) (
 		}
 	}
 }
+
+// FindFirstRoomInMap attempts to identify the first room in a dungeon map
+// Returns a room as [x, y, width, height] or an empty slice if no room could be identified
+func (g *DungeonGenerator) FindFirstRoomInMap(mapComp *components.MapComponent) []int {
+	// Strategy: scan the top-left quarter of the map looking for a room
+	// A room is defined as a contiguous area of floor tiles surrounded by walls
+	searchWidth := mapComp.Width / 2
+	searchHeight := mapComp.Height / 2
+
+	// First, find a floor tile (potential room center)
+	var startX, startY int
+	foundStart := false
+
+	for y := 5; y < searchHeight-5 && !foundStart; y++ {
+		for x := 5; x < searchWidth-5 && !foundStart; x++ {
+			if mapComp.Tiles[y][x] == components.TileFloor {
+				// Check if this might be room center (surrounded by floor tiles)
+				floorCount := 0
+				for dy := -2; dy <= 2; dy++ {
+					for dx := -2; dx <= 2; dx++ {
+						nx, ny := x+dx, y+dy
+						if nx >= 0 && nx < mapComp.Width && ny >= 0 && ny < mapComp.Height &&
+							mapComp.Tiles[ny][nx] == components.TileFloor {
+							floorCount++
+						}
+					}
+				}
+
+				// If we found enough floor tiles around, this is likely a room center
+				if floorCount >= 20 { // At least 20 out of 25 tiles are floor
+					startX, startY = x, y
+					foundStart = true
+					break
+				}
+			}
+		}
+	}
+
+	if !foundStart {
+		return []int{} // No suitable room found
+	}
+
+	// Now find the room boundaries by expanding from the center
+	minX, minY := startX, startY
+	maxX, maxY := startX, startY
+
+	// Find left boundary
+	for x := startX; x >= 0; x-- {
+		if mapComp.IsWall(x, startY) {
+			minX = x + 1
+			break
+		}
+		if x == 0 {
+			minX = 0
+		}
+	}
+
+	// Find right boundary
+	for x := startX; x < mapComp.Width; x++ {
+		if mapComp.IsWall(x, startY) {
+			maxX = x - 1
+			break
+		}
+		if x == mapComp.Width-1 {
+			maxX = mapComp.Width - 1
+		}
+	}
+
+	// Find top boundary
+	for y := startY; y >= 0; y-- {
+		if mapComp.IsWall(startX, y) {
+			minY = y + 1
+			break
+		}
+		if y == 0 {
+			minY = 0
+		}
+	}
+
+	// Find bottom boundary
+	for y := startY; y < mapComp.Height; y++ {
+		if mapComp.IsWall(startX, y) {
+			maxY = y - 1
+			break
+		}
+		if y == mapComp.Height-1 {
+			maxY = mapComp.Height - 1
+		}
+	}
+
+	width := maxX - minX + 1
+	height := maxY - minY + 1
+
+	// Validate the room (must be reasonable size)
+	if width < 4 || height < 4 || width > mapComp.Width/2 || height > mapComp.Height/2 {
+		return []int{} // Not a valid room
+	}
+
+	return []int{minX, minY, width, height}
+}

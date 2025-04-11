@@ -1,0 +1,24 @@
+{
+  "id": "demonic",
+  "name": "Hellish Depths",
+  "description": "A corrupted place where demonic forces have taken root",
+  "difficulty": 5,
+  "tags": ["demon", "fiend", "undead", "cultist"],
+  "exclude_tags": ["wildlife", "goblinoid"],
+  
+  "water_chance": 0.0,
+  "lava_chance": 0.5,
+  "grass_chance": 0.0,
+  "tree_chance": 0.0,
+  "special_tiles": [
+    {"tile_type": "bones", "chance": 0.1},
+    {"tile_type": "flames", "chance": 0.2},
+    {"tile_type": "blood", "chance": 0.15}
+  ],
+  
+  "density_factor": 1.2,
+  "higher_level_chance": 0.25,
+  "even_higher_level_chance": 0.1,
+  "boss_chance": 0.25,
+  "boss_types": ["demon_lord", "fire_elemental", "hell_knight"]
+} 

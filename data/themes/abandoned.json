@@ -1,0 +1,23 @@
+{
+  "id": "abandoned",
+  "name": "Abandoned Ruins",
+  "description": "A forgotten place, abandoned long ago and now home to all manner of creatures",
+  "difficulty": 1,
+  "tags": ["vermin", "undead", "wildlife", "goblinoid"],
+  "exclude_tags": ["demon", "dragon"],
+  
+  "water_chance": 0.3,
+  "lava_chance": 0.05,
+  "grass_chance": 0.2,
+  "tree_chance": 0.05,
+  "special_tiles": [
+    {"tile_type": "bones", "chance": 0.02},
+    {"tile_type": "rubble", "chance": 0.05}
+  ],
+  
+  "density_factor": 0.8,
+  "higher_level_chance": 0.1,
+  "even_higher_level_chance": 0.02,
+  "boss_chance": 0.1,
+  "boss_types": ["goblin_chief", "giant_spider"]
+} 

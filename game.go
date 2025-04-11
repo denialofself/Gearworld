@@ -154,57 +154,41 @@ func (g *Game) initialize() {
 	// Set a random seed for dungeon generation
 	dungeonThemer.SetSeed(time.Now().UnixNano())
 
+	// Load dungeon themes from JSON files
+	err := dungeonThemer.LoadThemesFromDirectory("data/themes")
+	if err != nil {
+		systems.GetMessageLog().Add(fmt.Sprintf("WARNING: Failed to load dungeon themes: %v", err))
+	} else {
+		systems.GetMessageLog().Add("Successfully loaded dungeon themes from data/themes")
+	}
+
 	// Configure the dungeon (level 1, abandoned theme, large size)
 	config := generation.DungeonConfiguration{
-		Level:                 1,
-		Theme:                 generation.ThemeAbandoned,
-		Size:                  generation.SizeLarge,
-		Generator:             generation.GeneratorBSP,
-		DensityFactor:         .30,
-		HigherLevelChance:     0.05, // 5% chance for level 2 monsters
-		EvenHigherLevelChance: 0.01, // 1% chance for level 3 monsters
-		AddStairsUp:           true, // Add stairs up to return to the world map
+		Level:       1,
+		Size:        generation.SizeSmall,
+		Generator:   generation.GeneratorBSP,
+		AddStairsUp: true,               // Add stairs up to return to the world map
+		ThemeID:     "starting_station", // Use the JSON theme if available
 	}
 
 	// Generate the themed dungeon with appropriate monsters
-	dungeonEntity := dungeonThemer.GenerateThemedDungeon(config)
+	startingStationEntity := dungeonThemer.GenerateThemedDungeon(config)
 
 	// Add map type component if it doesn't exist
-	if !g.world.HasComponent(dungeonEntity.ID, components.MapType) {
-		g.world.AddComponent(dungeonEntity.ID, components.MapType,
-			components.NewMapTypeComponent("dungeon", 1))
+	if !g.world.HasComponent(startingStationEntity.ID, components.MapType) {
+		g.world.AddComponent(startingStationEntity.ID, components.MapType,
+			components.NewMapTypeComponent("starting_station", 1))
 	}
 
 	// Log the dungeon entity ID for debugging
-	systems.GetMessageLog().Add(fmt.Sprintf("DEBUG: Created dungeon with ID: %d", dungeonEntity.ID))
+	systems.GetMessageLog().Add(fmt.Sprintf("DEBUG: Created dungeon with ID: %d", startingStationEntity.ID))
 
 	// Register the dungeon with the map registry
-	g.mapRegistrySystem.RegisterMap(dungeonEntity)
-
-	// Add a dungeon entrance on the world map
-	worldMapComp, exists := g.world.GetComponent(worldMapEntity.ID, components.MapComponentID)
-	if exists {
-		worldMap := worldMapComp.(*components.MapComponent)
-
-		// Find a suitable location for dungeon entrance (roughly center of map)
-		centerX, centerY := worldMap.Width/2, worldMap.Height/2
-
-		// Find an empty space near the center
-		for y := centerY - 5; y <= centerY+5; y++ {
-			for x := centerX - 5; x <= centerX+5; x++ {
-				if worldMap.Tiles[y][x] == components.TileGrass ||
-					worldMap.Tiles[y][x] == components.TileWasteland {
-					// Place dungeon entrance
-					worldMap.Tiles[y][x] = components.TileStairsDown
-					break
-				}
-			}
-		}
-	}
+	g.mapRegistrySystem.RegisterMap(startingStationEntity)
 
 	// Get the map component from the dungeon entity
 	var mapComp *components.MapComponent
-	if comp, exists := g.world.GetComponent(dungeonEntity.ID, components.MapComponentID); exists {
+	if comp, exists := g.world.GetComponent(startingStationEntity.ID, components.MapComponentID); exists {
 		mapComp = comp.(*components.MapComponent)
 	}
 
@@ -215,7 +199,7 @@ func (g *Game) initialize() {
 
 	// We'll start in the dungeon
 	// Set the active map in the map registry system
-	g.mapRegistrySystem.SetActiveMap(dungeonEntity)
+	g.mapRegistrySystem.SetActiveMap(startingStationEntity)
 
 	// Find empty position for player
 	playerX, playerY := g.mapSystem.FindEmptyPosition(mapComp)
@@ -225,7 +209,7 @@ func (g *Game) initialize() {
 
 	// Add map context component to the player
 	g.world.AddComponent(playerEntity.ID, components.MapContextID,
-		components.NewMapContextComponent(dungeonEntity.ID))
+		components.NewMapContextComponent(startingStationEntity.ID))
 
 	// Create a camera entity for the player
 	g.entitySpawner.CreateCamera(uint64(playerEntity.ID), playerX, playerY)

@@ -464,71 +464,14 @@ func (s *MapRegistrySystem) transitionBetweenMaps(world *ecs.World, tileType int
 	} else if tileType == components.TileStairsUp {
 		// Player is heading to the world map or previous level
 		if targetMapType.MapType == "worldmap" {
-			// Find the dungeon entrance (stairs down) on the world map
-			targetMapComp, exists := world.GetComponent(targetMap.ID, components.MapComponentID)
-			if !exists {
-				fmt.Println("ERROR: Target worldmap has no map component")
-				GetDebugLog().Add("ERROR: Target worldmap has no map component")
-				s.transitionInProgress = false // Reset flag
-				return
-			}
+			// For transitions to the world map
+			fmt.Println("Transitioning to world map")
+			GetDebugLog().Add("Transitioning to world map")
 
-			tmc := targetMapComp.(*components.MapComponent)
-			foundStairs := false
-
-			// Search for stairs down (dungeon entrance)
-			for y := 0; y < tmc.Height; y++ {
-				for x := 0; x < tmc.Width; x++ {
-					if tmc.Tiles[y][x] == components.TileStairsDown {
-						// Put player next to the entrance, not directly on it
-						// Try adjacent positions first
-						adjacentPositions := []struct{ dx, dy int }{
-							{1, 0}, {-1, 0}, {0, 1}, {0, -1},
-							{1, 1}, {1, -1}, {-1, 1}, {-1, -1},
-						}
-
-						for _, pos := range adjacentPositions {
-							checkX, checkY := x+pos.dx, y+pos.dy
-							// Make sure position is in bounds and walkable
-							if checkX >= 0 && checkX < tmc.Width &&
-								checkY >= 0 && checkY < tmc.Height &&
-								(tmc.Tiles[checkY][checkX] == components.TileGrass ||
-									tmc.Tiles[checkY][checkX] == components.TileWasteland) {
-								targetX, targetY = checkX, checkY
-								foundStairs = true
-								break
-							}
-						}
-
-						if !foundStairs {
-							// Just use the stairs position if no adjacent spot is available
-							fmt.Println("No walkable adjacent tiles near dungeon entrance, using stairs position")
-							targetX, targetY = x, y
-							foundStairs = true
-						}
-						break
-					}
-				}
-				if foundStairs {
-					break
-				}
-			}
-
-			if !foundStairs {
-				// If no stairs found, use last position or find an empty spot
-				fmt.Println("Could not find stairs on worldmap, using fallback position")
-				if s.lastPosition != nil && s.lastMapID == targetMap.ID {
-					targetX, targetY = s.lastPosition.X, s.lastPosition.Y
-				} else {
-					mapSystem := s.getMapSystem()
-					if mapSystem != nil {
-						targetX, targetY = mapSystem.FindEmptyPosition(tmc)
-					} else {
-						// Simple fallback
-						targetX, targetY = tmc.Width/2, tmc.Height/2
-					}
-				}
-			}
+			// For world map, always position at center (railway station) at 100,100
+			targetX, targetY = 100, 100
+			fmt.Printf("TRANSITION: Positioning player at railway station (100,100) on world map\n")
+			GetDebugLog().Add("TRANSITION: Positioning player at railway station (100,100) on world map")
 		} else {
 			// For dungeon-to-dungeon transitions (going back up a level)
 			// If we have a last position, use it
