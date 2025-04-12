@@ -1,0 +1,12 @@
+{
+  "id": "leather_armor",
+  "name": "Leather Armor",
+  "description": "Basic protection made from tanned hide. Offers minimal protection but is lightweight.",
+  "item_type": "armor",
+  "tile_x": 3,
+  "tile_y": 2,
+  "color": "#895129",
+  "value": 8,
+  "weight": 3,
+  "tags": ["armor", "light"]
+} 

@@ -1,6 +1,7 @@
 package components
 
 import (
+	"ebiten-rogue/ecs"
 	"image/color"
 )
 
@@ -89,5 +90,129 @@ func NewCameraComponent(targetEntityID uint64) *CameraComponent {
 		X:      0,
 		Y:      0,
 		Target: targetEntityID,
+	}
+}
+
+// InventoryComponent represents an entity's inventory of items
+type InventoryComponent struct {
+	Items       []ecs.EntityID // Items in the inventory
+	MaxCapacity int            // Maximum number of items the inventory can hold
+}
+
+// NewInventoryComponent creates a new inventory component with a given capacity
+func NewInventoryComponent(capacity int) *InventoryComponent {
+	return &InventoryComponent{
+		Items:       make([]ecs.EntityID, 0),
+		MaxCapacity: capacity,
+	}
+}
+
+// AddItem adds an item to the inventory if there's space
+// Returns true if the item was added, false if inventory is full
+func (i *InventoryComponent) AddItem(itemID ecs.EntityID) bool {
+	if len(i.Items) >= i.MaxCapacity {
+		return false
+	}
+
+	i.Items = append(i.Items, itemID)
+	return true
+}
+
+// RemoveItem removes an item from the inventory by its entity ID
+// Returns true if item was found and removed, false otherwise
+func (i *InventoryComponent) RemoveItem(itemID ecs.EntityID) bool {
+	for idx, id := range i.Items {
+		if id == itemID {
+			// Remove the item by replacing it with the last element and truncating
+			i.Items[idx] = i.Items[len(i.Items)-1]
+			i.Items = i.Items[:len(i.Items)-1]
+			return true
+		}
+	}
+	return false
+}
+
+// GetItemByIndex returns the item at the given index or 0 if index is out of bounds
+func (i *InventoryComponent) GetItemByIndex(index int) ecs.EntityID {
+	if index < 0 || index >= len(i.Items) {
+		return 0
+	}
+	return i.Items[index]
+}
+
+// HasSpace returns true if there's still room in the inventory
+func (i *InventoryComponent) HasSpace() bool {
+	return len(i.Items) < i.MaxCapacity
+}
+
+// IsFull returns true if the inventory is at capacity
+func (i *InventoryComponent) IsFull() bool {
+	return len(i.Items) >= i.MaxCapacity
+}
+
+// Size returns the current number of items in the inventory
+func (i *InventoryComponent) Size() int {
+	return len(i.Items)
+}
+
+// ItemComponent indicates that an entity is an item that can be collected
+type ItemComponent struct {
+	ItemType    string      // Type of item: "weapon", "armor", "potion", etc.
+	Value       int         // Base value/power of the item
+	Weight      int         // Weight of the item (for inventory capacity calculations)
+	Description string      // Description of the item
+	TemplateID  string      // ID of the template that created this item
+	Data        interface{} // Additional item-specific data
+}
+
+// NewItemComponent creates a new item component
+func NewItemComponent(itemType string, value int, weight int) *ItemComponent {
+	return &ItemComponent{
+		ItemType:    itemType,
+		Value:       value,
+		Weight:      weight,
+		Description: "",
+		TemplateID:  "",
+		Data:        nil,
+	}
+}
+
+// NewItemComponentFromTemplate creates a new item component from a template
+func NewItemComponentFromTemplate(templateID string, itemType string, value int, weight int, description string) *ItemComponent {
+	return &ItemComponent{
+		ItemType:    itemType,
+		Value:       value,
+		Weight:      weight,
+		Description: description,
+		TemplateID:  templateID,
+		Data:        nil,
+	}
+}
+
+// FOVComponent represents an entity's field of vision capabilities
+type FOVComponent struct {
+	Range          int  // How far the entity can see in tiles
+	LightSource    bool // Whether this entity emits light
+	LightRange     int  // How far the light reaches if this is a light source
+	LightIntensity int  // Intensity of the light (affects brightness)
+}
+
+// NewFOVComponent creates a new FOV component with the specified range
+func NewFOVComponent(visionRange int) *FOVComponent {
+	return &FOVComponent{
+		Range:          visionRange,
+		LightSource:    false,
+		LightRange:     0,
+		LightIntensity: 0,
+	}
+}
+
+// NewLightSourceFOVComponent creates a new FOV component for a light source
+func NewLightSourceFOVComponent(visionRange, lightRange, intensity int) *FOVComponent {
+	return &FOVComponent{
+		Range:          visionRange,
+		LightSource:    true,
+		LightRange:     lightRange,
+		LightIntensity: intensity,
 	}
 }

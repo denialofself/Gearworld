@@ -7,9 +7,11 @@ import (
 
 // MapComponent stores the game map data
 type MapComponent struct {
-	Width  int
-	Height int
-	Tiles  [][]int
+	Width    int
+	Height   int
+	Tiles    [][]int
+	Visible  [][]bool // Track currently visible tiles
+	Explored [][]bool // Track tiles that have been seen at least once
 }
 
 // Tile types
@@ -146,17 +148,25 @@ func (t *TileMappingComponent) GetTileDefinition(tileType int) TileDefinition {
 // NewMapComponent creates a new map with the given dimensions
 func NewMapComponent(width, height int) *MapComponent {
 	m := &MapComponent{
-		Width:  width,
-		Height: height,
-		Tiles:  make([][]int, height),
+		Width:    width,
+		Height:   height,
+		Tiles:    make([][]int, height),
+		Visible:  make([][]bool, height),
+		Explored: make([][]bool, height),
 	}
 
 	// Initialize the tiles
 	for y := 0; y < height; y++ {
 		m.Tiles[y] = make([]int, width)
+		m.Visible[y] = make([]bool, width)
+		m.Explored[y] = make([]bool, width)
+
 		for x := 0; x < width; x++ {
 			// Start with walls everywhere
 			m.Tiles[y][x] = TileWall
+			// Initially nothing is visible or explored
+			m.Visible[y][x] = false
+			m.Explored[y][x] = false
 		}
 	}
 

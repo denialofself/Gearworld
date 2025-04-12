@@ -18,6 +18,9 @@ type RenderSystem struct {
 	cameraSystem      *CameraSystem // Reference to the camera system
 	debugWindowActive bool          // Whether the debug window is currently displayed
 	debugScrollOffset int           // Current scroll position in the debug log
+	showInventory     bool          // Whether to show inventory instead of stats panel
+	itemViewMode      bool          // Whether we're viewing a specific item's details
+	selectedItemIndex int           // Index of the currently selected item
 }
 
 // NewRenderSystem creates a new rendering system
@@ -27,6 +30,9 @@ func NewRenderSystem(tileset *Tileset) *RenderSystem {
 		cameraSystem:      nil, // Will be set via SetCameraSystem
 		debugWindowActive: false,
 		debugScrollOffset: 0,
+		showInventory:     false,
+		itemViewMode:      false,
+		selectedItemIndex: -1,
 	}
 }
 
@@ -41,6 +47,41 @@ func (s *RenderSystem) ToggleDebugWindow() {
 	if s.debugWindowActive {
 		GetMessageLog().Add("Debug window activated")
 	}
+}
+
+// ToggleInventoryDisplay toggles between stats panel and inventory panel
+func (s *RenderSystem) ToggleInventoryDisplay() {
+	s.showInventory = !s.showInventory
+	// Reset item view mode when toggling inventory
+	s.itemViewMode = false
+	s.selectedItemIndex = -1
+	if s.showInventory {
+		GetMessageLog().Add("Inventory opened")
+	} else {
+		GetMessageLog().Add("Inventory closed")
+	}
+}
+
+// IsInventoryOpen returns whether the inventory panel is currently shown
+func (s *RenderSystem) IsInventoryOpen() bool {
+	return s.showInventory
+}
+
+// IsItemViewMode returns whether we're currently viewing an item's details
+func (s *RenderSystem) IsItemViewMode() bool {
+	return s.itemViewMode
+}
+
+// ViewItemDetails sets up to view the details of a specific item
+func (s *RenderSystem) ViewItemDetails(itemIndex int) {
+	s.itemViewMode = true
+	s.selectedItemIndex = itemIndex
+}
+
+// ExitItemView returns to the normal inventory view
+func (s *RenderSystem) ExitItemView() {
+	s.itemViewMode = false
+	s.selectedItemIndex = -1
 }
 
 // Update renders entities with Position and Renderable components
@@ -66,7 +107,11 @@ func (s *RenderSystem) Draw(world *ecs.World, screen *ebiten.Image) {
 	s.drawGameScreen(world, screen)
 
 	// Draw UI elements
-	s.drawStatsPanel(world, screen)
+	if s.showInventory {
+		s.drawInventoryPanel(world, screen)
+	} else {
+		s.drawStatsPanel(world, screen)
+	}
 	s.drawMessagesPanel(screen)
 }
 
@@ -157,20 +202,53 @@ func (s *RenderSystem) drawStandardMap(world *ecs.World, screen *ebiten.Image, m
 				continue
 			}
 
+			// Check tile visibility
+			isVisible := mapData.Visible[worldY][worldX]
+			isExplored := mapData.Explored[worldY][worldX]
+
+			// Only draw tiles that are visible or have been explored
+			if !isVisible && !isExplored {
+				// Draw unexplored tiles as black
+				s.tileset.DrawTile(screen, ' ', x, y, color.RGBA{0, 0, 0, 255})
+				continue
+			}
+
 			// Get tile type at this world position
 			tileType := mapData.Tiles[worldY][worldX]
 
 			// Get the tile's visual definition from the mapping
 			tileDef := tileMapping.GetTileDefinition(tileType)
 
+			// Create a modified color based on visibility
+			var fg color.Color
+
+			if isVisible {
+				// Fully visible - use normal colors
+				fg = tileDef.FG
+			} else if isExplored {
+				// Explored but not visible - darken the colors
+				if fgRGBA, ok := tileDef.FG.(color.RGBA); ok {
+					// Reduce brightness by 60%
+					fg = color.RGBA{
+						R: uint8(float64(fgRGBA.R) * 0.4),
+						G: uint8(float64(fgRGBA.G) * 0.4),
+						B: uint8(float64(fgRGBA.B) * 0.4),
+						A: fgRGBA.A,
+					}
+				} else {
+					// Default darkening if color conversion fails
+					fg = color.RGBA{40, 40, 40, 255}
+				}
+			}
+
 			// Draw the tile using either position or glyph based on the definition
 			if tileDef.UseTilePos {
 				// Use direct position reference
 				tileID := NewTileID(tileDef.TileX, tileDef.TileY)
-				s.tileset.DrawTileByID(screen, tileID, x, y, tileDef.FG)
+				s.tileset.DrawTileByID(screen, tileID, x, y, fg)
 			} else {
 				// Use character-based reference
-				s.tileset.DrawTile(screen, tileDef.Glyph, x, y, tileDef.FG)
+				s.tileset.DrawTile(screen, tileDef.Glyph, x, y, fg)
 			}
 		}
 	}
@@ -214,6 +292,15 @@ func (s *RenderSystem) drawEntities(world *ecs.World, screen *ebiten.Image, came
 	if activeMapEntity != nil && world.HasComponent(activeMapID, components.MapType) {
 		mapTypeComp, _ := world.GetComponent(activeMapID, components.MapType)
 		activeMapType = mapTypeComp.(*components.MapTypeComponent).MapType
+	}
+
+	// Get the map component to check visibility
+	var mapComponent *components.MapComponent
+	if comp, exists := world.GetComponent(activeMapID, components.MapComponentID); exists {
+		mapComponent = comp.(*components.MapComponent)
+	} else {
+		GetDebugLog().Add("RenderSystem: No map component found for visibility checks")
+		return
 	}
 
 	// Track entities rendered for debugging
@@ -261,7 +348,55 @@ func (s *RenderSystem) drawEntities(world *ecs.World, screen *ebiten.Image, came
 
 		if hasPos && hasRend {
 			pos := posComp.(*components.PositionComponent)
-			rend := rendComp.(*components.RenderableComponent) // Use camera system to convert world position to screen position
+			rend := rendComp.(*components.RenderableComponent)
+
+			// Check if the entity's position is within bounds
+			if pos.X < 0 || pos.X >= mapComponent.Width || pos.Y < 0 || pos.Y >= mapComponent.Height {
+				continue
+			}
+
+			// Check if the entity is in a visible tile
+			// Player is always visible
+			isVisible := mapComponent.Visible[pos.Y][pos.X] || entity.HasTag("player")
+			isExplored := mapComponent.Explored[pos.Y][pos.X]
+
+			// Treat certain tile types as always visible when explored
+			var tileTypeVisible bool = false
+			if isExplored && !isVisible {
+				// Get tile type at this position
+				tileType := mapComponent.Tiles[pos.Y][pos.X]
+				// Doors and stairs should remain visible when explored
+				tileTypeVisible = tileType == components.TileDoor ||
+					tileType == components.TileStairsUp ||
+					tileType == components.TileStairsDown
+			}
+
+			// Only draw if the tile is visible or it's explored and should remain visible
+			if !isVisible && !(isExplored && (entity.HasTag("stairs") || entity.HasTag("door") || tileTypeVisible)) {
+				continue
+			}
+
+			// If the tile is only explored but not currently visible, draw with reduced brightness
+			var entityColor color.Color
+			if isVisible {
+				entityColor = rend.FG
+			} else if isExplored {
+				// Entity is in an explored but not currently visible tile
+				if fgRGBA, ok := rend.FG.(color.RGBA); ok {
+					// Reduce brightness by 60%
+					entityColor = color.RGBA{
+						R: uint8(float64(fgRGBA.R) * 0.4),
+						G: uint8(float64(fgRGBA.G) * 0.4),
+						B: uint8(float64(fgRGBA.B) * 0.4),
+						A: fgRGBA.A,
+					}
+				} else {
+					// Default darkening if color conversion fails
+					entityColor = color.RGBA{40, 40, 40, 255}
+				}
+			}
+
+			// Use camera system to convert world position to screen position
 			var screenX, screenY int
 			if s.cameraSystem != nil {
 				screenX, screenY = s.cameraSystem.WorldToScreen(world, pos.X, pos.Y)
@@ -278,10 +413,10 @@ func (s *RenderSystem) drawEntities(world *ecs.World, screen *ebiten.Image, came
 				if rend.UseTilePos {
 					// Use position-based reference
 					tileID := NewTileID(rend.TileX, rend.TileY)
-					s.tileset.DrawTileByID(screen, tileID, screenX, screenY, rend.FG)
+					s.tileset.DrawTileByID(screen, tileID, screenX, screenY, entityColor)
 				} else {
 					// Use character-based reference
-					s.tileset.DrawTile(screen, rend.Char, screenX, screenY, rend.FG)
+					s.tileset.DrawTile(screen, rend.Char, screenX, screenY, entityColor)
 				}
 				entitiesRendered++
 			}
@@ -389,7 +524,191 @@ func (s *RenderSystem) drawStatsPanel(world *ecs.World, screen *ebiten.Image) {
 		s.tileset.DrawTile(screen, '-', x, config.GameScreenHeight-5, color.RGBA{180, 180, 180, 255})
 	}
 	s.tileset.DrawString(screen, "CONTROLS", config.GameScreenWidth+2, config.GameScreenHeight-4, color.RGBA{255, 230, 150, 255})
-	s.tileset.DrawString(screen, "Arrow Keys: Move", config.GameScreenWidth+2, config.GameScreenHeight-2, color.RGBA{200, 200, 200, 255})
+	s.tileset.DrawString(screen, "Arrow Keys: Move", config.GameScreenWidth+2, config.GameScreenHeight-3, color.RGBA{200, 200, 200, 255})
+	s.tileset.DrawString(screen, "I: Inventory", config.GameScreenWidth+2, config.GameScreenHeight-2, color.RGBA{200, 200, 200, 255})
+}
+
+// drawInventoryPanel draws the player inventory panel
+func (s *RenderSystem) drawInventoryPanel(world *ecs.World, screen *ebiten.Image) {
+	// Calculate inventory panel width (not used directly but kept for code consistency with other panels)
+	_ = config.ScreenWidth - config.GameScreenWidth
+
+	// Draw inventory panel border and background
+	for y := 0; y < config.GameScreenHeight; y++ {
+		// Draw vertical border
+		s.tileset.DrawTile(screen, '|', config.GameScreenWidth, y, color.RGBA{200, 200, 200, 255})
+
+		// Draw background for better readability
+		for x := config.GameScreenWidth + 1; x < config.ScreenWidth; x++ {
+			s.tileset.DrawTile(screen, ' ', x, y, color.RGBA{0, 0, 0, 255})
+		}
+	}
+
+	// Get player entity
+	playerEntities := world.GetEntitiesWithTag("player")
+	if len(playerEntities) == 0 {
+		return
+	}
+
+	playerID := playerEntities[0].ID
+
+	// Check if player has an inventory
+	var inventory *components.InventoryComponent
+	if comp, exists := world.GetComponent(playerID, components.Inventory); exists {
+		inventory = comp.(*components.InventoryComponent)
+
+		if s.itemViewMode {
+			// Draw item details view
+			s.drawItemDetailsView(world, screen, inventory)
+		} else {
+			// Draw inventory list view
+			s.drawInventoryListView(world, screen, inventory)
+		}
+	} else {
+		s.tileset.DrawString(screen, "No inventory", config.GameScreenWidth+2, 6, color.RGBA{200, 200, 200, 255})
+	}
+}
+
+// drawInventoryListView draws the list of items in the inventory
+func (s *RenderSystem) drawInventoryListView(world *ecs.World, screen *ebiten.Image, inventory *components.InventoryComponent) {
+	// Draw panel title
+	s.tileset.DrawString(screen, "INVENTORY", config.GameScreenWidth+2, 1, color.RGBA{255, 255, 255, 255})
+	// Draw horizontal separator under title
+	for x := config.GameScreenWidth + 1; x < config.ScreenWidth-1; x++ {
+		s.tileset.DrawTile(screen, '-', x, 2, color.RGBA{180, 180, 180, 255})
+	}
+
+	// Display inventory info
+	s.tileset.DrawString(screen,
+		fmt.Sprintf("Items: %d/%d", inventory.Size(), inventory.MaxCapacity),
+		config.GameScreenWidth+2, 4, color.RGBA{255, 230, 150, 255})
+
+	// Display items list
+	if inventory.Size() == 0 {
+		s.tileset.DrawString(screen, "No items", config.GameScreenWidth+2, 6, color.RGBA{200, 200, 200, 255})
+	} else {
+		// Display the items
+		for i, itemID := range inventory.Items {
+			if i >= 15 { // Increased limit since we're not showing descriptions
+				s.tileset.DrawString(screen, "...", config.GameScreenWidth+2, 6+i, color.RGBA{200, 200, 200, 255})
+				break
+			}
+
+			// Get item name if it has one
+			itemName := fmt.Sprintf("Item #%d", itemID)
+			if nameComp, exists := world.GetComponent(itemID, components.Name); exists {
+				itemName = nameComp.(*components.NameComponent).Name
+			}
+
+			// Display the item with a letter for selection
+			itemLetter := string(rune('a' + i))
+			s.tileset.DrawString(screen,
+				fmt.Sprintf("%s) %s", itemLetter, itemName),
+				config.GameScreenWidth+2, 6+i, color.RGBA{200, 200, 255, 255})
+		}
+	}
+
+	// Draw controls at bottom of panel
+	for x := config.GameScreenWidth + 1; x < config.ScreenWidth-1; x++ {
+		s.tileset.DrawTile(screen, '-', x, config.GameScreenHeight-5, color.RGBA{180, 180, 180, 255})
+	}
+	s.tileset.DrawString(screen, "CONTROLS", config.GameScreenWidth+2, config.GameScreenHeight-4, color.RGBA{255, 230, 150, 255})
+	s.tileset.DrawString(screen, "I/ESC: Close inventory", config.GameScreenWidth+2, config.GameScreenHeight-3, color.RGBA{200, 200, 200, 255})
+	s.tileset.DrawString(screen, "L: Look at selected item", config.GameScreenWidth+2, config.GameScreenHeight-2, color.RGBA{200, 200, 200, 255})
+	s.tileset.DrawString(screen, "a-z: Use/equip item", config.GameScreenWidth+2, config.GameScreenHeight-1, color.RGBA{200, 200, 200, 255})
+}
+
+// drawItemDetailsView draws the detailed view of a selected item
+func (s *RenderSystem) drawItemDetailsView(world *ecs.World, screen *ebiten.Image, inventory *components.InventoryComponent) {
+	// Make sure the selected index is valid
+	if s.selectedItemIndex < 0 || s.selectedItemIndex >= inventory.Size() {
+		s.ExitItemView()
+		return
+	}
+
+	// Get the selected item ID
+	itemID := inventory.Items[s.selectedItemIndex]
+
+	// Get item name
+	itemName := fmt.Sprintf("Item #%d", itemID)
+	if nameComp, exists := world.GetComponent(itemID, components.Name); exists {
+		itemName = nameComp.(*components.NameComponent).Name
+	}
+
+	// Draw panel title
+	s.tileset.DrawString(screen, "ITEM DETAILS", config.GameScreenWidth+2, 1, color.RGBA{255, 255, 255, 255})
+	// Draw horizontal separator under title
+	for x := config.GameScreenWidth + 1; x < config.ScreenWidth-1; x++ {
+		s.tileset.DrawTile(screen, '-', x, 2, color.RGBA{180, 180, 180, 255})
+	}
+
+	// Draw item name with letter
+	itemLetter := string(rune('a' + s.selectedItemIndex))
+	s.tileset.DrawString(screen,
+		fmt.Sprintf("%s) %s", itemLetter, itemName),
+		config.GameScreenWidth+2, 4, color.RGBA{255, 230, 150, 255})
+
+	// Get item component
+	var itemComp *components.ItemComponent
+	var hasItemComp bool
+	if comp, exists := world.GetComponent(itemID, components.Item); exists {
+		itemComp = comp.(*components.ItemComponent)
+		hasItemComp = true
+	}
+
+	if hasItemComp {
+		// Draw item description
+		if itemComp.Description != "" {
+			// Wrap description at 25 characters
+			maxLineWidth := 25
+			description := itemComp.Description
+
+			y := 6
+			for len(description) > 0 {
+				lineLen := len(description)
+				if lineLen > maxLineWidth {
+					lineLen = maxLineWidth
+				}
+
+				s.tileset.DrawString(screen,
+					description[:lineLen],
+					config.GameScreenWidth+2, y, color.RGBA{200, 200, 200, 255})
+
+				description = description[lineLen:]
+				y++
+			}
+
+			y += 1 // Add a blank line
+
+			// Draw item stats
+			s.tileset.DrawString(screen, "Stats:", config.GameScreenWidth+2, y, color.RGBA{255, 230, 150, 255})
+			y += 1
+
+			s.tileset.DrawString(screen,
+				fmt.Sprintf("Type: %s", itemComp.ItemType),
+				config.GameScreenWidth+2, y, color.RGBA{200, 200, 200, 255})
+			y += 1
+
+			s.tileset.DrawString(screen,
+				fmt.Sprintf("Value: %d", itemComp.Value),
+				config.GameScreenWidth+2, y, color.RGBA{200, 200, 200, 255})
+			y += 1
+
+			s.tileset.DrawString(screen,
+				fmt.Sprintf("Weight: %d", itemComp.Weight),
+				config.GameScreenWidth+2, y, color.RGBA{200, 200, 200, 255})
+		}
+	} else {
+		s.tileset.DrawString(screen, "No item data available", config.GameScreenWidth+2, 6, color.RGBA{200, 200, 200, 255})
+	}
+
+	// Draw controls at bottom of panel
+	for x := config.GameScreenWidth + 1; x < config.ScreenWidth-1; x++ {
+		s.tileset.DrawTile(screen, '-', x, config.GameScreenHeight-5, color.RGBA{180, 180, 180, 255})
+	}
+	s.tileset.DrawString(screen, "CONTROLS", config.GameScreenWidth+2, config.GameScreenHeight-4, color.RGBA{255, 230, 150, 255})
+	s.tileset.DrawString(screen, "ESC/L: Return to inventory", config.GameScreenWidth+2, config.GameScreenHeight-3, color.RGBA{200, 200, 200, 255})
+	s.tileset.DrawString(screen, "a-z: Use/equip item", config.GameScreenWidth+2, config.GameScreenHeight-2, color.RGBA{200, 200, 200, 255})
 }
 
 // drawMessagesPanel draws the message log panel

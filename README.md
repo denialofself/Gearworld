@@ -1,6 +1,6 @@
 # Ebiten Roguelike
 
-A Golang-based roguelike game using the Ebiten library. This game incorporates classic roguelike features such as turn-based combat, procedural generation, character progression, and eventually lighting and FOV systems.
+A Golang-based roguelike game using the Ebiten library. This game incorporates classic roguelike features such as turn-based combat, procedural generation, character progression, an inventory system, and map transitions.
 
 ## Features
 
@@ -15,6 +15,22 @@ A Golang-based roguelike game using the Ebiten library. This game incorporates c
 - Arrow keys control the player character
 - Movement is turn-based; when the player moves, enemies get their turn
 
+### Maps and Generation
+- World map generation using cellular automata
+- Dungeon generation using Binary Space Partitioning (BSP)
+- Map registry system to track and transition between different maps
+- Themed dungeons with customizable monster and item spawns
+
+### Items and Inventory
+- Collect and manage items in your inventory
+- Item templates loaded from JSON for easy content creation
+- Different item types (weapons, armor, potions)
+
+### Combat System
+- Turn-based combat with stats including attack, defense, and health
+- Action point system for controlling movement speed
+- Combat events and damage calculations
+
 ## Architecture Overview
 
 The game is built on an Entity-Component-System (ECS) architecture, which provides a flexible and modular way to build game mechanics.
@@ -23,10 +39,10 @@ The game is built on an Entity-Component-System (ECS) architecture, which provid
 
 ```mermaid
 graph TD
-    A[Entity] --> B[Components]
-    A --> C[Tags]
-    D[Systems] --> A
-    D --> E[Events]
+    Entity[Entity: Unique ID + Tags] --> Components[Components: Data Structures]
+    Systems[Systems: Game Logic] --> Entity
+    Systems --> Events[Events: System Communication]
+    Templates[Templates: JSON Data] --> Entity
 ```
 
 #### What is ECS?
@@ -34,6 +50,7 @@ graph TD
 - **Components** are data structures attached to entities (position, renderable, stats)
 - **Systems** contain the logic that processes entities with specific components
 - **Events** allow systems to communicate with each other
+- **Templates** define reusable configurations for entities loaded from JSON
 
 ## Components
 
@@ -51,6 +68,11 @@ classDiagram
     Entity --> StatsComponent
     Entity --> CollisionComponent
     Entity --> AIComponent
+    Entity --> ItemComponent
+    Entity --> InventoryComponent
+    Entity --> MapComponent
+    Entity --> CameraComponent
+    Entity --> NameComponent
     
     class PositionComponent {
         X, Y int
@@ -72,6 +94,9 @@ classDiagram
         Level int
         Exp int
         Recovery int
+        ActionPoints int
+        MaxActionPoints int
+        HealingFactor int
     }
     
     class CollisionComponent {
@@ -80,22 +105,56 @@ classDiagram
     
     class AIComponent {
         Type string
-        ActionPoints int
-        MaxActionPoints int
         SightRange int
         Target uint64
         Path []PathNode
         LastKnownTargetX int
         LastKnownTargetY int
     }
+    
+    class ItemComponent {
+        ItemType string
+        Value int
+        Weight int
+        Description string
+        TemplateID string
+        Data interface{}
+    }
+    
+    class InventoryComponent {
+        Items []EntityID
+        MaxCapacity int
+    }
+    
+    class MapComponent {
+        Width, Height int
+        Tiles [][]Tile
+        Regions [][]int
+        Visible [][]bool
+        Explored [][]bool
+    }
+    
+    class CameraComponent {
+        X, Y int
+        Target uint64
+    }
+    
+    class NameComponent {
+        Name string
+    }
 ```
 
 ### Key Components
 - **Position**: Stores x,y coordinates for an entity
 - **Renderable**: Contains information about how to draw the entity (character, tile, colors)
-- **Stats**: Health, attack, defense and other RPG-style attributes
+- **Stats**: Health, attack, defense, and other RPG-style attributes
 - **Collision**: Determines if an entity blocks movement
 - **AI**: Controls NPC behavior like pathfinding and targeting
+- **Item**: Defines an item's properties like value, weight and type
+- **Inventory**: Stores and manages a collection of items
+- **Map**: Contains the tile data for a map
+- **Camera**: Controls the viewport for map scrolling
+- **Name**: Provides a display name for the entity
 
 ## Systems
 
@@ -103,76 +162,124 @@ Systems implement the game logic by processing entities with specific components
 
 ```mermaid
 graph TD
-    A[Game] --> B[World]
-    B --> C[RenderSystem]
-    B --> D[MapSystem]
-    B --> E[MovementSystem]
-    B --> F[AISystem]
-    B --> G[CombatSystem]
-    B --> H[CameraSystem]
+    Game[Game] --> World[World ECS]
     
-    C --> I[Tileset]
-    I --> J[TileMappingComponent]
+    World --> RenderSystem[RenderSystem]
+    World --> MapSystem[MapSystem]
+    World --> MapRegistrySystem[MapRegistrySystem]
+    World --> MovementSystem[MovementSystem]
+    World --> PlayerTurnSystem[PlayerTurnProcessorSystem]
+    World --> CombatSystem[CombatSystem]
+    World --> CameraSystem[CameraSystem]
+    World --> AIPathfindingSystem[AIPathfindingSystem]
+    World --> AITurnSystem[AITurnProcessorSystem]
+    World --> PassiveEffectsSystem[PassiveEffectsSystem]
+    World --> InventorySystem[InventorySystem]
+    
+    RenderSystem --> Tileset[Tileset]
+    MapRegistrySystem --> MapTransitions[Map Transitions]
+    MapSystem --> World
+    AIPathfindingSystem --> MovementSystem
+    PlayerTurnSystem --> Events[Events]
+    Events --> AITurnSystem
 ```
 
 ### Key Systems
 - **RenderSystem**: Handles drawing entities to the screen
 - **MapSystem**: Manages map generation and map-related queries
+- **MapRegistrySystem**: Manages multiple maps and transitions between them
 - **MovementSystem**: Processes movement requests and collisions
-- **AISystem**: Controls enemy behavior and pathfinding
+- **PlayerTurnProcessorSystem**: Handles player input and turn processing
 - **CombatSystem**: Manages attacks and damage calculation
 - **CameraSystem**: Controls viewport for map scrolling
+- **AIPathfindingSystem**: Manages pathfinding for AI entities
+- **AITurnProcessorSystem**: Controls AI entity behavior and turn processing
+- **PassiveEffectsSystem**: Handles passive effects like health regeneration
+- **InventorySystem**: Manages inventory operations like adding/removing items
 
-## AI System Implementation
+## Generation Systems
 
-The game features an AI system for enemy behavior, currently supporting:
-
-```mermaid
-flowchart TD
-    A[AI System] --> B{Turn Processed?}
-    B -- No --> C[Process AI]
-    B -- Yes --> D[Wait for Player]
-    C --> E{AI Type?}
-    E -- slow_chase --> F[Path Finding]
-    F --> G[Follow Path]
-    G --> H[Move/Wait]
-    H --> I[Update Action Points]
-    D --> J[Listen for Events]
-    J -- Player Moved --> B
-```
-
-- **slow_chase**: AI that follows the player using A* pathfinding
-- AI entities use action point system to control movement speed
-- Line of sight detection determines if player is visible
-
-## Procedural Generation
-
-The game includes BSP (Binary Space Partitioning) dungeon generation:
+The game features multiple procedural generation systems for creating game worlds.
 
 ```mermaid
-flowchart TD
-    A[Generate Dungeon] --> B[Start with Solid Wall Map]
-    B --> C[Split Space Using BSP]
-    C --> D[Create Rooms in Leaf Nodes]
-    D --> E[Connect Rooms with Corridors]
-    E --> F[Place Player]
-    F --> G[Place Enemies]
+graph TD
+    Generation[Generation] --> WorldMapGen[WorldMapGenerator]
+    Generation --> DungeonGen[Dungeon Generator]
+    
+    DungeonGen --> BSPDungeon[BSP Dungeon]
+    DungeonGen --> CellularAutomata[Cellular Automata Dungeon]
+    
+    BSPDungeon --> DungeonThemer[Dungeon Themer]
+    DungeonThemer --> ThemeDefinition[Theme Definition]
+    ThemeDefinition --> Population[Population System]
+    
+    Population --> EntitySpawner[Entity Spawner]
+    EntitySpawner --> Templates[Template Manager]
+    Templates --> EntityTemplates[Entity Templates]
+    Templates --> ItemTemplates[Item Templates]
 ```
+
+### Generation Components
+- **WorldMapGenerator**: Creates the overworld map using cellular automata
+- **BSP Dungeon Generator**: Creates dungeon levels using Binary Space Partitioning
+- **Cellular Automata Generator**: Creates organic-feeling cave systems
+- **Dungeon Themer**: Applies themes to dungeons from JSON definitions
+- **Population System**: Populates dungeons with monsters and items based on themes
+- **Entity Spawner**: Creates entities from templates
+- **Template Manager**: Loads and manages entity/item templates from JSON files
+
+## Data-Driven Architecture
+
+The game uses a data-driven approach for content creation:
+
+```mermaid
+graph TD
+    DataFiles[JSON Data Files] --> TemplateManager[Template Manager]
+    TemplateManager --> EntityTemplates[Entity Templates]
+    TemplateManager --> ItemTemplates[Item Templates]
+    
+    EntityTemplates --> EntitySpawner[Entity Spawner]
+    ItemTemplates --> EntitySpawner
+    
+    DataFiles --> ThemeManager[Theme Definitions]
+    ThemeManager --> DungeonThemer[Dungeon Themer]
+    
+    EntitySpawner --> World[ECS World]
+```
+
+### Data Files
+- **Monster Templates**: Define monster stats, appearance, and behavior in JSON
+- **Item Templates**: Define items with properties, appearance, and effects
+- **Theme Definitions**: Configure dungeon themes with specific monsters and items
 
 ## Turn-Based System
 
 ```mermaid
 sequenceDiagram
-    Player->>MovementSystem: Move Command
-    MovementSystem->>World: Process Movement
-    World->>AISystem: Reset Turn Flag
-    AISystem->>Enemies: Process AI Turns
-    Enemies->>World: Update Positions
+    Player->>PlayerTurnSystem: Input Command
+    PlayerTurnSystem->>MovementSystem: Process Movement
+    MovementSystem->>World: Update Position
+    Note over World: Trigger Move Event
+    
+    World->>AITurnSystem: Begin AI Turns
+    AITurnSystem->>AIPathfindingSystem: Calculate Paths
+    AIPathfindingSystem->>AITurnSystem: Return Paths
+    AITurnSystem->>MovementSystem: Move Entities
+    
+    alt Combat Occurs
+        MovementSystem->>CombatSystem: Attack Entity
+        CombatSystem->>StatsComponent: Update Health
+        CombatSystem->>MessageSystem: Display Combat Message
+    end
+    
+    World->>PlayerTurnSystem: End Turn Cycle
     World->>RenderSystem: Update Display
 ```
 
-- Player moves trigger the turn cycle
-- AI entities get their turns after the player
+- Player actions trigger the turn cycle
+- AI entities process their turns after the player
+- Actions consume action points based on entity speed
+- Combat and effects are resolved during turn processing
 - Game waits for player input to continue the cycle
 
 

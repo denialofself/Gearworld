@@ -1,0 +1,12 @@
+{
+  "id": "rusty_spanner",
+  "name": "Rusty Spanner",
+  "description": "a rusty spanner, from a long lost world",
+  "item_type": "weapon",
+  "tile_x": 10,
+  "tile_y": 2,
+  "color": "#B7410E",
+  "value": 5,
+  "weight": 2,
+  "tags": ["weapon", "melee", "tool"]
+} 

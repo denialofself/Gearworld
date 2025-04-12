@@ -1,0 +1,12 @@
+{
+  "id": "health_potion",
+  "name": "Health Potion",
+  "description": "A small vial containing a red liquid that heals wounds when consumed.",
+  "item_type": "potion",
+  "tile_x": 13,
+  "tile_y": 10,
+  "color": "#FF6464",
+  "value": 10,
+  "weight": 1,
+  "tags": ["potion", "consumable", "healing"]
+} 

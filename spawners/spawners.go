@@ -69,6 +69,12 @@ func (s *EntitySpawner) CreatePlayer(x, y int) *ecs.Entity {
 		Blocks: true,
 	})
 
+	// Add inventory component to the player
+	s.world.AddComponent(playerEntity.ID, components.Inventory, components.NewInventoryComponent(20))
+
+	// Add FOV component to the player - default vision range of 4 tiles
+	s.world.AddComponent(playerEntity.ID, components.FOV, components.NewFOVComponent(4))
+
 	if s.logMessage != nil {
 		s.logMessage("Player created at " + strconv.Itoa(x) + "," + strconv.Itoa(y))
 	}
@@ -193,6 +199,140 @@ func (s *EntitySpawner) CreateTileMapping() *ecs.Entity {
 	s.world.AddComponent(tileMapEntity.ID, components.Appearance, components.NewTileMappingComponent())
 
 	return tileMapEntity
+}
+
+// CreateItem creates an item entity that can be collected by the player
+func (s *EntitySpawner) CreateItem(x, y int, itemTemplateID string) (*ecs.Entity, error) {
+	// Try to load the item template
+	template, exists := s.templateManager.GetItemTemplate(itemTemplateID)
+	if !exists {
+		return nil, fmt.Errorf("no item template found with ID '%s'", itemTemplateID)
+	}
+
+	// Create the item entity
+	itemEntity := s.world.CreateEntity()
+	itemEntity.AddTag("item")
+	s.world.TagEntity(itemEntity.ID, "item")
+
+	// Add any additional tags from the template
+	for _, tag := range template.Tags {
+		s.world.TagEntity(itemEntity.ID, tag)
+	}
+
+	// Add position component
+	s.world.AddComponent(itemEntity.ID, components.Position, &components.PositionComponent{
+		X: x,
+		Y: y,
+	})
+
+	// Add renderable component using template data
+	itemColor := data.ParseHexColor(template.Color)
+	s.world.AddComponent(itemEntity.ID, components.Renderable, components.NewRenderableComponentByPos(
+		template.TileX, template.TileY,
+		itemColor,
+	))
+
+	// Add item component
+	s.world.AddComponent(itemEntity.ID, components.Item, components.NewItemComponentFromTemplate(
+		template.ID,
+		template.ItemType,
+		template.Value,
+		template.Weight,
+		template.Description,
+	))
+
+	// Add name component
+	s.world.AddComponent(itemEntity.ID, components.Name, components.NewNameComponent(template.Name))
+
+	// Add map context component to associate the item with the current map
+	var mapID ecs.EntityID
+	if s.spawnMapID != 0 {
+		mapID = s.spawnMapID
+	} else {
+		// Fallback to getting the active map if spawnMapID not set
+		mapID = s.getActiveMap()
+	}
+
+	if mapID != 0 {
+		s.world.AddComponent(itemEntity.ID, components.MapContextID, components.NewMapContextComponent(mapID))
+	}
+
+	if s.logMessage != nil {
+		s.logMessage(fmt.Sprintf("Item %s created at %d,%d", template.Name, x, y))
+	}
+
+	return itemEntity, nil
+}
+
+// CreateItemFromType is a convenience method for backward compatibility
+func (s *EntitySpawner) CreateItemFromType(x, y int, itemType string, name string, value int, weight int) *ecs.Entity {
+	// Create the item entity
+	itemEntity := s.world.CreateEntity()
+	itemEntity.AddTag("item")
+	s.world.TagEntity(itemEntity.ID, "item")
+
+	// Add position component
+	s.world.AddComponent(itemEntity.ID, components.Position, &components.PositionComponent{
+		X: x,
+		Y: y,
+	})
+
+	// Set renderable component based on item type
+	var tileX, tileY int
+	var itemColor color.RGBA
+
+	// Define visual appearance based on item type
+	switch itemType {
+	case "weapon":
+		tileX, tileY = 15, 7 // Sword
+		itemColor = color.RGBA{220, 220, 255, 255}
+	case "armor":
+		tileX, tileY = 15, 9 // Armor
+		itemColor = color.RGBA{200, 200, 220, 255}
+	case "potion":
+		tileX, tileY = 15, 3 // Potion
+		itemColor = color.RGBA{255, 100, 100, 255}
+	case "scroll":
+		tileX, tileY = 15, 0 // Scroll
+		itemColor = color.RGBA{255, 255, 200, 255}
+	default:
+		tileX, tileY = 12, 0 // Default item
+		itemColor = color.RGBA{200, 200, 200, 255}
+	}
+
+	s.world.AddComponent(itemEntity.ID, components.Renderable, components.NewRenderableComponentByPos(
+		tileX, tileY,
+		itemColor,
+	))
+
+	// Add item component
+	s.world.AddComponent(itemEntity.ID, components.Item, components.NewItemComponent(
+		itemType,
+		value,
+		weight,
+	))
+
+	// Add name component
+	s.world.AddComponent(itemEntity.ID, components.Name, components.NewNameComponent(name))
+
+	// Add map context component to associate the item with the current map
+	var mapID ecs.EntityID
+	if s.spawnMapID != 0 {
+		mapID = s.spawnMapID
+	} else {
+		// Fallback to getting the active map if spawnMapID not set
+		mapID = s.getActiveMap()
+	}
+
+	if mapID != 0 {
+		s.world.AddComponent(itemEntity.ID, components.MapContextID, components.NewMapContextComponent(mapID))
+	}
+
+	if s.logMessage != nil {
+		s.logMessage(fmt.Sprintf("Item %s created at %d,%d", name, x, y))
+	}
+
+	return itemEntity
 }
 
 // getActiveMap returns the currently active map entity (if any)

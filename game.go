@@ -34,6 +34,8 @@ type Game struct {
 	aiPathfindingSystem       *systems.AIPathfindingSystem
 	aiTurnProcessorSystem     *systems.AITurnProcessorSystem
 	passiveEffectsSystem      *systems.PassiveEffectsSystem
+	inventorySystem           *systems.InventorySystem
+	fovSystem                 *systems.FOVSystem
 }
 
 // NewGame creates a new game instance
@@ -56,6 +58,8 @@ func NewGame() *Game {
 	aiPathfindingSystem := systems.NewAIPathfindingSystem()
 	aiTurnProcessorSystem := systems.NewAITurnProcessorSystem()
 	passiveEffectsSystem := systems.NewPassiveEffectsSystem()
+	inventorySystem := systems.NewInventorySystem()
+	fovSystem := systems.NewFOVSystem()
 
 	// Initialize the entity template manager
 	templateManager := data.NewEntityTemplateManager()
@@ -66,11 +70,20 @@ func NewGame() *Game {
 		fmt.Printf("Warning: Failed to load monster templates: %v\n", err)
 	}
 
+	// Load item templates
+	err = templateManager.LoadItemTemplatesFromDirectory("data/items")
+	if err != nil {
+		fmt.Printf("Warning: Failed to load item templates: %v\n", err)
+	}
+
 	// Create entity spawner
 	entitySpawner := spawners.NewEntitySpawner(world, templateManager, systems.GetMessageLog().Add)
 
 	// Connect the camera system to the render system
-	renderSystem.SetCameraSystem(cameraSystem) // Register systems with the world that need to be updated during the game loop
+	renderSystem.SetCameraSystem(cameraSystem)
+	playerTurnProcessorSystem.SetRenderSystem(renderSystem)
+
+	// Register systems with the world that need to be updated during the game loop
 	// Register systems with the world
 	world.AddSystem(mapSystem)
 	world.AddSystem(mapRegistrySystem)
@@ -81,6 +94,8 @@ func NewGame() *Game {
 	world.AddSystem(aiPathfindingSystem)
 	world.AddSystem(aiTurnProcessorSystem)
 	world.AddSystem(passiveEffectsSystem)
+	world.AddSystem(inventorySystem)
+	world.AddSystem(fovSystem)
 	// Create the game instance
 	game := &Game{
 		world:                     world,
@@ -96,6 +111,8 @@ func NewGame() *Game {
 		aiPathfindingSystem:       aiPathfindingSystem,
 		aiTurnProcessorSystem:     aiTurnProcessorSystem,
 		passiveEffectsSystem:      passiveEffectsSystem,
+		inventorySystem:           inventorySystem,
+		fovSystem:                 fovSystem,
 	}
 
 	// Initialize the game world
@@ -106,6 +123,8 @@ func NewGame() *Game {
 	aiPathfindingSystem.Initialize(world)
 	aiTurnProcessorSystem.Initialize(world)
 	passiveEffectsSystem.Initialize(world)
+	inventorySystem.Initialize(world)
+	fovSystem.Initialize(world)
 
 	// Call the map debug function
 	components.DebugWallDetection()
@@ -210,6 +229,19 @@ func (g *Game) initialize() {
 	// Add map context component to the player
 	g.world.AddComponent(playerEntity.ID, components.MapContextID,
 		components.NewMapContextComponent(startingStationEntity.ID))
+
+	// Create test items near the player
+	testItemX, testItemY := playerX+2, playerY
+	// Create items using templates
+	if _, err := g.entitySpawner.CreateItem(testItemX, testItemY, "rusty_spanner"); err != nil {
+		systems.GetMessageLog().Add(fmt.Sprintf("Failed to create rusty spanner: %v", err))
+	}
+	if _, err := g.entitySpawner.CreateItem(testItemX+1, testItemY, "health_potion"); err != nil {
+		systems.GetMessageLog().Add(fmt.Sprintf("Failed to create health potion: %v", err))
+	}
+	if _, err := g.entitySpawner.CreateItem(testItemX, testItemY+1, "leather_armor"); err != nil {
+		systems.GetMessageLog().Add(fmt.Sprintf("Failed to create leather armor: %v", err))
+	}
 
 	// Create a camera entity for the player
 	g.entitySpawner.CreateCamera(uint64(playerEntity.ID), playerX, playerY)

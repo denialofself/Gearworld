@@ -182,13 +182,12 @@ func (t *DungeonThemer) GenerateThemedDungeon(config DungeonConfiguration) *ecs.
 	}
 
 	// Add dungeon features (stairs, water pools, etc.) ONLY if not using JSON theme
-	// JSON themes handle features in applyThemeDefinition
 	if !usingJsonTheme {
 		t.dungeonGen.AddFeatures(mapComp, rooms)
 	} else {
 		// If using JSON theme, still add stairs down if not already added in applyThemeDefinition
 		// but skip other features (vegetation, pools) as those are controlled by the theme
-		if len(rooms) > 0 {
+		if mapComp != nil {
 			// Check if stairs down already exist
 			var hasStairsDown bool = false
 			for y := 0; y < mapComp.Height; y++ {
@@ -198,6 +197,28 @@ func (t *DungeonThemer) GenerateThemedDungeon(config DungeonConfiguration) *ecs.
 						if t.logMessage != nil {
 							t.logMessage(fmt.Sprintf("Found existing stairs down at (%d,%d)", x, y))
 						}
+
+						// Place the stairs and create a stairs entity
+						mapComp.SetTile(x, y, components.TileStairsDown)
+
+						// Create a stairs entity
+						stairsEntity := t.world.CreateEntity()
+						stairsEntity.AddTag("stairs")
+						t.world.TagEntity(stairsEntity.ID, "stairs")
+
+						// Add position component
+						t.world.AddComponent(stairsEntity.ID, components.Position, &components.PositionComponent{
+							X: x,
+							Y: y,
+						})
+
+						// Add map context component
+						t.world.AddComponent(stairsEntity.ID, components.MapContext, components.NewMapContextComponent(mapEntity.ID))
+
+						if t.logMessage != nil {
+							t.logMessage(fmt.Sprintf("Added stairs down at (%d,%d)", x, y))
+						}
+
 						break
 					}
 				}
@@ -208,13 +229,16 @@ func (t *DungeonThemer) GenerateThemedDungeon(config DungeonConfiguration) *ecs.
 
 			// If no stairs down, add them in the last room
 			if !hasStairsDown {
-				lastRoom := rooms[len(rooms)-1]
+				// Find the last room (typically the goal/boss room)
+				var lastRoom [4]int
+				if len(rooms) > 0 {
+					lastRoom = rooms[len(rooms)-1]
+				}
 
-				// Try to find a floor tile in the room
 				var stairsX, stairsY int
 				stairsPlaced := false
 
-				// Try several positions
+				// Try to find a good spot for stairs
 				for attempts := 0; attempts < 20 && !stairsPlaced; attempts++ {
 					testX := lastRoom[0] + t.rng.Intn(lastRoom[2])
 					testY := lastRoom[1] + t.rng.Intn(lastRoom[3])
@@ -236,8 +260,7 @@ func (t *DungeonThemer) GenerateThemedDungeon(config DungeonConfiguration) *ecs.
 							for dy := -radius; dy <= radius && !stairsPlaced; dy++ {
 								for dx := -radius; dx <= radius && !stairsPlaced; dx++ {
 									nx, ny := stairsX+dx, stairsY+dy
-									if nx >= lastRoom[0] && nx < lastRoom[0]+lastRoom[2] &&
-										ny >= lastRoom[1] && ny < lastRoom[1]+lastRoom[3] &&
+									if nx >= 0 && nx < mapComp.Width && ny >= 0 && ny < mapComp.Height &&
 										mapComp.Tiles[ny][nx] == components.TileFloor {
 										stairsX, stairsY = nx, ny
 										stairsPlaced = true
@@ -256,6 +279,20 @@ func (t *DungeonThemer) GenerateThemedDungeon(config DungeonConfiguration) *ecs.
 					if t.logMessage != nil {
 						t.logMessage(fmt.Sprintf("Added backup stairs down at (%d,%d)", stairsX, stairsY))
 					}
+
+					// Create a stairs entity at this position and tag it
+					stairsEntity := t.world.CreateEntity()
+					stairsEntity.AddTag("stairs")
+					t.world.TagEntity(stairsEntity.ID, "stairs")
+
+					// Add position component
+					t.world.AddComponent(stairsEntity.ID, components.Position, &components.PositionComponent{
+						X: stairsX,
+						Y: stairsY,
+					})
+
+					// Add map context component
+					t.world.AddComponent(stairsEntity.ID, components.MapContext, components.NewMapContextComponent(mapEntity.ID))
 				} else if t.logMessage != nil {
 					t.logMessage("WARNING: Could not find a suitable location for stairs down")
 				}
@@ -421,131 +458,45 @@ func (t *DungeonThemer) addCampfires(mapComp *components.MapComponent) {
 	// For now, just a placeholder that does nothing
 }
 
-// addStairsUpNearPlayerSpawn adds a staircase up near where the player will spawn
+// findPlayerSpawnLocation finds a suitable location for player spawning
+func (t *DungeonThemer) findPlayerSpawnLocation(mapComp *components.MapComponent) (int, int) {
+	// Return a random empty position in the map
+	return t.findEmptyPosition(mapComp)
+}
+
+// addStairsUpNearPlayerSpawn adds stairs up to a dungeon map
 func (t *DungeonThemer) addStairsUpNearPlayerSpawn(mapComp *components.MapComponent) {
-	// First, check if we already have stairs up in the map
-	stairsUpExists := false
-	for y := 0; y < mapComp.Height; y++ {
-		for x := 0; x < mapComp.Width; x++ {
-			if mapComp.Tiles[y][x] == components.TileStairsUp {
-				stairsUpExists = true
-				if t.logMessage != nil {
-					t.logMessage(fmt.Sprintf("Found existing stairs up at (%d,%d)", x, y))
-				}
-				break
-			}
-		}
-		if stairsUpExists {
-			break
-		}
-	}
+	// Find a suitable empty position for stairs
+	x, y := t.findPlayerSpawnLocation(mapComp)
 
-	// If stairs already exist, don't add more
-	if stairsUpExists {
-		return
-	}
-
-	// Find the first room for player spawn area
-	if len(t.dungeonGen.FindFirstRoomInMap(mapComp)) > 0 {
-		// Use the dedicated FindFirstRoomInMap function to get the first room
-		firstRoom := t.dungeonGen.FindFirstRoomInMap(mapComp)
-
-		// Calculate the center of the first room
-		centerX := firstRoom[0] + firstRoom[2]/2
-		centerY := firstRoom[1] + firstRoom[3]/2
-
-		// Place stairs up near the center but not exactly at center to avoid blocking player spawn
-		stairsX := centerX + (t.rng.Intn(3) - 1) // -1, 0, or +1 from center
-		stairsY := centerY + (t.rng.Intn(3) - 1) // -1, 0, or +1 from center
-
-		// Ensure stairs are within room bounds and on a floor tile
-		for attempts := 0; attempts < 20; attempts++ {
-			testX := stairsX + (t.rng.Intn(3) - 1)
-			testY := stairsY + (t.rng.Intn(3) - 1)
-
-			// Validate position is within bounds
-			if testX >= firstRoom[0] && testX < firstRoom[0]+firstRoom[2] &&
-				testY >= firstRoom[1] && testY < firstRoom[1]+firstRoom[3] &&
-				mapComp.Tiles[testY][testX] == components.TileFloor {
-				stairsX, stairsY = testX, testY
-				break
-			}
-		}
-
-		// Place the stairs
-		mapComp.SetTile(stairsX, stairsY, components.TileStairsUp)
-
-		if t.logMessage != nil {
-			t.logMessage(fmt.Sprintf("Added stairs up in first room at (%d,%d)", stairsX, stairsY))
-		}
-		return
-	}
-
-	// Fallback method if we can't find a proper room: scan for a cluster of floor tiles
-	var roomCenterX, roomCenterY int
-	var roomFound bool
-
-	// Scan for a good-sized room (likely the first one)
-	for startY := 2; startY < mapComp.Height-10 && !roomFound; startY += 5 {
-		for startX := 2; startX < mapComp.Width-10 && !roomFound; startX += 5 {
-			// Check if this could be the center of a room
-			floorCount := 0
-			for y := startY - 2; y <= startY+2; y++ {
-				for x := startX - 2; x <= startX+2; x++ {
-					if y >= 0 && y < mapComp.Height && x >= 0 && x < mapComp.Width &&
-						mapComp.Tiles[y][x] == components.TileFloor {
-						floorCount++
-					}
-				}
+	// Try to find another empty spot nearby
+	for dx := -3; dx <= 3; dx++ {
+		for dy := -3; dy <= 3; dy++ {
+			nx, ny := x+dx, y+dy
+			// Skip the exact spawn position
+			if dx == 0 && dy == 0 {
+				continue
 			}
 
-			// If we found a cluster of floor tiles, it's likely a room
-			if floorCount >= 20 { // At least 20 floor tiles in a 5x5 area
-				roomCenterX, roomCenterY = startX, startY
-				roomFound = true
-				break
+			// Check if position is valid and not a wall
+			if nx >= 0 && nx < mapComp.Width && ny >= 0 && ny < mapComp.Height &&
+				mapComp.Tiles[ny][nx] == components.TileFloor {
+				// Found a spot, place stairs up
+				mapComp.SetTile(nx, ny, components.TileStairsUp)
+				t.logMessage(fmt.Sprintf("Added stairs up at (%d,%d)", nx, ny))
+
+				// Since we don't have mapEntity.ID available here, just place the tile
+				// and skip creating a dedicated stairs entity for now
+
+				return
 			}
 		}
 	}
 
-	// If we couldn't find a room center, fall back to a random position
-	if !roomFound {
-		roomCenterX = mapComp.Width / 4 // Use the first quarter of the map as it likely has the first room
-		roomCenterY = mapComp.Height / 4
-	}
-
-	// Look for a floor tile near the room center to place the stairs
-	var stairsX, stairsY int
-	stairsFound := false
-
-	// Try positions close to the center first, then expand outward
-	for radius := 1; radius < 10 && !stairsFound; radius++ {
-		for offsetY := -radius; offsetY <= radius && !stairsFound; offsetY++ {
-			for offsetX := -radius; offsetX <= radius && !stairsFound; offsetX++ {
-				x := roomCenterX + offsetX
-				y := roomCenterY + offsetY
-
-				// Make sure position is valid and is a floor tile
-				if x >= 0 && x < mapComp.Width && y >= 0 && y < mapComp.Height &&
-					mapComp.Tiles[y][x] == components.TileFloor {
-					stairsX, stairsY = x, y
-					stairsFound = true
-				}
-			}
-		}
-	}
-
-	// If we still couldn't find a position, fall back to findEmptyPosition
-	if !stairsFound {
-		stairsX, stairsY = t.findEmptyPosition(mapComp)
-	}
-
-	// Place the stairs up
-	mapComp.SetTile(stairsX, stairsY, components.TileStairsUp)
-
-	if t.logMessage != nil {
-		t.logMessage(fmt.Sprintf("Adding stairs up at (%d,%d)", stairsX, stairsY))
-	}
+	// If all else fails, just place stairs at the spawn location
+	mapComp.SetTile(x, y, components.TileStairsUp)
+	t.logMessage(fmt.Sprintf("WARNING: Had to place stairs up at player spawn (%d,%d)", x, y))
+	// Skip creating stairs entity since we don't have mapEntity.ID
 }
 
 // findEmptyPosition finds an empty floor tile in the map
