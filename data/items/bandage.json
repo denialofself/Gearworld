@@ -1,0 +1,23 @@
+{
+  "id": "bandage",
+  "name": "Bandage",
+  "description": "A simple bandage to stop bleeding.",
+  "item_type": "first aid",
+  "tile_x": 14,
+  "tile_y": 7,
+  "color": "#FFFFFF",
+  "value": 10,
+  "weight": 1,
+  "tags": ["common", "healing", "consumable"],
+  "equip_slot": "",
+  "effects": [
+    {
+      "component": "Stats",
+      "property": "Health",
+      "operation": "add",
+      "value": 20
+    }
+  ],
+  "consumable": true,
+  "charges": 1
+}

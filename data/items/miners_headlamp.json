@@ -2,7 +2,7 @@
   "id": "miners_headlamp",
   "name": "Miner's Headlamp",
   "description": "A bright headlamp that extends vision range and provides light.",
-  "item_type": "helmet",
+  "item_type": "headgear",
   "tile_x": 5,
   "tile_y": 2,
   "color": "#FFFF00",

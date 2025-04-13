@@ -1,734 +1,143 @@
-===== DEBUG LOG STARTED AT 2025-04-12 22:54:33 =====
-[22:54:33.165] DEBUG: Created world map with ID: 2
-[22:54:33.165] REGISTRY: Registered worldmap (Level 0) with ID: 2
-[22:54:33.166] DEBUG: Creating enemy with MapContext ID: 3
-[22:54:33.166] DEBUG: Creating enemy with MapContext ID: 3
-[22:54:33.166] DEBUG: Creating enemy with MapContext ID: 3
-[22:54:33.166] DEBUG: Created dungeon with ID: 3
-[22:54:33.166] REGISTRY: Registered dungeon (Level 1) with ID: 3
-[22:54:33.166] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
-[22:54:33.166] SET ACTIVE MAP: Propagated to MapSystem
-[22:54:33.166] --- MAP SUMMARY ---
-[22:54:33.166] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[22:54:33.166] Map: dungeon (Level 1, ID: 3, Size: 40x30)
-[22:54:33.166] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[22:54:33.166] Active map ID: 3
-[22:54:33.167] Game initialization complete
-[22:54:35.288] DEBUG: Player moved to: 21,3 AI can now recalculate paths
-[22:54:35.461] DEBUG: Player moved to: 20,3 AI can now recalculate paths
-[22:54:35.607] DEBUG: Player moved to: 19,3 AI can now recalculate paths
-[22:54:35.756] DEBUG: Player moved to: 18,3 AI can now recalculate paths
-[22:54:35.927] DEBUG: Player moved to: 17,3 AI can now recalculate paths
-[22:55:26.243] DEBUG: Player moved to: 18,3 AI can now recalculate paths
-[22:55:26.478] DEBUG: Player moved to: 19,3 AI can now recalculate paths
-[22:55:26.611] DEBUG: Player moved to: 20,3 AI can now recalculate paths
-[22:55:26.755] DEBUG: Player moved to: 21,3 AI can now recalculate paths
-[22:55:26.943] DEBUG: Player moved to: 21,4 AI can now recalculate paths
-[22:55:27.124] DEBUG: Player moved to: 21,5 AI can now recalculate paths
-[22:55:27.284] DEBUG: Player moved to: 21,6 AI can now recalculate paths
-[22:55:27.410] DEBUG: Player moved to: 21,7 AI can now recalculate paths
-[22:55:27.576] DEBUG: Player moved to: 21,8 AI can now recalculate paths
-[22:55:27.721] DEBUG: Player moved to: 21,9 AI can now recalculate paths
-[22:55:27.910] DEBUG: Player moved to: 21,10 AI can now recalculate paths
-[22:55:28.105] DEBUG: Player moved to: 20,10 AI can now recalculate paths
-[22:55:28.277] DEBUG: Player moved to: 19,10 AI can now recalculate paths
-[22:55:28.411] DEBUG: Player moved to: 18,10 AI can now recalculate paths
-[22:55:28.576] DEBUG: Player moved to: 17,10 AI can now recalculate paths
-[22:55:28.722] DEBUG: Player moved to: 16,10 AI can now recalculate paths
-[22:55:28.862] DEBUG: Player moved to: 15,10 AI can now recalculate paths
-[22:55:29.041] DEBUG: Player moved to: 15,11 AI can now recalculate paths
-[22:55:29.209] DEBUG: Player moved to: 15,12 AI can now recalculate paths
-[22:55:29.355] DEBUG: Player moved to: 15,13 AI can now recalculate paths
-[22:55:29.493] DEBUG: Player moved to: 15,14 AI can now recalculate paths
-[22:55:29.640] DEBUG: Player moved to: 16,14 AI can now recalculate paths
-[22:55:29.827] DEBUG: Player moved to: 17,14 AI can now recalculate paths
-[22:55:29.994] DEBUG: Player moved to: 18,14 AI can now recalculate paths
-[22:55:30.127] DEBUG: Player moved to: 19,14 AI can now recalculate paths
-[22:55:30.293] DEBUG: Player moved to: 20,14 AI can now recalculate paths
-===== DEBUG LOG STARTED AT 2025-04-12 22:55:32 =====
-[22:55:32.797] DEBUG: Created world map with ID: 2
-[22:55:32.797] REGISTRY: Registered worldmap (Level 0) with ID: 2
-[22:55:32.798] DEBUG: Creating enemy with MapContext ID: 3
-[22:55:32.798] DEBUG: Creating enemy with MapContext ID: 3
-[22:55:32.798] DEBUG: Creating enemy with MapContext ID: 3
-[22:55:32.798] DEBUG: Created dungeon with ID: 3
-[22:55:32.798] REGISTRY: Registered dungeon (Level 1) with ID: 3
-[22:55:32.798] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
-[22:55:32.798] SET ACTIVE MAP: Propagated to MapSystem
-[22:55:32.798] --- MAP SUMMARY ---
-[22:55:32.798] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[22:55:32.798] Map: dungeon (Level 1, ID: 3, Size: 40x30)
-[22:55:32.798] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[22:55:32.798] Active map ID: 3
-[22:55:32.798] Game initialization complete
-[22:55:33.079] DEBUG: AI turn processor - Next step: 34,26, AP: 6
-[22:55:33.079] DEBUG: AI moved from 35,26 to 34,26 (AP: 4)
-[22:55:33.752] DEBUG: Player moved to: 31,28 AI can now recalculate paths
-[22:55:33.753] DEBUG: AI turn processor - Next step: 33,26, AP: 4
-[22:55:33.753] DEBUG: AI moved from 34,26 to 33,26 (AP: 2)
-[22:55:33.988] DEBUG: Player moved to: 32,28 AI can now recalculate paths
-[22:55:33.988] DEBUG: AI turn processor - Next step: 32,26, AP: 2
-[22:55:33.988] DEBUG: AI moved from 33,26 to 32,26 (AP: 0)
-[22:55:34.183] DEBUG: Player moved to: 33,28 AI can now recalculate paths
-[22:55:34.183] DEBUG: AI turn processor - Next step: 33,26, AP: 0
-[22:55:34.183] DEBUG: AI recovering 3 points (AP: 3)
-[22:55:34.371] DEBUG: Player moved to: 34,28 AI can now recalculate paths
-[22:55:34.371] DEBUG: AI turn processor - Next step: 33,26, AP: 3
-[22:55:34.371] DEBUG: AI moved from 32,26 to 33,26 (AP: 1)
-[22:55:34.788] DEBUG: Player moved to: 33,28 AI can now recalculate paths
-[22:55:34.788] DEBUG: AI turn processor - Next step: 33,27, AP: 1
-[22:55:34.788] DEBUG: AI waiting (AP: 0)
-[22:55:35.087] DEBUG: Player moved to: 33,27 AI can now recalculate paths
-[22:55:35.087] DEBUG: AI turn processor - Next step: 33,27, AP: 0
-[22:55:35.087] DEBUG: AI recovering 3 points (AP: 3)
-[22:55:35.385] DEBUG: Player moved to: 33,26 AI can now recalculate paths
-===== DEBUG LOG STARTED AT 2025-04-12 22:55:40 =====
-[22:55:40.098] DEBUG: Created world map with ID: 2
-[22:55:40.098] REGISTRY: Registered worldmap (Level 0) with ID: 2
-[22:55:40.099] DEBUG: Creating enemy with MapContext ID: 3
-[22:55:40.099] DEBUG: Creating enemy with MapContext ID: 3
-[22:55:40.099] DEBUG: Creating enemy with MapContext ID: 3
-[22:55:40.099] DEBUG: Created dungeon with ID: 3
-[22:55:40.099] REGISTRY: Registered dungeon (Level 1) with ID: 3
-[22:55:40.099] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
-[22:55:40.099] SET ACTIVE MAP: Propagated to MapSystem
-[22:55:40.099] --- MAP SUMMARY ---
-[22:55:40.099] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[22:55:40.099] Map: dungeon (Level 1, ID: 3, Size: 40x30)
-[22:55:40.099] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[22:55:40.099] Active map ID: 3
-[22:55:40.099] Game initialization complete
-[22:55:40.376] DEBUG: AI turn processor - Next step: 22,8, AP: 6
-[22:55:40.376] DEBUG: AI moved from 23,8 to 22,8 (AP: 4)
-[22:55:41.320] DEBUG: Player moved to: 18,8 AI can now recalculate paths
-[22:55:41.320] DEBUG: AI turn processor - Next step: 21,8, AP: 4
-[22:55:41.320] DEBUG: AI moved from 22,8 to 21,8 (AP: 2)
-[22:55:41.466] DEBUG: Player moved to: 19,8 AI can now recalculate paths
-[22:55:41.466] DEBUG: AI turn processor - Next step: 20,8, AP: 2
-[22:55:41.466] DEBUG: AI moved from 21,8 to 20,8 (AP: 0)
-[22:55:41.633] DEBUG: Player moved to: 20,8 AI can now recalculate paths
-[22:55:41.633] DEBUG: AI has no path, recovering 3 points (AP: 3)
-[22:55:41.820] DEBUG: Player moved to: 21,8 AI can now recalculate paths
-[22:55:41.820] DEBUG: AI attacked player (AP: 0)
-[22:55:42.466] DEBUG: Player moved to: 20,8 AI can now recalculate paths
-[22:55:42.619] DEBUG: Player moved to: 19,8 AI can now recalculate paths
-[22:55:42.966] DEBUG: Player moved to: 20,8 AI can now recalculate paths
-===== DEBUG LOG STARTED AT 2025-04-12 22:55:45 =====
-[22:55:45.857] DEBUG: Created world map with ID: 2
-[22:55:45.858] REGISTRY: Registered worldmap (Level 0) with ID: 2
-[22:55:45.859] DEBUG: Creating enemy with MapContext ID: 3
-[22:55:45.859] DEBUG: Creating enemy with MapContext ID: 3
-[22:55:45.859] DEBUG: Creating enemy with MapContext ID: 3
-[22:55:45.859] DEBUG: Created dungeon with ID: 3
-[22:55:45.859] REGISTRY: Registered dungeon (Level 1) with ID: 3
-[22:55:45.859] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
-[22:55:45.859] SET ACTIVE MAP: Propagated to MapSystem
-[22:55:45.859] --- MAP SUMMARY ---
-[22:55:45.859] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[22:55:45.859] Map: dungeon (Level 1, ID: 3, Size: 40x30)
-[22:55:45.859] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[22:55:45.859] Active map ID: 3
-[22:55:45.859] Game initialization complete
-[22:55:47.045] DEBUG: Player moved to: 32,2 AI can now recalculate paths
-[22:55:47.212] DEBUG: Player moved to: 33,2 AI can now recalculate paths
-[22:55:47.358] DEBUG: Player moved to: 34,2 AI can now recalculate paths
-[22:55:47.594] DEBUG: Player moved to: 35,2 AI can now recalculate paths
-[22:55:47.844] DEBUG: Player moved to: 35,3 AI can now recalculate paths
-[22:55:48.028] DEBUG: Player moved to: 34,3 AI can now recalculate paths
-[22:56:01.025] DEBUG: Player moved to: 34,4 AI can now recalculate paths
-[22:56:01.227] DEBUG: Player moved to: 34,5 AI can now recalculate paths
-[22:56:01.380] DEBUG: Player moved to: 34,6 AI can now recalculate paths
-[22:56:01.547] DEBUG: Player moved to: 34,7 AI can now recalculate paths
-[22:56:01.730] DEBUG: Player moved to: 34,8 AI can now recalculate paths
-[22:56:01.825] DEBUG: Player moved to: 33,8 AI can now recalculate paths
-[22:56:01.992] DEBUG: Player moved to: 32,8 AI can now recalculate paths
-[22:56:02.145] DEBUG: Player moved to: 31,8 AI can now recalculate paths
-[22:56:02.291] DEBUG: Player moved to: 30,8 AI can now recalculate paths
-[22:56:02.443] DEBUG: Player moved to: 29,8 AI can now recalculate paths
-[22:56:02.596] DEBUG: Player moved to: 28,8 AI can now recalculate paths
-===== DEBUG LOG STARTED AT 2025-04-12 23:03:34 =====
-[23:03:35.000] DEBUG: Created world map with ID: 2
-[23:03:35.000] REGISTRY: Registered worldmap (Level 0) with ID: 2
-[23:03:35.001] DEBUG: Creating enemy with MapContext ID: 3
-[23:03:35.001] DEBUG: Creating enemy with MapContext ID: 3
-[23:03:35.001] DEBUG: Creating enemy with MapContext ID: 3
-[23:03:35.001] DEBUG: Created dungeon with ID: 3
-[23:03:35.001] REGISTRY: Registered dungeon (Level 1) with ID: 3
-[23:03:35.001] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
-[23:03:35.001] SET ACTIVE MAP: Propagated to MapSystem
-[23:03:35.001] --- MAP SUMMARY ---
-[23:03:35.001] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[23:03:35.001] Map: dungeon (Level 1, ID: 3, Size: 40x30)
-[23:03:35.001] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[23:03:35.001] Active map ID: 3
-[23:03:35.001] Game initialization complete
-[23:03:35.292] DEBUG: AI turn processor - Next step: 13,9, AP: 6
-[23:03:35.292] DEBUG: AI skipped movement
-[23:03:35.292] DEBUG: AI turn processor - Next step: 11,7, AP: 6
-[23:03:35.292] DEBUG: AI skipped movement
-[23:03:36.502] DEBUG: Player moved to: 14,4 AI can now recalculate paths
-[23:03:36.502] DEBUG: AI turn processor - Next step: 12,8, AP: 5
-[23:03:36.502] DEBUG: AI moved from 12,9 to 12,8 (AP: 3)
-[23:03:36.502] DEBUG: AI turn processor - Next step: 11,7, AP: 5
-[23:03:36.502] DEBUG: AI moved from 10,7 to 11,7 (AP: 3)
-[23:03:36.779] DEBUG: Player moved to: 15,4 AI can now recalculate paths
-[23:03:36.779] DEBUG: AI turn processor - Next step: 13,8, AP: 3
-[23:03:36.779] DEBUG: AI moved from 12,8 to 13,8 (AP: 1)
-[23:03:36.779] DEBUG: AI turn processor - Next step: 12,7, AP: 3
-[23:03:36.779] DEBUG: AI moved from 11,7 to 12,7 (AP: 1)
-[23:03:37.016] DEBUG: Player moved to: 16,4 AI can now recalculate paths
-[23:03:37.016] DEBUG: AI turn processor - Next step: 14,8, AP: 1
-[23:03:37.016] DEBUG: AI waiting (AP: 0)
-[23:03:37.016] DEBUG: AI turn processor - Next step: 13,7, AP: 1
-[23:03:37.016] DEBUG: AI waiting (AP: 0)
-[23:03:37.328] DEBUG: Player moved to: 16,5 AI can now recalculate paths
-[23:03:37.328] DEBUG: AI turn processor - Next step: 13,7, AP: 0
-[23:03:37.328] DEBUG: AI recovering 3 points (AP: 3)
-[23:03:37.328] DEBUG: AI turn processor - Next step: 14,8, AP: 0
-[23:03:37.328] DEBUG: AI recovering 3 points (AP: 3)
-[23:03:37.565] DEBUG: Player moved to: 17,5 AI can now recalculate paths
-[23:03:37.565] DEBUG: AI turn processor - Next step: 14,8, AP: 3
-[23:03:37.565] DEBUG: AI moved from 13,8 to 14,8 (AP: 1)
-[23:03:37.565] DEBUG: AI turn processor - Next step: 13,7, AP: 3
-[23:03:37.565] DEBUG: AI moved from 12,7 to 13,7 (AP: 1)
-[23:03:39.934] DEBUG: Player moved to: 16,5 AI can now recalculate paths
-[23:03:39.934] DEBUG: AI turn processor - Next step: 14,7, AP: 1
-[23:03:39.934] DEBUG: AI waiting (AP: 0)
-[23:03:39.934] DEBUG: AI turn processor - Next step: 14,7, AP: 1
-[23:03:39.934] DEBUG: AI waiting (AP: 0)
-[23:03:40.115] DEBUG: Player moved to: 15,5 AI can now recalculate paths
-[23:03:40.115] DEBUG: AI turn processor - Next step: 15,8, AP: 0
-[23:03:40.115] DEBUG: AI recovering 3 points (AP: 3)
-[23:03:40.115] DEBUG: AI turn processor - Next step: 14,7, AP: 0
-[23:03:40.115] DEBUG: AI recovering 3 points (AP: 3)
-[23:03:40.281] DEBUG: Player moved to: 14,5 AI can now recalculate paths
-[23:03:40.282] DEBUG: AI turn processor - Next step: 14,7, AP: 3
-[23:03:40.282] DEBUG: AI moved from 14,8 to 14,7 (AP: 1)
-[23:03:40.282] DEBUG: AI turn processor - Next step: 14,7, AP: 3
-[23:03:40.282] DEBUG: AI waiting (AP: 2)
-[23:03:40.650] DEBUG: Player moved to: 13,5 AI can now recalculate paths
-[23:03:40.650] DEBUG: AI turn processor - Next step: 13,7, AP: 1
-[23:03:40.650] DEBUG: AI waiting (AP: 0)
-[23:03:40.650] DEBUG: AI turn processor - Next step: 13,6, AP: 2
-[23:03:40.650] DEBUG: AI moved from 13,7 to 13,6 (AP: 0)
-[23:03:41.102] DEBUG: Player moved to: 13,6 AI can now recalculate paths
-[23:03:41.102] DEBUG: AI turn processor - Next step: 13,7, AP: 0
-[23:03:41.102] DEBUG: AI recovering 3 points (AP: 3)
-[23:03:41.268] DEBUG: Player moved to: 14,6 AI can now recalculate paths
-[23:03:41.268] DEBUG: AI attacked player (AP: 0)
-[23:03:41.817] DEBUG: Player moved to: 14,7 AI can now recalculate paths
-[23:03:46.001] DEBUG: Player moved to: 13,7 AI can now recalculate paths
-[23:03:46.419] DEBUG: Player moved to: 14,7 AI can now recalculate paths
-[23:03:52.852] DEBUG: Rest action triggered
-[23:03:52.852] DEBUG: Player rested, AI will now take its turn
-[23:03:52.852] DEBUG: Player health: 92/100, HealingFactor: 5
-[23:03:53.748] DEBUG: Rest action triggered
-[23:03:53.748] DEBUG: Player rested, AI will now take its turn
-[23:03:53.748] DEBUG: Player health: 97/100, HealingFactor: 5
-[23:03:54.083] DEBUG: Rest action triggered
-[23:03:54.083] DEBUG: Player rested, AI will now take its turn
-[23:03:54.083] DEBUG: Player health: 100/100, HealingFactor: 5
-[23:03:54.384] DEBUG: Rest action triggered
-[23:03:54.384] DEBUG: Player rested, AI will now take its turn
-[23:03:54.384] DEBUG: Player health: 100/100, HealingFactor: 5
-[23:03:54.713] DEBUG: Rest action triggered
-[23:03:54.713] DEBUG: Player rested, AI will now take its turn
-[23:03:54.713] DEBUG: Player health: 100/100, HealingFactor: 5
-[23:03:54.950] DEBUG: Rest action triggered
-[23:03:54.950] DEBUG: Player rested, AI will now take its turn
-[23:03:54.950] DEBUG: Player health: 100/100, HealingFactor: 5
-[23:03:55.096] DEBUG: Rest action triggered
-[23:03:55.096] DEBUG: Player rested, AI will now take its turn
-[23:03:55.096] DEBUG: Player health: 100/100, HealingFactor: 5
-[23:03:55.784] DEBUG: Rest action triggered
-[23:03:55.784] DEBUG: Player rested, AI will now take its turn
-[23:03:55.784] DEBUG: Player health: 100/100, HealingFactor: 5
-[23:03:55.964] DEBUG: Rest action triggered
-[23:03:55.964] DEBUG: Player rested, AI will now take its turn
-[23:03:55.964] DEBUG: Player health: 100/100, HealingFactor: 5
-[23:03:56.118] DEBUG: Rest action triggered
-[23:03:56.118] DEBUG: Player rested, AI will now take its turn
-[23:03:56.118] DEBUG: Player health: 100/100, HealingFactor: 5
-[23:03:56.250] DEBUG: Rest action triggered
-[23:03:56.250] DEBUG: Player rested, AI will now take its turn
-[23:03:56.250] DEBUG: Player health: 100/100, HealingFactor: 5
-[23:03:56.395] DEBUG: Rest action triggered
-[23:03:56.395] DEBUG: Player rested, AI will now take its turn
-[23:03:56.395] DEBUG: Player health: 100/100, HealingFactor: 5
-[23:03:57.397] DEBUG: Player moved to: 13,7 AI can now recalculate paths
-[23:03:57.583] DEBUG: Player moved to: 12,7 AI can now recalculate paths
-[23:03:57.801] DEBUG: Player moved to: 12,8 AI can now recalculate paths
-[23:03:57.930] DEBUG: Player moved to: 12,9 AI can now recalculate paths
-[23:03:58.083] DEBUG: Player moved to: 13,9 AI can now recalculate paths
-[23:03:58.251] DEBUG: Player moved to: 14,9 AI can now recalculate paths
-[23:03:58.585] DEBUG: Player moved to: 14,8 AI can now recalculate paths
-[23:04:09.452] DEBUG: Player moved to: 13,8 AI can now recalculate paths
-[23:04:13.899] DEBUG: Player moved to: 14,8 AI can now recalculate paths
-[23:04:14.100] DEBUG: Player moved to: 15,8 AI can now recalculate paths
-[23:04:14.267] DEBUG: Player moved to: 16,8 AI can now recalculate paths
-[23:04:14.649] DEBUG: Player moved to: 15,8 AI can now recalculate paths
-[23:04:14.801] DEBUG: Player moved to: 14,8 AI can now recalculate paths
-[23:04:14.948] DEBUG: Player moved to: 13,8 AI can now recalculate paths
-[23:04:15.128] DEBUG: Player moved to: 12,8 AI can now recalculate paths
-[23:04:19.869] DEBUG: Player moved to: 13,8 AI can now recalculate paths
-[23:04:20.035] DEBUG: Player moved to: 14,8 AI can now recalculate paths
-[23:04:20.203] DEBUG: Player moved to: 15,8 AI can now recalculate paths
-[23:04:40.747] DEBUG: Player moved to: 14,8 AI can now recalculate paths
-[23:04:40.984] DEBUG: Player moved to: 13,8 AI can now recalculate paths
-[23:04:41.151] DEBUG: Player moved to: 12,8 AI can now recalculate paths
-[23:04:41.297] DEBUG: Player moved to: 11,8 AI can now recalculate paths
-[23:04:41.484] DEBUG: Player moved to: 10,8 AI can now recalculate paths
-[23:04:41.616] DEBUG: Player moved to: 9,8 AI can now recalculate paths
-[23:04:41.762] DEBUG: Player moved to: 8,8 AI can now recalculate paths
-[23:04:41.930] DEBUG: Player moved to: 7,8 AI can now recalculate paths
-[23:04:42.082] DEBUG: Player moved to: 6,8 AI can now recalculate paths
-[23:04:42.248] DEBUG: Player moved to: 5,8 AI can now recalculate paths
-[23:04:42.401] DEBUG: Player moved to: 4,8 AI can now recalculate paths
-[23:04:42.797] DEBUG: Player moved to: 3,8 AI can now recalculate paths
-[23:04:43.152] DEBUG: Player moved to: 4,8 AI can now recalculate paths
-[23:04:43.298] DEBUG: Player moved to: 5,8 AI can now recalculate paths
-[23:04:43.564] DEBUG: Player moved to: 6,8 AI can now recalculate paths
-[23:04:43.680] DEBUG: Player moved to: 7,8 AI can now recalculate paths
-[23:04:43.798] DEBUG: Player moved to: 8,8 AI can now recalculate paths
-[23:04:43.916] DEBUG: Player moved to: 9,8 AI can now recalculate paths
-[23:04:44.036] DEBUG: Player moved to: 10,8 AI can now recalculate paths
-[23:04:44.145] DEBUG: Player moved to: 11,8 AI can now recalculate paths
-[23:04:44.548] DEBUG: Player moved to: 12,8 AI can now recalculate paths
-[23:04:44.715] DEBUG: Player moved to: 13,8 AI can now recalculate paths
-[23:04:44.881] DEBUG: Player moved to: 14,8 AI can now recalculate paths
-[23:04:45.084] DEBUG: Player moved to: 15,8 AI can now recalculate paths
-[23:04:45.300] DEBUG: Player moved to: 16,8 AI can now recalculate paths
-[23:04:45.431] DEBUG: Player moved to: 16,7 AI can now recalculate paths
-[23:04:45.584] DEBUG: Player moved to: 16,6 AI can now recalculate paths
-[23:04:45.834] DEBUG: Player moved to: 17,6 AI can now recalculate paths
-[23:04:45.980] DEBUG: Player moved to: 18,6 AI can now recalculate paths
-[23:04:46.098] DEBUG: Player moved to: 19,6 AI can now recalculate paths
-[23:04:46.216] DEBUG: Player moved to: 20,6 AI can now recalculate paths
-[23:04:46.348] DEBUG: Player moved to: 21,6 AI can now recalculate paths
-[23:04:46.466] DEBUG: Player moved to: 22,6 AI can now recalculate paths
-[23:04:46.633] DEBUG: Player moved to: 23,6 AI can now recalculate paths
-[23:04:46.780] DEBUG: Player moved to: 24,6 AI can now recalculate paths
-[23:04:46.933] DEBUG: Player moved to: 25,6 AI can now recalculate paths
-[23:04:47.101] DEBUG: Player moved to: 26,6 AI can now recalculate paths
-[23:04:47.266] DEBUG: Player moved to: 27,6 AI can now recalculate paths
-[23:04:47.468] DEBUG: Player moved to: 28,6 AI can now recalculate paths
-[23:04:47.600] DEBUG: Player moved to: 29,6 AI can now recalculate paths
-[23:04:47.780] DEBUG: Player moved to: 30,6 AI can now recalculate paths
-[23:04:47.935] DEBUG: Player moved to: 31,6 AI can now recalculate paths
-[23:04:48.086] DEBUG: Player moved to: 32,6 AI can now recalculate paths
-[23:04:48.266] DEBUG: Player moved to: 33,6 AI can now recalculate paths
-[23:04:48.600] DEBUG: Player moved to: 33,7 AI can now recalculate paths
-[23:04:48.732] DEBUG: Player moved to: 33,8 AI can now recalculate paths
-[23:04:48.948] DEBUG: Player moved to: 33,7 AI can now recalculate paths
-[23:04:49.102] DEBUG: Player moved to: 33,6 AI can now recalculate paths
-[23:04:49.269] DEBUG: Player moved to: 32,6 AI can now recalculate paths
-[23:04:49.530] DEBUG: Player moved to: 31,6 AI can now recalculate paths
-[23:04:49.645] DEBUG: Player moved to: 30,6 AI can now recalculate paths
-[23:04:49.766] DEBUG: Player moved to: 29,6 AI can now recalculate paths
-[23:04:49.879] DEBUG: Player moved to: 28,6 AI can now recalculate paths
-[23:04:49.996] DEBUG: Player moved to: 27,6 AI can now recalculate paths
-[23:04:50.115] DEBUG: Player moved to: 26,6 AI can now recalculate paths
-[23:04:50.233] DEBUG: Player moved to: 25,6 AI can now recalculate paths
-[23:04:50.486] DEBUG: Player moved to: 25,7 AI can now recalculate paths
-[23:04:50.615] DEBUG: Player moved to: 25,8 AI can now recalculate paths
-[23:04:50.762] DEBUG: Player moved to: 25,9 AI can now recalculate paths
-[23:04:50.984] DEBUG: Player moved to: 24,9 AI can now recalculate paths
-[23:04:51.185] DEBUG: Player moved to: 24,10 AI can now recalculate paths
-[23:04:51.331] DEBUG: Player moved to: 24,11 AI can now recalculate paths
-[23:04:51.498] DEBUG: Player moved to: 24,12 AI can now recalculate paths
-[23:04:51.665] DEBUG: Player moved to: 24,13 AI can now recalculate paths
-[23:04:51.830] DEBUG: Player moved to: 24,14 AI can now recalculate paths
-[23:04:51.985] DEBUG: Player moved to: 24,15 AI can now recalculate paths
-[23:04:52.150] DEBUG: Player moved to: 24,16 AI can now recalculate paths
-[23:04:52.317] DEBUG: Player moved to: 24,17 AI can now recalculate paths
-[23:04:52.484] DEBUG: Player moved to: 24,18 AI can now recalculate paths
-[23:04:52.652] DEBUG: Player moved to: 24,19 AI can now recalculate paths
-[23:04:52.831] DEBUG: Player moved to: 24,20 AI can now recalculate paths
-[23:04:53.000] DEBUG: Player moved to: 24,21 AI can now recalculate paths
-[23:04:53.151] DEBUG: Player moved to: 24,22 AI can now recalculate paths
-[23:04:53.318] DEBUG: Player moved to: 24,23 AI can now recalculate paths
-[23:04:53.485] DEBUG: Player moved to: 24,24 AI can now recalculate paths
-[23:04:53.762] DEBUG: Player moved to: 24,23 AI can now recalculate paths
-[23:04:53.915] DEBUG: Player moved to: 24,22 AI can now recalculate paths
-[23:04:54.082] DEBUG: Player moved to: 25,22 AI can now recalculate paths
-[23:04:54.415] DEBUG: Player moved to: 25,21 AI can now recalculate paths
-[23:04:54.596] DEBUG: Player moved to: 26,21 AI can now recalculate paths
-[23:04:54.867] DEBUG: Player moved to: 27,21 AI can now recalculate paths
-[23:04:54.978] DEBUG: Player moved to: 28,21 AI can now recalculate paths
-[23:04:55.096] DEBUG: Player moved to: 29,21 AI can now recalculate paths
-[23:04:55.215] DEBUG: Player moved to: 30,21 AI can now recalculate paths
-[23:04:55.333] DEBUG: Player moved to: 31,21 AI can now recalculate paths
-[23:04:55.451] DEBUG: Player moved to: 32,21 AI can now recalculate paths
-[23:04:55.451] DEBUG: AI turn processor - Next step: 32,27, AP: 6
-[23:04:55.451] DEBUG: AI moved from 33,27 to 32,27 (AP: 4)
-[23:04:55.562] DEBUG: Player moved to: 33,21 AI can now recalculate paths
-[23:04:55.562] DEBUG: AI turn processor - Next step: 33,27, AP: 4
-[23:04:55.562] DEBUG: AI moved from 32,27 to 33,27 (AP: 2)
-[23:04:55.681] DEBUG: Player moved to: 34,21 AI can now recalculate paths
-[23:04:55.681] DEBUG: AI turn processor - Next step: 34,27, AP: 2
-[23:04:55.681] DEBUG: AI moved from 33,27 to 34,27 (AP: 0)
-[23:04:56.035] DEBUG: Player moved to: 34,22 AI can now recalculate paths
-[23:04:56.035] DEBUG: AI turn processor - Next step: 34,26, AP: 0
-[23:04:56.035] DEBUG: AI recovering 3 points (AP: 3)
-[23:04:56.167] DEBUG: Player moved to: 34,23 AI can now recalculate paths
-[23:04:56.167] DEBUG: AI turn processor - Next step: 34,26, AP: 3
-[23:04:56.167] DEBUG: AI moved from 34,27 to 34,26 (AP: 1)
-[23:04:56.313] DEBUG: Player moved to: 34,24 AI can now recalculate paths
-[23:04:56.313] DEBUG: AI turn processor - Next step: 34,25, AP: 1
-[23:04:56.313] DEBUG: AI waiting (AP: 0)
-[23:04:56.502] DEBUG: Player moved to: 34,25 AI can now recalculate paths
-[23:04:56.502] DEBUG: AI turn processor - Next step: 34,25, AP: 0
-[23:04:56.502] DEBUG: AI recovering 3 points (AP: 3)
-[23:04:56.780] DEBUG: Player moved to: 34,26 AI can now recalculate paths
-[23:04:57.002] DEBUG: Player moved to: 34,25 AI can now recalculate paths
-[23:04:57.264] DEBUG: Player moved to: 34,24 AI can now recalculate paths
-[23:04:57.383] DEBUG: Player moved to: 34,23 AI can now recalculate paths
-[23:04:57.500] DEBUG: Player moved to: 34,22 AI can now recalculate paths
-[23:04:57.612] DEBUG: Player moved to: 34,21 AI can now recalculate paths
-[23:04:57.730] DEBUG: Player moved to: 34,20 AI can now recalculate paths
-[23:04:57.848] DEBUG: Player moved to: 34,19 AI can now recalculate paths
-[23:04:57.967] DEBUG: Player moved to: 34,18 AI can now recalculate paths
-[23:04:58.133] DEBUG: Player moved to: 34,19 AI can now recalculate paths
-[23:04:58.301] DEBUG: Player moved to: 34,20 AI can now recalculate paths
-[23:04:58.466] DEBUG: Player moved to: 34,21 AI can now recalculate paths
-[23:04:58.612] DEBUG: Player moved to: 34,22 AI can now recalculate paths
-[23:04:59.080] DEBUG: Player moved to: 34,21 AI can now recalculate paths
-[23:04:59.231] DEBUG: Player moved to: 33,21 AI can now recalculate paths
-[23:04:59.502] DEBUG: Player moved to: 32,21 AI can now recalculate paths
-[23:04:59.613] DEBUG: Player moved to: 31,21 AI can now recalculate paths
-[23:04:59.731] DEBUG: Player moved to: 30,21 AI can now recalculate paths
-[23:04:59.850] DEBUG: Player moved to: 29,21 AI can now recalculate paths
-[23:04:59.968] DEBUG: Player moved to: 28,21 AI can now recalculate paths
-[23:05:00.078] DEBUG: Player moved to: 27,21 AI can now recalculate paths
-[23:05:00.199] DEBUG: Player moved to: 26,21 AI can now recalculate paths
-[23:05:00.314] DEBUG: Player moved to: 25,21 AI can now recalculate paths
-[23:05:00.433] DEBUG: Player moved to: 24,21 AI can now recalculate paths
-[23:05:00.482] DEBUG: Player moved to: 24,20 AI can now recalculate paths
-[23:05:00.746] DEBUG: Player moved to: 24,19 AI can now recalculate paths
-[23:05:00.865] DEBUG: Player moved to: 24,18 AI can now recalculate paths
-[23:05:00.982] DEBUG: Player moved to: 24,17 AI can now recalculate paths
-[23:05:01.102] DEBUG: Player moved to: 24,16 AI can now recalculate paths
-[23:05:01.218] DEBUG: Player moved to: 24,15 AI can now recalculate paths
-[23:05:01.331] DEBUG: Player moved to: 24,14 AI can now recalculate paths
-[23:05:01.447] DEBUG: Player moved to: 24,13 AI can now recalculate paths
-[23:05:01.566] DEBUG: Player moved to: 24,12 AI can now recalculate paths
-[23:05:01.685] DEBUG: Player moved to: 24,11 AI can now recalculate paths
-[23:05:01.802] DEBUG: Player moved to: 24,10 AI can now recalculate paths
-[23:05:01.913] DEBUG: Player moved to: 24,9 AI can now recalculate paths
-[23:05:02.031] DEBUG: Player moved to: 24,8 AI can now recalculate paths
-[23:05:02.149] DEBUG: Player moved to: 24,7 AI can now recalculate paths
-[23:05:02.267] DEBUG: Player moved to: 24,6 AI can now recalculate paths
-[23:05:02.352] DEBUG: Player moved to: 23,6 AI can now recalculate paths
-[23:05:02.615] DEBUG: Player moved to: 22,6 AI can now recalculate paths
-[23:05:02.735] DEBUG: Player moved to: 21,6 AI can now recalculate paths
-[23:05:02.852] DEBUG: Player moved to: 20,6 AI can now recalculate paths
-[23:05:02.962] DEBUG: Player moved to: 19,6 AI can now recalculate paths
-[23:05:03.080] DEBUG: Player moved to: 18,6 AI can now recalculate paths
-[23:05:03.199] DEBUG: Player moved to: 17,6 AI can now recalculate paths
-[23:05:03.317] DEBUG: Player moved to: 16,6 AI can now recalculate paths
-[23:05:03.437] DEBUG: Player moved to: 15,6 AI can now recalculate paths
-[23:05:03.546] DEBUG: Player moved to: 14,6 AI can now recalculate paths
-[23:05:03.664] DEBUG: Player moved to: 13,6 AI can now recalculate paths
-[23:05:03.783] DEBUG: Player moved to: 12,6 AI can now recalculate paths
-[23:05:03.901] DEBUG: Player moved to: 11,6 AI can now recalculate paths
-[23:05:04.018] DEBUG: Player moved to: 10,6 AI can now recalculate paths
-[23:05:04.130] DEBUG: Player moved to: 9,6 AI can now recalculate paths
-[23:05:04.297] DEBUG: Player moved to: 9,7 AI can now recalculate paths
-[23:05:04.567] DEBUG: Player moved to: 9,8 AI can now recalculate paths
-[23:05:04.686] DEBUG: Player moved to: 9,9 AI can now recalculate paths
-[23:05:04.796] DEBUG: Player moved to: 9,10 AI can now recalculate paths
-[23:05:04.914] DEBUG: Player moved to: 9,11 AI can now recalculate paths
-[23:05:05.033] DEBUG: Player moved to: 9,12 AI can now recalculate paths
-[23:05:05.152] DEBUG: Player moved to: 9,13 AI can now recalculate paths
-[23:05:05.263] DEBUG: Player moved to: 9,14 AI can now recalculate paths
-[23:05:05.382] DEBUG: Player moved to: 9,15 AI can now recalculate paths
-[23:05:05.499] DEBUG: Player moved to: 9,16 AI can now recalculate paths
-[23:05:05.617] DEBUG: Player moved to: 9,17 AI can now recalculate paths
-[23:05:05.729] DEBUG: Player moved to: 9,18 AI can now recalculate paths
-[23:05:05.846] DEBUG: Player moved to: 9,19 AI can now recalculate paths
-[23:05:05.964] DEBUG: Player moved to: 9,20 AI can now recalculate paths
-[23:05:06.082] DEBUG: Player moved to: 9,21 AI can now recalculate paths
-[23:05:06.200] DEBUG: Player moved to: 9,22 AI can now recalculate paths
-[23:05:06.313] DEBUG: Player moved to: 9,23 AI can now recalculate paths
-[23:05:06.429] DEBUG: Player moved to: 9,24 AI can now recalculate paths
-[23:05:06.548] DEBUG: Player moved to: 9,25 AI can now recalculate paths
-[23:05:06.666] DEBUG: Player moved to: 9,26 AI can now recalculate paths
-[23:05:06.784] DEBUG: Player moved to: 9,27 AI can now recalculate paths
-[23:05:06.895] DEBUG: Player moved to: 10,27 AI can now recalculate paths
-[23:05:07.166] DEBUG: Player moved to: 11,27 AI can now recalculate paths
-[23:05:07.285] DEBUG: Player moved to: 12,27 AI can now recalculate paths
-[23:05:07.397] DEBUG: Player moved to: 13,27 AI can now recalculate paths
-[23:05:07.514] DEBUG: Player moved to: 14,27 AI can now recalculate paths
-[23:05:07.583] DEBUG: Player moved to: 13,27 AI can now recalculate paths
-[23:05:07.847] DEBUG: Player moved to: 12,27 AI can now recalculate paths
-[23:05:07.967] DEBUG: Player moved to: 11,27 AI can now recalculate paths
-[23:05:08.084] DEBUG: Player moved to: 10,27 AI can now recalculate paths
-[23:05:08.197] DEBUG: Player moved to: 9,27 AI can now recalculate paths
-[23:05:08.299] DEBUG: Player moved to: 9,26 AI can now recalculate paths
-[23:05:08.563] DEBUG: Player moved to: 9,25 AI can now recalculate paths
-[23:05:08.681] DEBUG: Player moved to: 9,24 AI can now recalculate paths
-[23:05:08.800] DEBUG: Player moved to: 9,23 AI can now recalculate paths
-[23:05:08.917] DEBUG: Player moved to: 9,22 AI can now recalculate paths
-[23:05:09.035] DEBUG: Player moved to: 9,21 AI can now recalculate paths
-[23:05:09.146] DEBUG: Player moved to: 9,20 AI can now recalculate paths
-[23:05:09.265] DEBUG: Player moved to: 9,19 AI can now recalculate paths
-[23:05:09.383] DEBUG: Player moved to: 9,18 AI can now recalculate paths
-[23:05:09.497] DEBUG: Player moved to: 9,17 AI can now recalculate paths
-[23:05:09.612] DEBUG: Player moved to: 9,16 AI can now recalculate paths
-[23:05:09.730] DEBUG: Player moved to: 9,15 AI can now recalculate paths
-[23:05:09.852] DEBUG: Player moved to: 9,14 AI can now recalculate paths
-[23:05:09.966] DEBUG: Player moved to: 9,13 AI can now recalculate paths
-[23:05:10.086] DEBUG: Player moved to: 9,12 AI can now recalculate paths
-[23:05:10.197] DEBUG: Player moved to: 9,11 AI can now recalculate paths
-[23:05:10.314] DEBUG: Player moved to: 9,10 AI can now recalculate paths
-===== DEBUG LOG STARTED AT 2025-04-12 23:11:14 =====
-[23:11:14.608] DEBUG: Created world map with ID: 2
-[23:11:14.608] REGISTRY: Registered worldmap (Level 0) with ID: 2
-[23:11:14.609] DEBUG: Creating enemy with MapContext ID: 3
-[23:11:14.609] DEBUG: Creating enemy with MapContext ID: 3
-[23:11:14.609] DEBUG: Creating enemy with MapContext ID: 3
-[23:11:14.609] DEBUG: Created dungeon with ID: 3
-[23:11:14.609] REGISTRY: Registered dungeon (Level 1) with ID: 3
-[23:11:14.609] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
-[23:11:14.609] SET ACTIVE MAP: Propagated to MapSystem
-[23:11:14.609] --- MAP SUMMARY ---
-[23:11:14.609] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[23:11:14.609] Map: dungeon (Level 1, ID: 3, Size: 40x30)
-[23:11:14.609] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[23:11:14.609] Active map ID: 3
-[23:11:14.609] Game initialization complete
-[23:11:14.897] DEBUG: AI turn processor - Next step: 20,20, AP: 6
-[23:11:14.897] DEBUG: AI moved from 19,20 to 20,20 (AP: 4)
-[23:11:18.037] DEBUG: Player moved to: 20,22 AI can now recalculate paths
-[23:11:18.037] DEBUG: AI turn processor - Next step: 20,21, AP: 4
-[23:11:18.037] DEBUG: AI moved from 20,20 to 20,21 (AP: 2)
-[23:11:20.235] DEBUG: Player moved to: 19,22 AI can now recalculate paths
-[23:11:20.420] DEBUG: Player moved to: 18,22 AI can now recalculate paths
-[23:11:20.670] DEBUG: Player moved to: 17,22 AI can now recalculate paths
-[23:11:21.069] DEBUG: Player moved to: 18,22 AI can now recalculate paths
-[23:11:21.248] DEBUG: Player moved to: 19,22 AI can now recalculate paths
-[23:11:21.399] DEBUG: Player moved to: 20,22 AI can now recalculate paths
-[23:11:21.553] DEBUG: Player moved to: 21,22 AI can now recalculate paths
-[23:11:21.719] DEBUG: Player moved to: 22,22 AI can now recalculate paths
-[23:11:21.865] DEBUG: Player moved to: 23,22 AI can now recalculate paths
-[23:11:22.004] DEBUG: Player moved to: 24,22 AI can now recalculate paths
-[23:11:22.185] DEBUG: Player moved to: 25,22 AI can now recalculate paths
-[23:11:22.185] DEBUG: AI turn processor - Next step: 28,27, AP: 6
-[23:11:22.185] DEBUG: AI moved from 29,27 to 28,27 (AP: 4)
-[23:11:22.318] DEBUG: Player moved to: 26,22 AI can now recalculate paths
-[23:11:22.318] DEBUG: AI turn processor - Next step: 27,27, AP: 4
-[23:11:22.318] DEBUG: AI moved from 28,27 to 27,27 (AP: 2)
-[23:11:22.498] DEBUG: Player moved to: 27,22 AI can now recalculate paths
-[23:11:22.498] DEBUG: AI turn processor - Next step: 27,26, AP: 2
-[23:11:22.498] DEBUG: AI skipped movement
-[23:11:22.498] DEBUG: AI turn processor - Next step: 33,17, AP: 6
-[23:11:22.498] DEBUG: AI moved from 34,17 to 33,17 (AP: 4)
-[23:11:22.734] DEBUG: Player moved to: 28,22 AI can now recalculate paths
-[23:11:22.734] DEBUG: AI turn processor - Next step: 32,17, AP: 4
-[23:11:22.734] DEBUG: AI moved from 33,17 to 32,17 (AP: 2)
-[23:11:22.734] DEBUG: AI turn processor - Next step: 28,27, AP: 1
-[23:11:22.734] DEBUG: AI waiting (AP: 0)
-[23:11:22.936] DEBUG: Player moved to: 28,23 AI can now recalculate paths
-[23:11:22.936] DEBUG: AI turn processor - Next step: 28,27, AP: 0
-[23:11:22.936] DEBUG: AI recovering 3 points (AP: 3)
-[23:11:22.936] DEBUG: AI turn processor - Next step: 32,18, AP: 2
-[23:11:22.936] DEBUG: AI moved from 32,17 to 32,18 (AP: 0)
-[23:11:23.102] DEBUG: Player moved to: 28,24 AI can now recalculate paths
-[23:11:23.102] DEBUG: AI turn processor - Next step: 28,27, AP: 3
-[23:11:23.102] DEBUG: AI moved from 27,27 to 28,27 (AP: 1)
-[23:11:23.102] DEBUG: AI turn processor - Next step: 31,18, AP: 0
-[23:11:23.102] DEBUG: AI recovering 3 points (AP: 3)
-[23:11:23.305] DEBUG: Player moved to: 27,24 AI can now recalculate paths
-[23:11:23.306] DEBUG: AI turn processor - Next step: 27,27, AP: 1
-[23:11:23.306] DEBUG: AI waiting (AP: 0)
-[23:11:23.306] DEBUG: AI turn processor - Next step: 31,18, AP: 3
-[23:11:23.306] DEBUG: AI skipped movement
-[23:11:23.547] DEBUG: Player moved to: 27,23 AI can now recalculate paths
-[23:11:23.547] DEBUG: AI turn processor - Next step: 27,27, AP: 0
-[23:11:23.547] DEBUG: AI recovering 3 points (AP: 3)
-[23:11:23.547] DEBUG: AI turn processor - Next step: 31,18, AP: 2
-[23:11:23.547] DEBUG: AI moved from 32,18 to 31,18 (AP: 0)
-[23:11:23.880] DEBUG: Player moved to: 27,24 AI can now recalculate paths
-[23:11:23.880] DEBUG: AI turn processor - Next step: 27,27, AP: 3
-[23:11:23.880] DEBUG: AI moved from 28,27 to 27,27 (AP: 1)
-[23:11:23.880] DEBUG: AI turn processor - Next step: 30,18, AP: 0
-[23:11:23.880] DEBUG: AI recovering 3 points (AP: 3)
-[23:11:24.103] DEBUG: Player moved to: 27,25 AI can now recalculate paths
-[23:11:24.103] DEBUG: AI turn processor - Next step: 27,26, AP: 1
-[23:11:24.103] DEBUG: AI waiting (AP: 0)
-[23:11:24.103] DEBUG: AI turn processor - Next step: 30,18, AP: 3
-[23:11:24.103] DEBUG: AI moved from 31,18 to 30,18 (AP: 1)
-[23:11:24.333] DEBUG: Player moved to: 27,26 AI can now recalculate paths
-[23:11:24.333] DEBUG: AI turn processor - Next step: 27,26, AP: 0
-[23:11:24.333] DEBUG: AI recovering 3 points (AP: 3)
-[23:11:24.333] DEBUG: AI turn processor - Next step: 29,18, AP: 1
-[23:11:24.333] DEBUG: AI waiting (AP: 0)
-[23:11:26.266] DEBUG: Player moved to: 28,26 AI can now recalculate paths
-[23:11:26.266] DEBUG: AI attacked player (AP: 0)
-[23:11:26.266] DEBUG: AI turn processor - Next step: 29,18, AP: 0
-[23:11:26.266] DEBUG: AI recovering 3 points (AP: 3)
-[23:11:26.702] DEBUG: Player moved to: 27,26 AI can now recalculate paths
-[23:11:26.702] DEBUG: AI turn processor - Next step: 29,18, AP: 3
-[23:11:26.702] DEBUG: AI moved from 30,18 to 29,18 (AP: 1)
-[23:11:26.702] DEBUG: AI turn processor - Next step: 27,26, AP: 0
-[23:11:26.702] DEBUG: AI recovering 3 points (AP: 3)
-===== DEBUG LOG STARTED AT 2025-04-12 23:12:36 =====
-[23:12:36.780] DEBUG: Created world map with ID: 2
-[23:12:36.780] REGISTRY: Registered worldmap (Level 0) with ID: 2
-[23:12:36.781] DEBUG: Creating enemy with MapContext ID: 3
-[23:12:36.781] DEBUG: Creating enemy with MapContext ID: 3
-[23:12:36.781] DEBUG: Creating enemy with MapContext ID: 3
-[23:12:36.781] DEBUG: Creating enemy with MapContext ID: 3
-[23:12:36.781] DEBUG: Created dungeon with ID: 3
-[23:12:36.781] REGISTRY: Registered dungeon (Level 1) with ID: 3
-[23:12:36.781] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
-[23:12:36.781] SET ACTIVE MAP: Propagated to MapSystem
-[23:12:36.781] --- MAP SUMMARY ---
-[23:12:36.781] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[23:12:36.781] Map: dungeon (Level 1, ID: 3, Size: 40x30)
-[23:12:36.781] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[23:12:36.781] Active map ID: 3
-[23:12:36.781] Game initialization complete
-[23:12:38.167] DEBUG: Player moved to: 13,7 AI can now recalculate paths
-[23:12:38.605] DEBUG: Player moved to: 14,7 AI can now recalculate paths
-[23:12:38.965] DEBUG: Player moved to: 15,7 AI can now recalculate paths
-[23:12:39.216] DEBUG: Player moved to: 15,8 AI can now recalculate paths
-[23:12:39.501] DEBUG: Player moved to: 16,8 AI can now recalculate paths
-[23:12:40.036] DEBUG: Player moved to: 16,9 AI can now recalculate paths
-[23:12:40.216] DEBUG: Player moved to: 16,10 AI can now recalculate paths
-[23:12:40.383] DEBUG: Player moved to: 16,11 AI can now recalculate paths
-[23:12:40.536] DEBUG: Player moved to: 16,12 AI can now recalculate paths
-[23:12:40.703] DEBUG: Player moved to: 16,13 AI can now recalculate paths
-[23:12:40.866] DEBUG: Player moved to: 17,13 AI can now recalculate paths
-[23:12:41.037] DEBUG: Player moved to: 18,13 AI can now recalculate paths
-[23:12:41.204] DEBUG: Player moved to: 19,13 AI can now recalculate paths
-[23:12:41.489] DEBUG: Player moved to: 20,13 AI can now recalculate paths
-[23:12:41.655] DEBUG: Player moved to: 21,13 AI can now recalculate paths
-[23:12:41.836] DEBUG: Player moved to: 22,13 AI can now recalculate paths
-[23:12:42.002] DEBUG: Player moved to: 23,13 AI can now recalculate paths
-[23:12:42.169] DEBUG: Player moved to: 24,13 AI can now recalculate paths
-[23:12:42.552] DEBUG: Player moved to: 23,13 AI can now recalculate paths
-[23:12:42.719] DEBUG: Player moved to: 22,13 AI can now recalculate paths
-[23:12:42.871] DEBUG: Player moved to: 21,13 AI can now recalculate paths
-[23:12:43.003] DEBUG: Player moved to: 20,13 AI can now recalculate paths
-[23:12:43.149] DEBUG: Player moved to: 19,13 AI can now recalculate paths
-[23:12:43.302] DEBUG: Player moved to: 19,14 AI can now recalculate paths
-[23:12:43.469] DEBUG: Player moved to: 19,15 AI can now recalculate paths
-[23:12:43.621] DEBUG: Player moved to: 19,16 AI can now recalculate paths
-[23:12:43.769] DEBUG: Player moved to: 19,17 AI can now recalculate paths
-[23:12:43.920] DEBUG: Player moved to: 19,18 AI can now recalculate paths
-[23:12:44.088] DEBUG: Player moved to: 19,19 AI can now recalculate paths
-[23:12:44.219] DEBUG: Player moved to: 19,20 AI can now recalculate paths
-[23:12:44.400] DEBUG: Player moved to: 19,21 AI can now recalculate paths
-[23:12:44.684] DEBUG: Player moved to: 19,22 AI can now recalculate paths
-[23:12:44.838] DEBUG: Player moved to: 19,23 AI can now recalculate paths
-[23:12:44.971] DEBUG: Player moved to: 19,24 AI can now recalculate paths
-[23:12:45.139] DEBUG: Player moved to: 19,25 AI can now recalculate paths
-[23:12:45.470] DEBUG: Player moved to: 18,25 AI can now recalculate paths
-[23:12:45.617] DEBUG: Player moved to: 17,25 AI can now recalculate paths
-[23:12:45.782] DEBUG: Player moved to: 16,25 AI can now recalculate paths
-[23:12:45.938] DEBUG: Player moved to: 15,25 AI can now recalculate paths
-[23:12:46.102] DEBUG: Player moved to: 14,25 AI can now recalculate paths
-[23:12:46.248] DEBUG: Player moved to: 14,24 AI can now recalculate paths
-[23:12:46.439] DEBUG: Player moved to: 14,23 AI can now recalculate paths
-[23:12:46.582] DEBUG: Player moved to: 14,22 AI can now recalculate paths
-[23:12:46.736] DEBUG: Player moved to: 14,21 AI can now recalculate paths
-[23:12:46.888] DEBUG: Player moved to: 14,20 AI can now recalculate paths
-[23:12:47.068] DEBUG: Player moved to: 15,20 AI can now recalculate paths
-[23:12:47.271] DEBUG: Player moved to: 16,20 AI can now recalculate paths
-[23:12:47.533] DEBUG: Player moved to: 17,20 AI can now recalculate paths
-[23:12:47.555] DEBUG: Player moved to: 17,21 AI can now recalculate paths
-[23:12:47.667] DEBUG: Player moved to: 17,22 AI can now recalculate paths
-[23:12:47.973] DEBUG: Player moved to: 18,22 AI can now recalculate paths
-[23:12:48.105] DEBUG: Player moved to: 19,22 AI can now recalculate paths
-[23:12:48.270] DEBUG: Player moved to: 20,22 AI can now recalculate paths
-[23:12:48.451] DEBUG: Player moved to: 21,22 AI can now recalculate paths
-[23:12:48.618] DEBUG: Player moved to: 22,22 AI can now recalculate paths
-[23:12:48.784] DEBUG: Player moved to: 23,22 AI can now recalculate paths
-[23:12:48.785] DEBUG: AI turn processor - Next step: 30,25, AP: 6
-[23:12:48.785] DEBUG: AI moved from 31,25 to 30,25 (AP: 4)
-[23:12:48.937] DEBUG: Player moved to: 24,22 AI can now recalculate paths
-[23:12:48.937] DEBUG: AI turn processor - Next step: 29,25, AP: 4
-[23:12:48.937] DEBUG: AI skipped movement
-[23:12:49.118] DEBUG: Player moved to: 25,22 AI can now recalculate paths
-[23:12:49.118] DEBUG: AI turn processor - Next step: 29,25, AP: 3
-[23:12:49.118] DEBUG: AI moved from 30,25 to 29,25 (AP: 1)
-[23:12:49.320] DEBUG: Player moved to: 26,22 AI can now recalculate paths
-[23:12:49.320] DEBUG: AI turn processor - Next step: 28,25, AP: 1
-[23:12:49.320] DEBUG: AI waiting (AP: 0)
-[23:12:49.618] DEBUG: Player moved to: 27,22 AI can now recalculate paths
-[23:12:49.618] DEBUG: AI turn processor - Next step: 29,24, AP: 0
-[23:12:49.618] DEBUG: AI recovering 3 points (AP: 3)
-[23:12:49.821] DEBUG: Player moved to: 28,22 AI can now recalculate paths
-[23:12:49.821] DEBUG: AI turn processor - Next step: 35,25, AP: 6
-[23:12:49.821] DEBUG: AI moved from 36,25 to 35,25 (AP: 4)
-[23:12:49.821] DEBUG: AI turn processor - Next step: 28,25, AP: 3
-[23:12:49.821] DEBUG: AI moved from 29,25 to 28,25 (AP: 1)
-[23:12:50.265] DEBUG: Player moved to: 28,23 AI can now recalculate paths
-[23:12:50.265] DEBUG: AI turn processor - Next step: 28,24, AP: 1
-[23:12:50.265] DEBUG: AI waiting (AP: 0)
-[23:12:50.265] DEBUG: AI turn processor - Next step: 34,25, AP: 4
-[23:12:50.265] DEBUG: AI moved from 35,25 to 34,25 (AP: 2)
-[23:12:50.452] DEBUG: Player moved to: 28,24 AI can now recalculate paths
-[23:12:50.452] DEBUG: AI turn processor - Next step: 33,25, AP: 2
-[23:12:50.452] DEBUG: AI skipped movement
-[23:12:50.452] DEBUG: AI turn processor - Next step: 28,24, AP: 0
-[23:12:50.452] DEBUG: AI recovering 3 points (AP: 3)
-===== DEBUG LOG STARTED AT 2025-04-12 23:14:35 =====
-[23:14:35.996] DEBUG: Created world map with ID: 2
-[23:14:35.996] REGISTRY: Registered worldmap (Level 0) with ID: 2
-[23:14:35.997] DEBUG: Creating enemy with MapContext ID: 3
-[23:14:35.997] DEBUG: Creating enemy with MapContext ID: 3
-[23:14:35.997] DEBUG: Creating enemy with MapContext ID: 3
-[23:14:35.997] DEBUG: Created dungeon with ID: 3
-[23:14:35.997] REGISTRY: Registered dungeon (Level 1) with ID: 3
-[23:14:35.997] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
-[23:14:35.997] SET ACTIVE MAP: Propagated to MapSystem
-[23:14:35.997] --- MAP SUMMARY ---
-[23:14:35.997] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[23:14:35.997] Map: dungeon (Level 1, ID: 3, Size: 40x30)
-[23:14:35.997] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[23:14:35.997] Active map ID: 3
-[23:14:35.997] Game initialization complete
-[23:14:36.274] DEBUG: AI attacked player (AP: 3)
-[23:14:40.350] DEBUG: Player moved to: 33,10 AI can now recalculate paths
-[23:14:40.530] DEBUG: Player moved to: 34,10 AI can now recalculate paths
-[23:14:40.711] DEBUG: Player moved to: 35,10 AI can now recalculate paths
-[23:14:40.850] DEBUG: Player moved to: 36,10 AI can now recalculate paths
-[23:14:41.045] DEBUG: Player moved to: 37,10 AI can now recalculate paths
-[23:14:41.329] DEBUG: Player moved to: 37,9 AI can now recalculate paths
-[23:14:41.517] DEBUG: Player moved to: 36,9 AI can now recalculate paths
-[23:14:41.649] DEBUG: Player moved to: 35,9 AI can now recalculate paths
-[23:14:41.767] DEBUG: Player moved to: 34,9 AI can now recalculate paths
-[23:14:43.032] DEBUG: Player moved to: 33,9 AI can now recalculate paths
-[23:14:43.213] DEBUG: Player moved to: 32,9 AI can now recalculate paths
-[23:14:43.330] DEBUG: Player moved to: 31,9 AI can now recalculate paths
-[23:14:43.567] DEBUG: Player moved to: 31,10 AI can now recalculate paths
-[23:14:43.737] DEBUG: Player moved to: 31,11 AI can now recalculate paths
-[23:14:43.893] DEBUG: Player moved to: 32,11 AI can now recalculate paths
-[23:14:44.081] DEBUG: Player moved to: 33,11 AI can now recalculate paths
-[23:14:44.248] DEBUG: Player moved to: 33,12 AI can now recalculate paths
-[23:14:44.415] DEBUG: Player moved to: 33,13 AI can now recalculate paths
-[23:14:44.561] DEBUG: Player moved to: 33,14 AI can now recalculate paths
-[23:14:44.713] DEBUG: Player moved to: 33,15 AI can now recalculate paths
-[23:14:44.880] DEBUG: Player moved to: 33,16 AI can now recalculate paths
-[23:14:44.880] DEBUG: AI turn processor - Next step: 35,24, AP: 6
-[23:14:44.880] DEBUG: AI moved from 36,24 to 35,24 (AP: 4)
-[23:14:45.034] DEBUG: Player moved to: 33,17 AI can now recalculate paths
-[23:14:45.034] DEBUG: AI turn processor - Next step: 35,23, AP: 4
-[23:14:45.034] DEBUG: AI moved from 35,24 to 35,23 (AP: 2)
-[23:14:45.165] DEBUG: Player moved to: 33,18 AI can now recalculate paths
-[23:14:45.166] DEBUG: AI turn processor - Next step: 35,22, AP: 2
-[23:14:45.166] DEBUG: AI moved from 35,23 to 35,22 (AP: 0)
-[23:14:45.346] DEBUG: Player moved to: 32,18 AI can now recalculate paths
-[23:14:45.346] DEBUG: AI turn processor - Next step: 34,22, AP: 0
-[23:14:45.346] DEBUG: AI recovering 3 points (AP: 3)
-[23:14:45.514] DEBUG: Player moved to: 31,18 AI can now recalculate paths
-[23:14:45.514] DEBUG: AI turn processor - Next step: 34,22, AP: 3
-[23:14:45.514] DEBUG: AI moved from 35,22 to 34,22 (AP: 1)
-[23:14:45.833] DEBUG: Player moved to: 31,19 AI can now recalculate paths
-[23:14:45.833] DEBUG: AI turn processor - Next step: 33,22, AP: 1
-[23:14:45.833] DEBUG: AI waiting (AP: 0)
-[23:14:46.096] DEBUG: Player moved to: 31,20 AI can now recalculate paths
-[23:14:46.096] DEBUG: AI turn processor - Next step: 33,22, AP: 0
-[23:14:46.096] DEBUG: AI recovering 3 points (AP: 3)
+===== DEBUG LOG STARTED AT 2025-04-13 16:53:01 =====
+[16:53:01.955] DEBUG: Created world map with ID: 2
+[16:53:01.955] REGISTRY: Registered worldmap (Level 0) with ID: 2
+[16:53:01.956] DEBUG: Creating enemy with MapContext ID: 3
+[16:53:01.956] DEBUG: Creating enemy with MapContext ID: 3
+[16:53:01.956] DEBUG: Creating enemy with MapContext ID: 3
+[16:53:01.956] DEBUG: Creating enemy with MapContext ID: 3
+[16:53:01.956] DEBUG: Created dungeon with ID: 3
+[16:53:01.956] REGISTRY: Registered dungeon (Level 1) with ID: 3
+[16:53:01.956] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
+[16:53:01.956] SET ACTIVE MAP: Propagated to MapSystem
+[16:53:01.956] --- MAP SUMMARY ---
+[16:53:01.956] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[16:53:01.957] Map: dungeon (Level 1, ID: 3, Size: 40x30)
+[16:53:01.957] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[16:53:01.957] Active map ID: 3
+[16:53:01.958] Game initialization complete
+===== DEBUG LOG STARTED AT 2025-04-13 16:53:05 =====
+[16:53:06.030] DEBUG: Created world map with ID: 2
+[16:53:06.030] REGISTRY: Registered worldmap (Level 0) with ID: 2
+[16:53:06.031] DEBUG: Creating enemy with MapContext ID: 3
+[16:53:06.031] DEBUG: Creating enemy with MapContext ID: 3
+[16:53:06.031] DEBUG: Creating enemy with MapContext ID: 3
+[16:53:06.031] DEBUG: Creating enemy with MapContext ID: 3
+[16:53:06.032] DEBUG: Created dungeon with ID: 3
+[16:53:06.032] REGISTRY: Registered dungeon (Level 1) with ID: 3
+[16:53:06.032] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
+[16:53:06.032] SET ACTIVE MAP: Propagated to MapSystem
+[16:53:06.032] --- MAP SUMMARY ---
+[16:53:06.032] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[16:53:06.032] Map: dungeon (Level 1, ID: 3, Size: 40x30)
+[16:53:06.032] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[16:53:06.032] Active map ID: 3
+[16:53:06.033] Game initialization complete
+[16:53:06.296] DEBUG: AI turn processor - Next step: 26,19, AP: 6
+[16:53:06.296] DEBUG: AI moved from 27,19 to 26,19 (AP: 4)
+[16:53:07.112] DEBUG: Player moved to: 21,24 AI can now recalculate paths
+[16:53:07.112] DEBUG: AI turn processor - Next step: 25,19, AP: 4
+[16:53:07.112] DEBUG: AI moved from 26,19 to 25,19 (AP: 2)
+[16:53:07.299] DEBUG: Player moved to: 22,24 AI can now recalculate paths
+[16:53:07.299] DEBUG: AI turn processor - Next step: 24,19, AP: 2
+[16:53:07.299] DEBUG: AI moved from 25,19 to 24,19 (AP: 0)
+[16:53:07.432] DEBUG: Player moved to: 23,24 AI can now recalculate paths
+[16:53:07.432] DEBUG: AI turn processor - Next step: 23,19, AP: 0
+[16:53:07.432] DEBUG: AI recovering 3 points (AP: 3)
+[16:53:07.634] DEBUG: Player moved to: 23,25 AI can now recalculate paths
+[16:53:07.634] DEBUG: AI turn processor - Next step: 23,19, AP: 3
+[16:53:07.634] DEBUG: AI moved from 24,19 to 23,19 (AP: 1)
+[16:53:07.911] DEBUG: Player moved to: 24,25 AI can now recalculate paths
+[16:53:07.912] DEBUG: AI turn processor - Next step: 24,19, AP: 1
+[16:53:07.912] DEBUG: AI waiting (AP: 0)
+[16:53:08.079] DEBUG: Player moved to: 25,25 AI can now recalculate paths
+[16:53:08.079] DEBUG: AI turn processor - Next step: 24,19, AP: 0
+[16:53:08.079] DEBUG: AI recovering 3 points (AP: 3)
+[16:53:09.078] DEBUG: Player moved to: 24,25 AI can now recalculate paths
+[16:53:09.078] DEBUG: AI turn processor - Next step: 24,19, AP: 3
+[16:53:09.078] DEBUG: AI moved from 23,19 to 24,19 (AP: 1)
+[16:53:15.062] DEBUG: Player moved to: 24,24 AI can now recalculate paths
+[16:53:15.062] DEBUG: AI turn processor - Next step: 24,20, AP: 1
+[16:53:15.062] DEBUG: AI waiting (AP: 0)
+[16:53:15.249] DEBUG: Player moved to: 24,23 AI can now recalculate paths
+[16:53:15.249] DEBUG: AI turn processor - Next step: 24,20, AP: 0
+[16:53:15.249] DEBUG: AI recovering 3 points (AP: 3)
+[16:53:15.383] DEBUG: Player moved to: 24,22 AI can now recalculate paths
+[16:53:15.383] DEBUG: AI turn processor - Next step: 24,20, AP: 3
+[16:53:15.383] DEBUG: AI moved from 24,19 to 24,20 (AP: 1)
+[16:53:15.547] DEBUG: Player moved to: 24,21 AI can now recalculate paths
+[16:53:15.547] DEBUG: AI turn processor - Next step: 24,21, AP: 1
+[16:53:15.547] DEBUG: AI waiting (AP: 0)
+[16:53:21.444] DEBUG: Player moved to: 23,21 AI can now recalculate paths
+[16:53:21.444] DEBUG: AI turn processor - Next step: 23,20, AP: 0
+[16:53:21.444] DEBUG: AI recovering 3 points (AP: 3)
+[16:53:21.816] DEBUG: Player moved to: 23,20 AI can now recalculate paths
+[16:53:21.816] DEBUG: AI attacked player (AP: 0)
+[16:53:22.483] DEBUG: Player moved to: 23,19 AI can now recalculate paths
+[16:53:22.483] DEBUG: AI turn processor - Next step: 24,12, AP: 6
+[16:53:22.483] DEBUG: AI moved from 24,11 to 24,12 (AP: 4)
+[16:53:22.483] DEBUG: AI turn processor - Next step: 23,20, AP: 0
+[16:53:22.483] DEBUG: AI recovering 3 points (AP: 3)
+[16:53:22.964] DEBUG: Player moved to: 23,18 AI can now recalculate paths
+[16:53:22.964] DEBUG: AI turn processor - Next step: 24,13, AP: 4
+[16:53:22.964] DEBUG: AI moved from 24,12 to 24,13 (AP: 2)
+[16:53:22.964] DEBUG: AI turn processor - Next step: 23,20, AP: 3
+[16:53:22.964] DEBUG: AI moved from 24,20 to 23,20 (AP: 1)
+[16:53:23.783] DEBUG: Player moved to: 24,18 AI can now recalculate paths
+[16:53:23.783] DEBUG: AI turn processor - Next step: 24,14, AP: 2
+[16:53:23.783] DEBUG: AI moved from 24,13 to 24,14 (AP: 0)
+[16:53:23.783] DEBUG: AI turn processor - Next step: 24,20, AP: 1
+[16:53:23.783] DEBUG: AI waiting (AP: 0)
+[16:53:24.116] DEBUG: Player moved to: 24,19 AI can now recalculate paths
+[16:53:24.116] DEBUG: AI turn processor - Next step: 24,15, AP: 0
+[16:53:24.116] DEBUG: AI recovering 3 points (AP: 3)
+[16:53:24.116] DEBUG: AI turn processor - Next step: 24,20, AP: 0
+[16:53:24.116] DEBUG: AI recovering 3 points (AP: 3)
+[16:53:24.449] DEBUG: Player moved to: 24,20 AI can now recalculate paths
+[16:53:24.449] DEBUG: AI turn processor - Next step: 24,15, AP: 3
+[16:53:24.449] DEBUG: AI moved from 24,14 to 24,15 (AP: 1)
+[16:53:24.449] DEBUG: AI attacked player (AP: 0)
+[16:53:26.000] DEBUG: Player moved to: 24,19 AI can now recalculate paths
+[16:53:26.000] DEBUG: AI turn processor - Next step: 24,16, AP: 1
+[16:53:26.000] DEBUG: AI waiting (AP: 0)
+[16:53:26.332] DEBUG: Player moved to: 24,18 AI can now recalculate paths
+[16:53:26.332] DEBUG: AI turn processor - Next step: 24,16, AP: 0
+[16:53:26.332] DEBUG: AI recovering 3 points (AP: 3)
+[16:53:26.631] DEBUG: Player moved to: 24,17 AI can now recalculate paths
+[16:53:26.631] DEBUG: AI turn processor - Next step: 24,16, AP: 3
+[16:53:26.631] DEBUG: AI moved from 24,15 to 24,16 (AP: 1)
+[16:53:27.333] DEBUG: Player moved to: 23,17 AI can now recalculate paths
+[16:53:27.333] DEBUG: AI turn processor - Next step: 23,16, AP: 1
+[16:53:27.333] DEBUG: AI waiting (AP: 0)
+[16:53:27.618] DEBUG: Player moved to: 23,16 AI can now recalculate paths
+[16:53:27.618] DEBUG: AI turn processor - Next step: 23,16, AP: 0
+[16:53:27.618] DEBUG: AI recovering 3 points (AP: 3)
+[16:53:28.416] DEBUG: Player moved to: 23,15 AI can now recalculate paths
+[16:53:28.416] DEBUG: AI attacked player (AP: 0)
+[16:53:29.132] DEBUG: Player moved to: 24,15 AI can now recalculate paths
+[16:53:29.132] DEBUG: AI turn processor - Next step: 24,15, AP: 0
+[16:53:29.132] DEBUG: AI recovering 3 points (AP: 3)
+[16:53:29.578] DEBUG: Player moved to: 25,15 AI can now recalculate paths
+[16:53:29.578] DEBUG: AI attacked player (AP: 0)
+[16:53:30.327] DEBUG: Player moved to: 25,16 AI can now recalculate paths
+[16:53:30.327] DEBUG: AI turn processor - Next step: 25,16, AP: 0
+[16:53:30.327] DEBUG: AI recovering 3 points (AP: 3)
+[16:53:32.863] DEBUG: Player moved to: 25,17 AI can now recalculate paths
+[16:53:33.030] DEBUG: Player moved to: 25,18 AI can now recalculate paths
+[16:53:37.748] DEBUG: Player moved to: 24,18 AI can now recalculate paths
+[16:53:37.929] DEBUG: Player moved to: 23,18 AI can now recalculate paths
+[16:53:38.278] DEBUG: Player moved to: 22,18 AI can now recalculate paths
+[16:53:38.597] DEBUG: Player moved to: 22,19 AI can now recalculate paths
+[16:53:38.763] DEBUG: Player moved to: 22,20 AI can now recalculate paths
+[16:53:38.929] DEBUG: Player moved to: 22,21 AI can now recalculate paths
+[16:53:39.214] DEBUG: Player moved to: 22,22 AI can now recalculate paths
+[16:53:39.397] DEBUG: Player moved to: 23,22 AI can now recalculate paths
+[16:53:39.550] DEBUG: Player moved to: 24,22 AI can now recalculate paths
+[16:53:40.084] DEBUG: Rest action triggered
+[16:53:40.084] DEBUG: Player rested, AI will now take its turn
+[16:53:40.084] DEBUG: Player health: 95/100, HealingFactor: 5
+[16:53:40.444] DEBUG: Rest action triggered
+[16:53:40.444] DEBUG: Player rested, AI will now take its turn
+[16:53:40.444] DEBUG: Player health: 100/100, HealingFactor: 5
+[16:53:40.750] DEBUG: Rest action triggered
+[16:53:40.750] DEBUG: Player rested, AI will now take its turn
+[16:53:40.750] DEBUG: Player health: 100/100, HealingFactor: 5

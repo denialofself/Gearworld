@@ -33,7 +33,7 @@ type Game struct {
 	entitySpawner             *spawners.EntitySpawner
 	aiPathfindingSystem       *systems.AIPathfindingSystem
 	aiTurnProcessorSystem     *systems.AITurnProcessorSystem
-	passiveEffectsSystem      *systems.PassiveEffectsSystem
+	effectsSystem             *systems.EffectsSystem
 	inventorySystem           *systems.InventorySystem
 	fovSystem                 *systems.FOVSystem
 	// Equipment functionality is now handled by the inventory system
@@ -57,8 +57,8 @@ func NewGame() *Game {
 	cameraSystem := systems.NewCameraSystem()
 	renderSystem := systems.NewRenderSystem(tileset)
 	aiPathfindingSystem := systems.NewAIPathfindingSystem()
-	aiTurnProcessorSystem := systems.NewAITurnProcessorSystem()	
-	passiveEffectsSystem := systems.NewPassiveEffectsSystem()
+	aiTurnProcessorSystem := systems.NewAITurnProcessorSystem()
+	effectsSystem := systems.NewEffectsSystem()
 	inventorySystem := systems.NewInventorySystem()
 	fovSystem := systems.NewFOVSystem()
 	// Equipment functionality is now handled by the inventory system
@@ -93,9 +93,9 @@ func NewGame() *Game {
 	world.AddSystem(playerTurnProcessorSystem)
 	world.AddSystem(combatSystem)
 	world.AddSystem(cameraSystem)
-	world.AddSystem(aiPathfindingSystem)	
+	world.AddSystem(aiPathfindingSystem)
 	world.AddSystem(aiTurnProcessorSystem)
-	world.AddSystem(passiveEffectsSystem)
+	world.AddSystem(effectsSystem)
 	world.AddSystem(inventorySystem)
 	world.AddSystem(fovSystem)
 	// Equipment functionality is now handled by the inventory system
@@ -114,8 +114,8 @@ func NewGame() *Game {
 		entitySpawner:             entitySpawner,
 		aiPathfindingSystem:       aiPathfindingSystem,
 		aiTurnProcessorSystem:     aiTurnProcessorSystem,
-		passiveEffectsSystem:      passiveEffectsSystem,
-		inventorySystem:           inventorySystem,		
+		effectsSystem:             effectsSystem,
+		inventorySystem:           inventorySystem,
 		fovSystem:                 fovSystem,
 		// Equipment functionality is now handled by the inventory system
 	}
@@ -127,7 +127,7 @@ func NewGame() *Game {
 	combatSystem.Initialize(world)
 	aiPathfindingSystem.Initialize(world)
 	aiTurnProcessorSystem.Initialize(world)
-	passiveEffectsSystem.Initialize(world)	
+	effectsSystem.Initialize(world)
 	inventorySystem.Initialize(world)
 	fovSystem.Initialize(world)
 	// Equipment system has been removed - functionality moved to inventory system
@@ -242,8 +242,8 @@ func (g *Game) initialize() {
 	if _, err := g.entitySpawner.CreateItem(testItemX, testItemY, "rusty_spanner"); err != nil {
 		systems.GetMessageLog().Add(fmt.Sprintf("Failed to create rusty spanner: %v", err))
 	}
-	if _, err := g.entitySpawner.CreateItem(testItemX+1, testItemY, "health_potion"); err != nil {
-		systems.GetMessageLog().Add(fmt.Sprintf("Failed to create health potion: %v", err))
+	if _, err := g.entitySpawner.CreateItem(testItemX+1, testItemY, "bandage"); err != nil {
+		systems.GetMessageLog().Add(fmt.Sprintf("Failed to create bandage: %v", err))
 	}
 	// Add our new equipment items
 	if _, err := g.entitySpawner.CreateItem(testItemX+1, testItemY+1, "miners_headlamp"); err != nil {

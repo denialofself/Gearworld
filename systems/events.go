@@ -14,7 +14,33 @@ const (
 	EventItemPickup  ecs.EventType = "item_pickup"
 	EventEnemyAttack ecs.EventType = "enemy_attack"
 	EventRest        ecs.EventType = "rest"
+	EventEffects     ecs.EventType = "effects"
 )
+
+// Effect type constants
+const (
+	EffectTypeHeal        string = "heal"
+	EffectTypeDamage      string = "damage"
+	EffectTypeStatBoost   string = "stat_boost"
+	EffectTypeFOVModify   string = "fov_modify"
+	EffectTypeLightSource string = "light_source"
+	EffectTypeTemporary   string = "temporary" // For future use with timed effects
+)
+
+// EffectsEvent is emitted when an effect should be applied to an entity
+type EffectsEvent struct {
+	EntityID    ecs.EntityID // Entity to apply the effect to
+	EffectType  string       // Type of effect (heal, damage, etc.)
+	Property    string       // Property to affect (Health, Attack, etc.)
+	Value       interface{}  // Value of the effect
+	Source      string       // Source of the effect (item_id, rest, etc.)
+	DisplayText string       // Optional text to display
+}
+
+// Type returns the event type
+func (e EffectsEvent) Type() ecs.EventType {
+	return EventEffects
+}
 
 // CollisionEvent is emitted when entities collide
 type CollisionEvent struct {

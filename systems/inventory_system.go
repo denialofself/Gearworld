@@ -2,7 +2,6 @@ package systems
 
 import (
 	"fmt"
-	"reflect"
 
 	"ebiten-rogue/components"
 	"ebiten-rogue/ecs"
@@ -155,7 +154,7 @@ func (s *InventorySystem) DropItem(world *ecs.World, playerID ecs.EntityID, item
 	return true
 }
 
-// UseItem uses the item at the given index in the player's inventory
+// UseItem attempts to use the item at the given index in the player's inventory
 func (s *InventorySystem) UseItem(world *ecs.World, playerID ecs.EntityID, itemIndex int) bool {
 	// Get player inventory
 	invComp, exists := world.GetComponent(playerID, components.Inventory)
@@ -181,25 +180,86 @@ func (s *InventorySystem) UseItem(world *ecs.World, playerID ecs.EntityID, itemI
 		return false
 	}
 	item := itemComp.(*components.ItemComponent)
-	// Handle based on item type
-	switch item.ItemType {
-	case "potion":
-		// Implement potion effects
-		GetMessageLog().Add(fmt.Sprintf("You drink the %s.", s.getItemName(world, itemID)))
-		// Remove from inventory after use
-		inventory.RemoveItem(itemID)
-		return true
 
-	case "scroll":
-		// Implement scroll effects
-		GetMessageLog().Add(fmt.Sprintf("You read the %s.", s.getItemName(world, itemID)))
-		// Remove from inventory after use
+	// Check if item is consumable
+	isConsumable := false
+
+	// Look for consumable flag in item data
+	if data, ok := item.Data.(map[string]interface{}); ok {
+		if consumable, ok := data["consumable"].(bool); ok && consumable {
+			isConsumable = true
+		}
+
+		// Check for consumable in tags
+		if tags, ok := data["tags"].([]interface{}); ok {
+			for _, tag := range tags {
+				if tagStr, ok := tag.(string); ok && tagStr == "consumable" {
+					isConsumable = true
+					break
+				}
+			}
+		}
+	}
+
+	// Handle based on item type or consumable status
+	if isConsumable || item.ItemType == "potion" || item.ItemType == "scroll" ||
+		item.ItemType == "first aid" || item.ItemType == "bandage" {
+		// This is a consumable item - apply its effects
+		itemName := s.getItemName(world, itemID)
+
+		// Different use messages based on item type
+		switch item.ItemType {
+		case "potion":
+			GetMessageLog().Add(fmt.Sprintf("You drink the %s.", itemName))
+		case "scroll":
+			GetMessageLog().Add(fmt.Sprintf("You read the %s.", itemName))
+		default:
+			GetMessageLog().Add(fmt.Sprintf("You use the %s.", itemName))
+		}
+
+		// Apply effects directly using our new system
+		if item.Data != nil {
+			if effects, ok := item.Data.([]components.ItemEffect); ok {
+				// Apply all effects at once
+				err := ApplyEntityEffects(world, playerID, effects)
+				if err != nil {
+					GetMessageLog().Add(fmt.Sprintf("Error applying effects: %v", err))
+				} else {
+					// Different effect messages based on primary effect
+					hasPrimaryEffectMessage := false
+					for _, effect := range effects {
+						if effect.Component == "Stats" && effect.Property == "Health" {
+							GetMessageLog().Add(fmt.Sprintf("The %s heals your wounds.", itemName))
+							hasPrimaryEffectMessage = true
+							break
+						}
+					}
+
+					// Generic message if no specific effect message was shown
+					if !hasPrimaryEffectMessage && len(effects) > 0 {
+						GetMessageLog().Add(fmt.Sprintf("You feel the effects of the %s.", itemName))
+					}
+				}
+			}
+		}
+
+		// Remove from inventory after use (it's consumable)
 		inventory.RemoveItem(itemID)
 		return true
-	case "weapon", "armor", "helmet", "shield", "boots", "accessory":
-		// Simple direct equipping of the item
-		if s.directEquipItem(world, playerID, itemID) {
-			return true
+	} else if item.ItemType == "weapon" || item.ItemType == "armor" || item.ItemType == "headgear" ||
+		item.ItemType == "shield" || item.ItemType == "ring" || item.ItemType == "amulet" {
+		// This is an equippable item
+		// Check if the item is already equipped
+		if s.isItemEquipped(world, playerID, itemID) {
+			// If it's equipped, unequip it
+			if s.unequipItemByID(world, playerID, itemID) {
+				return true
+			}
+		} else {
+			// Otherwise, try to equip it
+			if s.directEquipItem(world, playerID, itemID) {
+				return true
+			}
 		}
 	}
 
@@ -207,7 +267,7 @@ func (s *InventorySystem) UseItem(world *ecs.World, playerID ecs.EntityID, itemI
 	return false
 }
 
-// directEquipItem is a simplified equipment function that directly manages the equipment component
+// directEquipItem is a simplified equipment function that uses the effects system
 func (s *InventorySystem) directEquipItem(world *ecs.World, entityID, itemID ecs.EntityID) bool {
 	// Get the item component
 	itemComp, exists := world.GetComponent(itemID, components.Item)
@@ -226,7 +286,7 @@ func (s *InventorySystem) directEquipItem(world *ecs.World, entityID, itemID ecs
 		slot = components.SlotBody
 	case "shield":
 		slot = components.SlotOffHand
-	case "helmet":
+	case "headgear":
 		slot = components.SlotHead
 	case "boots":
 		slot = components.SlotFeet
@@ -237,146 +297,80 @@ func (s *InventorySystem) directEquipItem(world *ecs.World, entityID, itemID ecs
 		return false
 	}
 
-	// Get or create equipment component
-	var equipComp *components.EquipmentComponent
-	if comp, exists := world.GetComponent(entityID, components.Equipment); exists {
-		equipComp = comp.(*components.EquipmentComponent)
-	} else {
-		equipComp = components.NewEquipmentComponent()
-		world.AddComponent(entityID, components.Equipment, equipComp)
+	// Use the proper EquipItem method that handles all the details
+	err := s.EquipItem(entityID, itemID, slot)
+	if err != nil {
+		GetMessageLog().Add(fmt.Sprintf("Cannot equip: %v", err))
+		return false
 	}
 
-	// Unequip any existing item in the slot
-	if oldItemID := equipComp.GetEquippedItem(slot); oldItemID != 0 {
-		// Just remove it from the slot without complex effect handling
-		equipComp.UnequipItem(slot)
-		GetMessageLog().Add(fmt.Sprintf("Unequipped previous item from %s slot", slot))
-	}
-
-	// Simply equip the new item to the slot
-	equipComp.EquipItem(slot, itemID)
-
-	// Apply any item effects
-	if item.Data != nil {
-		if effects, ok := item.Data.([]components.ItemEffect); ok {
-			for _, effect := range effects {
-				equipComp.AddEffect(itemID, effect)
-				// Apply the effect directly here
-				s.applySimpleEffect(world, entityID, effect)
-			}
-		}
-	}
-
-	// Get item name for message
-	itemName := "an item"
-	if nameComp, exists := world.GetComponent(itemID, components.Name); exists {
-		itemName = nameComp.(*components.NameComponent).Name
-	}
-
-	GetMessageLog().Add(fmt.Sprintf("Equipped %s to %s slot", itemName, slot))
 	return true
 }
 
-// applySimpleEffect applies a simple effect to the appropriate component
-func (s *InventorySystem) applySimpleEffect(world *ecs.World, entityID ecs.EntityID, effect components.ItemEffect) {
-	switch effect.Component {
-	case "FOV":
-		// Handle FOV effects
-		if fovComp, exists := world.GetComponent(entityID, components.FOV); exists {
-			fov := fovComp.(*components.FOVComponent)
-
-			switch effect.Property {
-			case "Range":
-				if effect.Operation == "add" {
-					if value, ok := effect.Value.(float64); ok {
-						fov.Range += int(value)
-					} else if value, ok := effect.Value.(int); ok {
-						fov.Range += value
-					}
-				} else if effect.Operation == "set" {
-					if value, ok := effect.Value.(float64); ok {
-						fov.Range = int(value)
-					} else if value, ok := effect.Value.(int); ok {
-						fov.Range = value
-					}
-				}
-			case "LightSource":
-				if effect.Operation == "set" {
-					if value, ok := effect.Value.(bool); ok {
-						fov.LightSource = value
-					}
-				}
-			case "LightRange":
-				if effect.Operation == "add" {
-					if value, ok := effect.Value.(float64); ok {
-						fov.LightRange += int(value)
-					} else if value, ok := effect.Value.(int); ok {
-						fov.LightRange += value
-					}
-				} else if effect.Operation == "set" {
-					if value, ok := effect.Value.(float64); ok {
-						fov.LightRange = int(value)
-					} else if value, ok := effect.Value.(int); ok {
-						fov.LightRange = value
-					}
-				}
-			}
-		}
-
-	case "Stats":
-		// Handle Stats effects - simplified approach
-		if statsComp, exists := world.GetComponent(entityID, components.Stats); exists {
-			stats := statsComp.(*components.StatsComponent)
-
-			// Directly modify the stats based on the property
-			switch effect.Property {
-			case "Health":
-				if effect.Operation == "add" {
-					if value, ok := effect.Value.(float64); ok {
-						stats.Health += int(value)
-					} else if value, ok := effect.Value.(int); ok {
-						stats.Health += value
-					}
-				}
-			case "MaxHealth":
-				if effect.Operation == "add" {
-					if value, ok := effect.Value.(float64); ok {
-						stats.MaxHealth += int(value)
-					} else if value, ok := effect.Value.(int); ok {
-						stats.MaxHealth += value
-					}
-				}
-			case "Attack":
-				if effect.Operation == "add" {
-					if value, ok := effect.Value.(float64); ok {
-						stats.Attack += int(value)
-					} else if value, ok := effect.Value.(int); ok {
-						stats.Attack += value
-					}
-				}
-			case "Defense":
-				if effect.Operation == "add" {
-					if value, ok := effect.Value.(float64); ok {
-						stats.Defense += int(value)
-					} else if value, ok := effect.Value.(int); ok {
-						stats.Defense += value
-					}
-				}
-			}
-		}
+// EquipItem equips an item to a slot
+func (s *InventorySystem) EquipItem(entityID ecs.EntityID, itemID ecs.EntityID, slot components.EquipmentSlot) error {
+	// Get the item component
+	itemComp, exists := s.world.GetComponent(itemID, components.Item)
+	if !exists {
+		return fmt.Errorf("entity is not an item")
 	}
+	item := itemComp.(*components.ItemComponent)
+
+	// Get or create equipment component
+	equipComp, exists := s.world.GetComponent(entityID, components.Equipment)
+	if !exists {
+		equipComp = components.NewEquipmentComponent()
+		s.world.AddComponent(entityID, components.Equipment, equipComp)
+	}
+	equipment := equipComp.(*components.EquipmentComponent)
+
+	// Unequip any existing item in the slot
+	if oldItemID := equipment.GetEquippedItem(slot); oldItemID != 0 {
+		s.UnequipItem(entityID, slot)
+		GetMessageLog().Add(fmt.Sprintf("Unequipped previous item from %s slot", slot))
+	}
+
+	// Equip the new item
+	equipment.EquipItem(slot, itemID)
+
+	// Process the item effects
+	if item.Data != nil {
+		if effects, ok := item.Data.([]components.ItemEffect); ok {
+			GetMessageLog().Add(fmt.Sprintf("Applying %d effects from %s", len(effects), s.getItemName(s.world, itemID)))
+
+			// Track the effects in the equipment component
+			for _, effect := range effects {
+				equipment.AddEffect(itemID, effect)
+			}
+
+			// Apply all effects at once using our utility
+			err := ApplyEntityEffects(s.world, entityID, effects)
+			if err != nil {
+				GetMessageLog().Add(fmt.Sprintf("Error applying effects: %v", err))
+			}
+		} else {
+			GetMessageLog().Add(fmt.Sprintf("Item data is not []ItemEffect but %T", item.Data))
+		}
+	} else {
+		GetMessageLog().Add(fmt.Sprintf("Item %s has no effects data", s.getItemName(s.world, itemID)))
+	}
+
+	// Get item name for message
+	itemName := s.getItemName(s.world, itemID)
+
+	// Emit an equipment event that other systems might be interested in
+	s.world.EmitEvent(ItemEquippedEvent{
+		EntityID: entityID,
+		ItemID:   itemID,
+		Slot:     string(slot),
+	})
+
+	GetMessageLog().Add(fmt.Sprintf("Equipped %s to %s slot", itemName, slot))
+	return nil
 }
 
-// getItemName gets the name of an item
-func (s *InventorySystem) getItemName(world *ecs.World, itemID ecs.EntityID) string {
-	if nameComp, exists := world.GetComponent(itemID, components.Name); exists {
-		return nameComp.(*components.NameComponent).Name
-	}
-	return "unknown item"
-}
-
-// EquipItem equips an item to an entity and applies its effects
-func (s *InventorySystem) EquipItem(entityID, itemID ecs.EntityID) error {
+// EquipItemAuto equips an item to the appropriate slot based on its type
+func (s *InventorySystem) EquipItemAuto(entityID, itemID ecs.EntityID) error {
 	// Get the item component
 	itemComp, exists := s.world.GetComponent(itemID, components.Item)
 	if !exists {
@@ -393,7 +387,7 @@ func (s *InventorySystem) EquipItem(entityID, itemID ecs.EntityID) error {
 		slot = components.SlotBody
 	case "shield":
 		slot = components.SlotOffHand
-	case "helmet":
+	case "headgear":
 		slot = components.SlotHead
 	case "boots":
 		slot = components.SlotFeet
@@ -403,36 +397,59 @@ func (s *InventorySystem) EquipItem(entityID, itemID ecs.EntityID) error {
 		return fmt.Errorf("item has unknown type: %s", item.ItemType)
 	}
 
-	// Get or create equipment component
-	var equipComp *components.EquipmentComponent
-	if comp, exists := s.world.GetComponent(entityID, components.Equipment); exists {
-		equipComp = comp.(*components.EquipmentComponent)
-	} else {
-		equipComp = components.NewEquipmentComponent()
-		s.world.AddComponent(entityID, components.Equipment, equipComp)
+	// Equip to the determined slot
+	return s.EquipItem(entityID, itemID, slot)
+}
+
+// isItemEquipped checks if an item is already equipped by the entity
+func (s *InventorySystem) isItemEquipped(world *ecs.World, entityID, itemID ecs.EntityID) bool {
+	// Get equipment component
+	equipComp, exists := world.GetComponent(entityID, components.Equipment)
+	if !exists {
+		return false
 	}
+	equipment := equipComp.(*components.EquipmentComponent)
 
-	// Unequip any existing item in the slot
-	if oldItemID := equipComp.GetEquippedItem(slot); oldItemID != 0 {
-		s.UnequipItem(entityID, slot)
-	}
-
-	// Equip the new item
-	equipComp.EquipItem(slot, itemID)
-
-	// Extract effects from item data and apply them
-	if item.Data != nil {
-		if effects, ok := item.Data.([]components.ItemEffect); ok {
-			for _, effect := range effects {
-				equipComp.AddEffect(itemID, effect)
-				s.applyItemEffect(entityID, itemID, effect)
-			}
+	// Check all equipment slots to see if the item is equipped in any of them
+	for _, slot := range []components.EquipmentSlot{
+		components.SlotHead, components.SlotBody, components.SlotMainHand,
+		components.SlotOffHand, components.SlotFeet, components.SlotAccessory,
+	} {
+		if equipment.GetEquippedItem(slot) == itemID {
+			return true
 		}
 	}
 
-	// Log the equipment
-	GetMessageLog().Add(fmt.Sprintf("Equipped %s", s.getItemName(s.world, itemID)))
-	return nil
+	return false
+}
+
+// unequipItemByID finds which slot an item is equipped in and unequips it
+func (s *InventorySystem) unequipItemByID(world *ecs.World, entityID, itemID ecs.EntityID) bool {
+	// Get equipment component
+	equipComp, exists := world.GetComponent(entityID, components.Equipment)
+	if !exists {
+		return false
+	}
+	equipment := equipComp.(*components.EquipmentComponent)
+
+	// Check all equipment slots to find the item
+	for _, slot := range []components.EquipmentSlot{
+		components.SlotHead, components.SlotBody, components.SlotMainHand,
+		components.SlotOffHand, components.SlotFeet, components.SlotAccessory,
+	} {
+		if equipment.GetEquippedItem(slot) == itemID {
+			// Found the item, unequip it
+			err := s.UnequipItem(entityID, slot)
+			if err != nil {
+				GetMessageLog().Add(fmt.Sprintf("Failed to unequip: %v", err))
+				return false
+			}
+			GetMessageLog().Add(fmt.Sprintf("Unequipped %s", s.getItemName(world, itemID)))
+			return true
+		}
+	}
+
+	return false
 }
 
 // UnequipItem removes an item from a slot and removes its effects
@@ -450,156 +467,284 @@ func (s *InventorySystem) UnequipItem(entityID ecs.EntityID, slot components.Equ
 		return fmt.Errorf("no item equipped in slot %s", slot)
 	}
 
-	// Remove the item's effects
-	s.removeItemEffects(entityID, itemID)
+	// Get the item's effects
+	effects, exists := equipment.ActiveEffects[itemID]
+	if exists {
+		GetMessageLog().Add(fmt.Sprintf("Removing %d effects from %s", len(effects), s.getItemName(s.world, itemID)))
+
+		// Remove all effects at once using our utility
+		err := RemoveEntityEffects(s.world, entityID, effects)
+		if err != nil {
+			GetMessageLog().Add(fmt.Sprintf("Error removing effects: %v", err))
+		}
+	}
+
+	// Remove the tracked effects from the equipment component
 	equipment.RemoveEffects(itemID)
 
 	// Unequip the item
 	equipment.UnequipItem(slot)
+
+	// Emit an unequip event
+	s.world.EmitEvent(ItemUnequippedEvent{
+		EntityID: entityID,
+		ItemID:   itemID,
+		Slot:     string(slot),
+	})
 
 	// Log the unequipment
 	GetMessageLog().Add(fmt.Sprintf("Unequipped %s", s.getItemName(s.world, itemID)))
 	return nil
 }
 
-// applyItemEffect applies an effect to an entity
-func (s *InventorySystem) applyItemEffect(entityID, itemID ecs.EntityID, effect components.ItemEffect) {
-	switch effect.Component {
-	case "FOV":
-		s.applyFOVEffect(entityID, effect)
-	case "Stats":
-		s.applyStatsEffect(entityID, effect)
+// getItemName gets the name of an item
+func (s *InventorySystem) getItemName(world *ecs.World, itemID ecs.EntityID) string {
+	if nameComp, exists := world.GetComponent(itemID, components.Name); exists {
+		return nameComp.(*components.NameComponent).Name
 	}
+	return "unknown item"
 }
 
-// applyFOVEffect applies FOV-related effects
-func (s *InventorySystem) applyFOVEffect(entityID ecs.EntityID, effect components.ItemEffect) {
-	// Get FOV component
-	fovComp, exists := s.world.GetComponent(entityID, components.FOV)
-	if !exists {
-		return
-	}
-	fov := fovComp.(*components.FOVComponent)
+// Apply item effect based on JSON definition - generic implementation
+func (s *InventorySystem) ApplyItemEffect(world *ecs.World, entityID, itemID ecs.EntityID, effect components.ItemEffect) {
+	// Log debug info to track effect application
+	GetMessageLog().Add(fmt.Sprintf("Applying %s.%s effect (%s %v)",
+		effect.Component, effect.Property, effect.Operation, effect.Value))
 
-	// Apply the effect based on property and operation
-	switch effect.Property {
-	case "Range":
-		if effect.Operation == "add" {
-			if value, ok := effect.Value.(float64); ok {
-				fov.Range += int(value)
-			} else if value, ok := effect.Value.(int); ok {
-				fov.Range += value
-			}
-		} else if effect.Operation == "set" {
-			if value, ok := effect.Value.(float64); ok {
-				fov.Range = int(value)
-			} else if value, ok := effect.Value.(int); ok {
-				fov.Range = value
-			}
-		}
-	case "LightSource":
-		if effect.Operation == "set" {
-			if value, ok := effect.Value.(bool); ok {
-				fov.LightSource = value
-			}
-		}
-	case "LightRange":
-		if effect.Operation == "add" {
-			if value, ok := effect.Value.(float64); ok {
-				fov.LightRange += int(value)
-			} else if value, ok := effect.Value.(int); ok {
-				fov.LightRange += value
-			}
-		} else if effect.Operation == "set" {
-			if value, ok := effect.Value.(float64); ok {
-				fov.LightRange = int(value)
-			} else if value, ok := effect.Value.(int); ok {
-				fov.LightRange = value
-			}
-		}
-	}
-}
-
-// applyStatsEffect applies stat-related effects
-func (s *InventorySystem) applyStatsEffect(entityID ecs.EntityID, effect components.ItemEffect) {
-	// Get Stats component
-	statsComp, exists := s.world.GetComponent(entityID, components.Stats)
-	if !exists {
-		return
-	}
-	stats := statsComp.(*components.StatsComponent)
-
-	// Use reflection to get the field value
-	statsValue := reflect.ValueOf(stats).Elem()
-	field := statsValue.FieldByName(effect.Property)
-
-	// Make sure the field exists and is an int
-	if !field.IsValid() || field.Kind() != reflect.Int {
+	// Apply the effect using our utility function
+	err := ApplyEntityEffect(world, entityID, effect.Component, effect.Property, effect.Operation, effect.Value)
+	if err != nil {
+		GetMessageLog().Add(fmt.Sprintf("Error applying effect: %v", err))
 		return
 	}
 
-	// Apply the effect based on operation
-	currentValue := int(field.Int())
-	var newValue int
+	// Log successful application
+	GetMessageLog().Add(fmt.Sprintf("%s.%s %s to %v applied successfully",
+		effect.Component, effect.Property, effect.Operation, effect.Value))
+}
 
-	switch effect.Operation {
-	case "add":
-		if value, ok := effect.Value.(float64); ok {
-			newValue = currentValue + int(value)
-		} else if value, ok := effect.Value.(int); ok {
-			newValue = currentValue + value
-		}
-	case "multiply":
-		if value, ok := effect.Value.(float64); ok {
-			newValue = int(float64(currentValue) * value)
-		} else if value, ok := effect.Value.(int); ok {
-			newValue = currentValue * value
-		}
-	case "set":
-		if value, ok := effect.Value.(float64); ok {
-			newValue = int(value)
-		} else if value, ok := effect.Value.(int); ok {
-			newValue = value
+// Remove item effect based on JSON definition - generic implementation
+func (s *InventorySystem) RemoveItemEffect(world *ecs.World, entityID, itemID ecs.EntityID, effect components.ItemEffect) {
+	// Log debug info to track effect removal
+	GetMessageLog().Add(fmt.Sprintf("Removing %s.%s effect (%s %v)",
+		effect.Component, effect.Property, effect.Operation, effect.Value))
+
+	// Create inverse effect
+	inverseOp, inverseVal, err := CreateInverseEffect(
+		effect.Component, effect.Property, effect.Operation, effect.Value)
+	if err != nil {
+		GetMessageLog().Add(fmt.Sprintf("Error creating inverse effect: %v", err))
+		return
+	}
+
+	// Apply the inverse effect
+	err = ApplyEntityEffect(world, entityID, effect.Component, effect.Property, inverseOp, inverseVal)
+	if err != nil {
+		GetMessageLog().Add(fmt.Sprintf("Error applying inverse effect: %v", err))
+		return
+	}
+
+	// Log successful removal
+	GetMessageLog().Add(fmt.Sprintf("Successfully removed effect from %s.%s",
+		effect.Component, effect.Property))
+}
+
+// createInverseEffect creates the inverse of an effect for removal (legacy function, kept for reference)
+func createInverseEffect(effect components.ItemEffect) components.ItemEffect {
+	inverseEffect := effect // Copy the original effect
+
+	// Use the utility function to create inverse
+	inverseOp, inverseVal, err := CreateInverseEffect(
+		effect.Component, effect.Property, effect.Operation, effect.Value)
+	if err == nil {
+		inverseEffect.Operation = inverseOp
+		inverseEffect.Value = inverseVal
+	} else {
+		// Fallback to old behavior if there's an error
+		switch effect.Operation {
+		case "add":
+			// For numeric values, negate them
+			switch v := effect.Value.(type) {
+			case int:
+				inverseEffect.Value = -v
+			case float64:
+				inverseEffect.Value = -v
+			}
+		case "set":
+			// For "set" operations, use defaults based on property
+			switch effect.Component {
+			case "Stats":
+				switch effect.Property {
+				case "Attack":
+					inverseEffect.Value = 1 // Default attack
+				case "Defense":
+					inverseEffect.Value = 0 // Default defense
+				}
+			case "FOV":
+				switch effect.Property {
+				case "Range":
+					inverseEffect.Value = 8 // Default FOV range
+				case "LightRange":
+					inverseEffect.Value = 0 // Default light range
+				case "LightSource":
+					inverseEffect.Value = false // Default light source state
+				}
+			}
 		}
 	}
 
-	// Set the new value
-	field.SetInt(int64(newValue))
+	return inverseEffect
 }
 
+// Note: These methods are no longer needed as their functionality is now handled
+// in the UnequipItem method which uses the effects system to cancel effects
+// They're kept here as comments for reference but should be removed in future refactoring
+
+/*
 // removeItemEffects removes all effects from an item
 func (s *InventorySystem) removeItemEffects(entityID, itemID ecs.EntityID) {
-	// Get equipment component
-	equipComp, exists := s.world.GetComponent(entityID, components.Equipment)
-	if !exists {
-		return
-	}
-	equipment := equipComp.(*components.EquipmentComponent)
-
-	// Get effects for the item
-	effects, exists := equipment.ActiveEffects[itemID]
-	if !exists || len(effects) == 0 {
-		return
-	}
-
-	// Remove each effect
-	for _, effect := range effects {
-		s.removeItemEffect(entityID, effect)
-	}
+    // This functionality has been moved to UnequipItem which uses the effects system
 }
 
 // removeItemEffect removes a single effect
 func (s *InventorySystem) removeItemEffect(entityID ecs.EntityID, effect components.ItemEffect) {
-	// This is a simplified implementation that just reverses additions
-	if effect.Operation == "add" {
-		// Create a negative version of the effect
-		inverseEffect := effect
-		if value, ok := effect.Value.(float64); ok {
-			inverseEffect.Value = -value
-		} else if value, ok := effect.Value.(int); ok {
-			inverseEffect.Value = -value
-		}
-		s.applyItemEffect(entityID, 0, inverseEffect)
+    // This functionality has been moved to UnequipItem which uses the effects system
+}
+*/
+
+// HandleUseKeyPress handles when the player presses the 'U' key to use the currently selected item
+func (s *InventorySystem) HandleUseKeyPress(world *ecs.World, playerID ecs.EntityID, selectedItemIndex int) bool {
+	// Check if the index is valid
+	if selectedItemIndex < 0 {
+		GetMessageLog().Add("No item selected.")
+		return false
 	}
-	// For "set" operations, you'd need to track the original value
+
+	// Use the item with our existing UseItem method
+	return s.UseItem(world, playerID, selectedItemIndex)
+}
+
+// IsItemConsumable checks if an item can be consumed/used directly
+func (s *InventorySystem) IsItemConsumable(world *ecs.World, itemID ecs.EntityID) bool {
+	// Get item component
+	itemComp, exists := world.GetComponent(itemID, components.Item)
+	if !exists {
+		return false
+	}
+	item := itemComp.(*components.ItemComponent)
+
+	// Check item type first
+	if item.ItemType == "potion" || item.ItemType == "scroll" ||
+		item.ItemType == "first aid" || item.ItemType == "bandage" {
+		return true
+	}
+
+	// Check for consumable flag in data
+	if data, ok := item.Data.(map[string]interface{}); ok {
+		if consumable, ok := data["consumable"].(bool); ok && consumable {
+			return true
+		}
+
+		// Check for consumable in tags
+		if tags, ok := data["tags"].([]interface{}); ok {
+			for _, tag := range tags {
+				if tagStr, ok := tag.(string); ok && tagStr == "consumable" {
+					return true
+				}
+			}
+		}
+	}
+
+	// Check if data is directly an array of ItemEffect
+	if effects, ok := item.Data.([]components.ItemEffect); ok && len(effects) > 0 {
+		// If item has effects and isn't equippable, it's likely consumable
+		equippable := item.ItemType == "weapon" || item.ItemType == "armor" ||
+			item.ItemType == "headgear" || item.ItemType == "shield" ||
+			item.ItemType == "boots" || item.ItemType == "accessory"
+
+		return !equippable
+	}
+
+	return false
+}
+
+// RemoveEquippedItemEffects removes the effects of an equipped item
+func (s *InventorySystem) RemoveEquippedItemEffects(world *ecs.World, entityID ecs.EntityID, slot string) bool {
+	// Get equipment component
+	equipComp, hasEquip := world.GetComponent(entityID, components.Equipment)
+	if !hasEquip {
+		return false
+	}
+
+	equipment := equipComp.(*components.EquipmentComponent)
+
+	// Convert string slot to EquipmentSlot
+	var equipSlot components.EquipmentSlot
+	switch slot {
+	case "mainhand":
+		equipSlot = components.SlotMainHand
+	case "offhand":
+		equipSlot = components.SlotOffHand
+	case "head":
+		equipSlot = components.SlotHead
+	case "body":
+		equipSlot = components.SlotBody
+	case "feet":
+		equipSlot = components.SlotFeet
+	case "accessory":
+		equipSlot = components.SlotAccessory
+	default:
+		return false
+	}
+
+	// Get the item in the slot
+	itemID := equipment.GetEquippedItem(equipSlot)
+	if itemID == 0 {
+		return false
+	}
+
+	// Get the item component
+	itemComp, hasItem := world.GetComponent(itemID, components.Item)
+	if !hasItem {
+		return false
+	}
+
+	item := itemComp.(*components.ItemComponent)
+
+	// Remove effects of the item
+	if item.Data != nil {
+		if effects, ok := item.Data.([]components.ItemEffect); ok {
+			err := RemoveEntityEffects(world, entityID, effects)
+			if err != nil {
+				GetMessageLog().Add(fmt.Sprintf("Error removing effects: %v", err))
+			}
+		}
+	}
+
+	return true
+}
+
+// AddItemEffect adds an effect to an entity with the given parameters
+func (s *InventorySystem) AddItemEffect(world *ecs.World, entityID ecs.EntityID, effect components.ItemEffect) error {
+	// Use our utility function to apply the effect
+	err := ApplyEntityEffect(world, entityID, effect.Component, effect.Property, effect.Operation, effect.Value)
+	if err != nil {
+		return fmt.Errorf("failed to apply effect: %v", err)
+	}
+	return nil
+}
+
+// GetInverseEffect creates an inverse effect for removing effects
+func (s *InventorySystem) GetInverseEffect(effect components.ItemEffect) (components.ItemEffect, error) {
+	inverseOp, inverseVal, err := CreateInverseEffect(effect.Component, effect.Property, effect.Operation, effect.Value)
+	if err != nil {
+		return components.ItemEffect{}, err
+	}
+
+	return components.ItemEffect{
+		Component: effect.Component,
+		Property:  effect.Property,
+		Operation: inverseOp,
+		Value:     inverseVal,
+	}, nil
 }

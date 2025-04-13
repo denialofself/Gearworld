@@ -62,7 +62,10 @@ func NewPlayerTurnProcessorSystem() *PlayerTurnProcessorSystem {
 	system.movementKeys[ebiten.KeyK] = DirUp
 	system.movementKeys[ebiten.KeyL] = DirRight
 	system.movementKeys[ebiten.KeyY] = DirUpLeft
-	system.movementKeys[ebiten.KeyU] = DirUpRight
+	// Don't map U to movement to avoid conflicts with item usage
+	// system.movementKeys[ebiten.KeyU] = DirUpRight
+	// Use Page Up key for up-right movement instead
+	system.movementKeys[ebiten.KeyPageUp] = DirUpRight
 	system.movementKeys[ebiten.KeyB] = DirDownLeft
 	system.movementKeys[ebiten.KeyN] = DirDownRight
 
@@ -397,6 +400,27 @@ func (s *PlayerTurnProcessorSystem) processInventoryInput(world *ecs.World) {
 		return
 	}
 
+	// Process 'U' key to use consumable items like bandages
+	if inpututil.IsKeyJustPressed(ebiten.KeyU) {
+		selectedIndex := s.renderSystem.GetSelectedItemIndex()
+		if selectedIndex >= 0 && selectedIndex < inventory.Size() {
+			// Try to find the inventory system to use the item
+			for _, system := range world.GetSystems() {
+				if invSystem, ok := system.(*InventorySystem); ok {
+					// Use the specialized HandleUseKeyPress for consumable items
+					if invSystem.HandleUseKeyPress(world, playerID, selectedIndex) {
+						// Mark the turn as complete if item was used
+						world.EmitEvent(TurnCompletedEvent{
+							EntityID: playerID,
+						})
+					}
+					break
+				}
+			}
+		}
+		return
+	}
+
 	// Process item selection (keys a-z for items 0-25)
 	for i := 0; i < 26 && i < inventory.Size(); i++ {
 		// Calculate the correct key code
@@ -488,6 +512,31 @@ func (s *PlayerTurnProcessorSystem) ProcessPlayerTurn(world *ecs.World) bool {
 						inventory := invComp.(*components.InventoryComponent)
 						if inventory.Size() > 0 && selectedIndex >= 0 && selectedIndex < inventory.Size() {
 							invSystem.UseItem(world, playerEntity.ID, selectedIndex)
+						}
+					}
+					break
+				}
+			}
+			return false
+		}
+
+		// Handle using items with U key
+		if inpututil.IsKeyJustPressed(ebiten.KeyU) {
+			selectedIndex := s.renderSystem.GetSelectedItemIndex()
+			// Find the inventory system to use the item
+			for _, system := range world.GetSystems() {
+				if invSystem, ok := system.(*InventorySystem); ok {
+					if playerEntity != nil && world.HasComponent(playerEntity.ID, components.Inventory) {
+						invComp, _ := world.GetComponent(playerEntity.ID, components.Inventory)
+						inventory := invComp.(*components.InventoryComponent)
+						if inventory.Size() > 0 && selectedIndex >= 0 && selectedIndex < inventory.Size() {
+							// Use the specialized HandleUseKeyPress for consumable items
+							if invSystem.HandleUseKeyPress(world, playerEntity.ID, selectedIndex) {
+								// Mark the turn as complete if item was used
+								world.EmitEvent(TurnCompletedEvent{
+									EntityID: playerEntity.ID,
+								})
+							}
 						}
 					}
 					break

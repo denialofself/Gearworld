@@ -59,10 +59,10 @@ func (s *EntitySpawner) CreatePlayer(x, y int) *ecs.Entity {
 		Health:        100,
 		MaxHealth:     100,
 		Attack:        5,
-		Defense:       2,
+		Defense:       1,
 		Level:         1,
 		Exp:           0,
-		HealingFactor: 5,
+		HealingFactor: 1,
 	})
 
 	s.world.AddComponent(playerEntity.ID, components.Collision, &components.CollisionComponent{

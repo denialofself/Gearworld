@@ -689,12 +689,13 @@ func (s *RenderSystem) drawInventoryListView(world *ecs.World, screen *ebiten.Im
 
 	// Draw controls at bottom of panel
 	for x := config.GameScreenWidth + 1; x < config.ScreenWidth-1; x++ {
-		s.tileset.DrawTile(screen, '-', x, config.GameScreenHeight-5, color.RGBA{180, 180, 180, 255})
+		s.tileset.DrawTile(screen, '-', x, config.GameScreenHeight-6, color.RGBA{180, 180, 180, 255})
 	}
-	s.tileset.DrawString(screen, "CONTROLS", config.GameScreenWidth+2, config.GameScreenHeight-4, color.RGBA{255, 230, 150, 255})
-	s.tileset.DrawString(screen, "I/ESC: Close inventory", config.GameScreenWidth+2, config.GameScreenHeight-3, color.RGBA{200, 200, 200, 255})
-	s.tileset.DrawString(screen, "↑/↓: Navigate items", config.GameScreenWidth+2, config.GameScreenHeight-2, color.RGBA{200, 200, 200, 255})
-	s.tileset.DrawString(screen, "Enter: View details, E: Equip item", config.GameScreenWidth+2, config.GameScreenHeight-1, color.RGBA{200, 200, 200, 255})
+	s.tileset.DrawString(screen, "CONTROLS", config.GameScreenWidth+2, config.GameScreenHeight-5, color.RGBA{255, 230, 150, 255})
+	s.tileset.DrawString(screen, "I/ESC: Close inventory", config.GameScreenWidth+2, config.GameScreenHeight-4, color.RGBA{200, 200, 200, 255})
+	s.tileset.DrawString(screen, "↑/↓: Navigate items", config.GameScreenWidth+2, config.GameScreenHeight-3, color.RGBA{200, 200, 200, 255})
+	s.tileset.DrawString(screen, "Enter: View details", config.GameScreenWidth+2, config.GameScreenHeight-2, color.RGBA{200, 200, 200, 255})
+	s.tileset.DrawString(screen, "E: Equip item, U: Use item", config.GameScreenWidth+2, config.GameScreenHeight-1, color.RGBA{200, 200, 200, 255})
 }
 
 // drawItemDetailsView draws the detailed view of a selected item
@@ -826,12 +827,10 @@ func (s *RenderSystem) drawItemDetailsView(world *ecs.World, screen *ebiten.Imag
 	}
 
 	// Draw controls at bottom of panel
-	for x := config.GameScreenWidth + 1; x < config.ScreenWidth-1; x++ {
-		s.tileset.DrawTile(screen, '-', x, config.GameScreenHeight-5, color.RGBA{180, 180, 180, 255})
-	}
-	s.tileset.DrawString(screen, "CONTROLS", config.GameScreenWidth+2, config.GameScreenHeight-4, color.RGBA{255, 230, 150, 255})
-	s.tileset.DrawString(screen, "ESC: Return to inventory", config.GameScreenWidth+2, config.GameScreenHeight-3, color.RGBA{200, 200, 200, 255})
-	s.tileset.DrawString(screen, "E: Equip item", config.GameScreenWidth+2, config.GameScreenHeight-2, color.RGBA{200, 200, 200, 255})
+	s.tileset.DrawString(screen, "CONTROLS", config.GameScreenWidth+2, config.GameScreenHeight-5, color.RGBA{255, 230, 150, 255})
+	s.tileset.DrawString(screen, "ESC: Return to inventory", config.GameScreenWidth+2, config.GameScreenHeight-4, color.RGBA{200, 200, 200, 255})
+	s.tileset.DrawString(screen, "E: Equip item", config.GameScreenWidth+2, config.GameScreenHeight-3, color.RGBA{200, 200, 200, 255})
+	s.tileset.DrawString(screen, "U: Use item", config.GameScreenWidth+2, config.GameScreenHeight-2, color.RGBA{200, 200, 200, 255})
 	s.tileset.DrawString(screen, "←/→: Previous/Next item", config.GameScreenWidth+2, config.GameScreenHeight-1, color.RGBA{200, 200, 200, 255})
 }
 

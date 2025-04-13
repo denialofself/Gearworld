@@ -8,5 +8,13 @@
   "color": "#B7410E",
   "value": 5,
   "weight": 2,
-  "tags": ["weapon", "melee", "tool"]
+  "tags": ["weapon", "melee", "tool"],
+  "effects": [
+    {
+      "component": "Stats",
+      "property": "Attack",
+      "operation": "add",
+      "value": 1
+    }
+  ]
 } 

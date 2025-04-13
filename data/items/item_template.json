@@ -1,0 +1,23 @@
+{
+  "id": "item_id",
+  "name": "Item Name",
+  "description": "A detailed description of the item.",
+  "item_type": "miscellaneous",
+  "tile_x": 14,
+  "tile_y": 7,
+  "color": "#FFFFFF",
+  "value": 10,
+  "weight": 1,
+  "tags": ["common", "sample"],
+  "equip_slot": "",
+  "effects": [
+    {
+      "component": "Stats",
+      "property": "Health",
+      "operation": "add",
+      "value": 0
+    }
+  ],
+  "consumable": true,
+  "charges": 3
+}
