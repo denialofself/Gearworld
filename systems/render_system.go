@@ -16,30 +16,76 @@ import (
 // RenderSystem handles drawing entities to the screen
 type RenderSystem struct {
 	tileset           *Tileset
-	cameraSystem      *CameraSystem // Reference to the camera system
-	debugWindowActive bool          // Whether the debug window is currently displayed
-	debugScrollOffset int           // Current scroll position in the debug log
-	showInventory     bool          // Whether to show inventory instead of stats panel
-	itemViewMode      bool          // Whether we're viewing a specific item's details
-	selectedItemIndex int           // Index of the currently selected item
+	cameraX           int          // Camera X position
+	cameraY           int          // Camera Y position
+	cameraTargetID    ecs.EntityID // Entity the camera is following
+	debugWindowActive bool         // Whether the debug window is currently displayed
+	debugScrollOffset int          // Current scroll position in the debug log
+	showInventory     bool         // Whether to show inventory instead of stats panel
+	itemViewMode      bool         // Whether we're viewing a specific item's details
+	selectedItemIndex int          // Index of the currently selected item
+	initialized       bool         // Whether the system has been initialized
 }
 
 // NewRenderSystem creates a new rendering system
 func NewRenderSystem(tileset *Tileset) *RenderSystem {
 	return &RenderSystem{
 		tileset:           tileset,
-		cameraSystem:      nil, // Will be set via SetCameraSystem
+		cameraX:           0,
+		cameraY:           0,
+		cameraTargetID:    0,
 		debugWindowActive: false,
 		debugScrollOffset: 0,
 		showInventory:     false,
 		itemViewMode:      false,
 		selectedItemIndex: -1,
+		initialized:       false,
 	}
 }
 
-// SetCameraSystem sets the camera system to be used for rendering
-func (s *RenderSystem) SetCameraSystem(cameraSystem *CameraSystem) {
-	s.cameraSystem = cameraSystem
+// Initialize sets up the render system
+func (s *RenderSystem) Initialize(world *ecs.World) {
+	if s.initialized {
+		return
+	}
+
+	// Register to listen for camera update events
+	world.GetEventManager().Subscribe(EventCameraUpdate, func(event ecs.Event) {
+		cameraEvent := event.(CameraUpdateEvent)
+		s.cameraX = cameraEvent.X
+		s.cameraY = cameraEvent.Y
+		s.cameraTargetID = cameraEvent.TargetID
+	})
+
+	// Register to listen for inventory UI events
+	world.GetEventManager().Subscribe(EventInventoryUI, func(event ecs.Event) {
+		uiEvent := event.(InventoryUIEvent)
+		switch uiEvent.Action {
+		case "open":
+			s.showInventory = true
+			s.itemViewMode = false
+		case "close":
+			s.showInventory = false
+			s.itemViewMode = false
+		case "select_item":
+			s.selectedItemIndex = uiEvent.ItemIndex
+		case "view_details":
+			s.itemViewMode = true
+			s.selectedItemIndex = uiEvent.ItemIndex
+		}
+	})
+
+	// Register to listen for equipment change events - just for debug logging
+	world.RegisterEventListener(s.handleEquipmentChange)
+
+	s.initialized = true
+}
+
+// Update performs any rendering-related updates
+func (s *RenderSystem) Update(world *ecs.World, dt float64) {
+	if !s.initialized {
+		s.Initialize(world)
+	}
 }
 
 // ToggleDebugWindow toggles the visibility of the debug message window
@@ -83,18 +129,6 @@ func (s *RenderSystem) ViewItemDetails(itemIndex int) {
 func (s *RenderSystem) ExitItemView() {
 	s.itemViewMode = false
 	s.selectedItemIndex = -1
-}
-
-// Update renders entities with Position and Renderable components
-func (s *RenderSystem) Update(world *ecs.World, dt float64) {
-	// If we haven't been given a camera system, find one in the world	if s.cameraSystem == nil {
-	// Find a camera system by iterating through the world's systems
-	for _, system := range world.GetSystems() {
-		if cameraSystem, ok := system.(*CameraSystem); ok {
-			s.cameraSystem = cameraSystem
-			break
-		}
-	}
 }
 
 // No need for equipment caching - it will be rendered directly in drawStatsPanel
@@ -408,13 +442,8 @@ func (s *RenderSystem) drawEntities(world *ecs.World, screen *ebiten.Image, came
 
 			// Use camera system to convert world position to screen position
 			var screenX, screenY int
-			if s.cameraSystem != nil {
-				screenX, screenY = s.cameraSystem.WorldToScreen(world, pos.X, pos.Y)
-			} else {
-				// Fallback if camera system is not available
-				screenX = pos.X - cameraX
-				screenY = pos.Y - cameraY
-			}
+			screenX = pos.X - cameraX
+			screenY = pos.Y - cameraY
 
 			// Only draw entities within the visible game screen
 			if screenX >= 0 && screenX < config.GameScreenWidth &&
@@ -1153,12 +1182,6 @@ func (s *RenderSystem) GetSelectedItemIndex() int {
 // SetSelectedItemIndex sets the selected item index
 func (s *RenderSystem) SetSelectedItemIndex(index int) {
 	s.selectedItemIndex = index
-}
-
-// Initialize sets up the render system
-func (s *RenderSystem) Initialize(world *ecs.World) {
-	// Register to listen for equipment change events - just for debug logging
-	world.RegisterEventListener(s.handleEquipmentChange)
 }
 
 // handleEquipmentChange listens for equipment change events

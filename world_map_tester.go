@@ -40,9 +40,6 @@ func NewWorldMapTester() *WorldMapTester {
 	cameraSystem := systems.NewCameraSystem()
 	renderSystem := systems.NewRenderSystem(tileset)
 
-	// Connect the camera system to the render system
-	renderSystem.SetCameraSystem(cameraSystem)
-
 	// Register systems with the world that need to be updated during the game loop
 	world.AddSystem(mapSystem)
 	world.AddSystem(cameraSystem)

@@ -4,7 +4,6 @@ import (
 	"ebiten-rogue/components"
 	"ebiten-rogue/config"
 	"ebiten-rogue/ecs"
-	"fmt"
 )
 
 // CameraSystem handles viewport positioning and scrolling
@@ -16,84 +15,49 @@ func NewCameraSystem() *CameraSystem {
 	return &CameraSystem{}
 }
 
-// Update updates the camera position based on the player's position
+// Update updates the camera position to follow the target entity
 func (s *CameraSystem) Update(world *ecs.World, dt float64) {
-	// Find player entity
-	playerEntities := world.GetEntitiesWithTag("player")
-	if len(playerEntities) == 0 {
-		return
-	}
-
-	playerID := playerEntities[0].ID
-
-	// Get the player position
-	playerPosComp, hasPos := world.GetComponent(playerID, components.Position)
-	if !hasPos {
-		return
-	}
-	playerPos := playerPosComp.(*components.PositionComponent)
-
-	// Find camera entity or create one if it doesn't exist
+	// Find all camera entities
 	cameraEntities := world.GetEntitiesWithTag("camera")
-	var cameraID ecs.EntityID
-	var cameraComp *components.CameraComponent
-
 	if len(cameraEntities) == 0 {
-		// Create a new camera entity
-		cameraEntity := world.CreateEntity()
-		cameraID = cameraEntity.ID
-		cameraComp = components.NewCameraComponent(uint64(playerID))
-		world.AddComponent(cameraID, components.Camera, cameraComp)
-	} else {
-		cameraID = cameraEntities[0].ID
-		comp, _ := world.GetComponent(cameraID, components.Camera)
-		cameraComp = comp.(*components.CameraComponent)
+		return
 	}
 
-	// Find active map from MapRegistrySystem (preferred)
-	var activeMapID ecs.EntityID
-	var activeMapType string
-	for _, system := range world.GetSystems() {
-		if mapReg, ok := system.(interface{ GetActiveMap() *ecs.Entity }); ok {
-			if activeMap := mapReg.GetActiveMap(); activeMap != nil {
-				activeMapID = activeMap.ID
-
-				// Get map type
-				if typeComp, exists := world.GetComponent(activeMap.ID, components.MapType); exists {
-					mapTypeComp := typeComp.(*components.MapTypeComponent)
-					activeMapType = mapTypeComp.MapType
-				}
-				break
-			}
+	// Process each camera
+	for _, cameraEntity := range cameraEntities {
+		cameraComp, exists := world.GetComponent(cameraEntity.ID, components.Camera)
+		if !exists {
+			continue
 		}
-	}
+		camera := cameraComp.(*components.CameraComponent)
 
-	// If no map found from registry, fall back to any map entity
-	if activeMapID == 0 {
-		standardMapEntities := world.GetEntitiesWithTag("map")
-		if len(standardMapEntities) > 0 {
-			activeMapID = standardMapEntities[0].ID
+		// Only update if the camera has a target
+		if camera.Target == 0 {
+			continue
 		}
-	}
 
-	// If we have an active map, update camera
-	if activeMapID != 0 {
-		// Verify player's map context matches active map
-		if world.HasComponent(playerID, components.MapContextID) {
-			mapContextComp, _ := world.GetComponent(playerID, components.MapContextID)
-			mapContext := mapContextComp.(*components.MapContextComponent)
+		// Get target position
+		targetPosComp, exists := world.GetComponent(ecs.EntityID(camera.Target), components.Position)
+		if !exists {
+			continue
+		}
+		targetPos := targetPosComp.(*components.PositionComponent)
 
-			// Only log debug info when player is actually on the world map
-			// AND the map context matches (player is actually on the active map)
-			if activeMapType == "worldmap" && mapContext.MapID == activeMapID {
-				GetDebugLog().Add(fmt.Sprintf("CAMERA: Player position on worldmap: %d,%d (MapContextID: %d)",
-					playerPos.X, playerPos.Y, mapContext.MapID))
-			}
+		// Update camera position
+		oldX, oldY := camera.X, camera.Y
+		camera.X = targetPos.X - config.ScreenWidth/2
+		camera.Y = targetPos.Y - config.ScreenHeight/2
 
-			// Only update camera if player is on the active map
-			if mapContext.MapID == activeMapID {
-				s.updateCameraForStandardMap(world, playerPos, cameraComp, activeMapID)
-			}
+		// If the camera position changed, emit an event
+		if oldX != camera.X || oldY != camera.Y {
+			world.EmitEvent(CameraUpdateEvent{
+				CameraID:  cameraEntity.ID,
+				X:         camera.X,
+				Y:         camera.Y,
+				TargetID:  ecs.EntityID(camera.Target),
+				ViewportW: config.ScreenWidth,
+				ViewportH: config.ScreenHeight,
+			})
 		}
 	}
 }

@@ -7,14 +7,20 @@ import (
 
 // Event type constants
 const (
-	EventCollision   ecs.EventType = "collision"
-	EventMovement    ecs.EventType = "movement"
-	EventCombat      ecs.EventType = "combat"
-	EventDeath       ecs.EventType = "death"
-	EventItemPickup  ecs.EventType = "item_pickup"
-	EventEnemyAttack ecs.EventType = "enemy_attack"
-	EventRest        ecs.EventType = "rest"
-	EventEffects     ecs.EventType = "effects"
+	EventCollision         ecs.EventType = "collision"
+	EventMovement          ecs.EventType = "movement"
+	EventCombat            ecs.EventType = "combat"
+	EventDeath             ecs.EventType = "death"
+	EventItemPickup        ecs.EventType = "item_pickup"
+	EventEnemyAttack       ecs.EventType = "enemy_attack"
+	EventRest              ecs.EventType = "rest"
+	EventEffects           ecs.EventType = "effects"
+	EventEquipItem         ecs.EventType = "equip_item"
+	EventUnequipItem       ecs.EventType = "unequip_item"
+	EventEquipmentQuery    ecs.EventType = "equipment_query"
+	EventEquipmentResponse ecs.EventType = "equipment_response"
+	EventCameraUpdate      ecs.EventType = "camera_update"
+	EventInventoryUI       ecs.EventType = "inventory_ui"
 )
 
 // Effect type constants
@@ -198,4 +204,81 @@ type ItemUnequippedEvent struct {
 // Type returns the event type
 func (e ItemUnequippedEvent) Type() ecs.EventType {
 	return "item_unequipped"
+}
+
+// EquipItemRequestEvent is emitted when an item should be equipped
+type EquipItemRequestEvent struct {
+	EntityID ecs.EntityID // Entity to equip the item to
+	ItemID   ecs.EntityID // Item to be equipped
+	SlotHint string       // Optional slot hint, empty for auto-assignment
+}
+
+// Type returns the event type
+func (e EquipItemRequestEvent) Type() ecs.EventType {
+	return EventEquipItem
+}
+
+// UnequipItemRequestEvent is emitted when an item should be unequipped
+type UnequipItemRequestEvent struct {
+	EntityID ecs.EntityID // Entity to unequip the item from
+	ItemID   ecs.EntityID // Item to be unequipped
+}
+
+// Type returns the event type
+func (e UnequipItemRequestEvent) Type() ecs.EventType {
+	return EventUnequipItem
+}
+
+// EquipmentQueryRequestEvent is emitted to check equipment status
+type EquipmentQueryRequestEvent struct {
+	EntityID ecs.EntityID // Entity to check
+	ItemID   ecs.EntityID // Item to check
+	QueryID  string       // Unique ID to match with response
+}
+
+// Type returns the event type
+func (e EquipmentQueryRequestEvent) Type() ecs.EventType {
+	return EventEquipmentQuery
+}
+
+// EquipmentQueryResponseEvent is the response to an equipment query
+type EquipmentQueryResponseEvent struct {
+	EntityID   ecs.EntityID // Entity checked
+	ItemID     ecs.EntityID // Item checked
+	IsEquipped bool         // Whether the item is equipped
+	Slot       string       // Where the item is equipped, if applicable
+	QueryID    string       // Matching ID from the request
+}
+
+// Type returns the event type
+func (e EquipmentQueryResponseEvent) Type() ecs.EventType {
+	return EventEquipmentResponse
+}
+
+// CameraUpdateEvent is emitted when the camera position changes
+type CameraUpdateEvent struct {
+	CameraID  ecs.EntityID // ID of the camera entity
+	X         int          // New X position
+	Y         int          // New Y position
+	TargetID  ecs.EntityID // ID of the entity the camera is following (optional)
+	ViewportW int          // Viewport width (optional)
+	ViewportH int          // Viewport height (optional)
+}
+
+// Type returns the event type
+func (e CameraUpdateEvent) Type() ecs.EventType {
+	return EventCameraUpdate
+}
+
+// InventoryUIEvent is emitted for inventory UI interactions
+type InventoryUIEvent struct {
+	Action    string       // "open", "close", "select_item", "view_details", etc.
+	EntityID  ecs.EntityID // Entity whose inventory is being interacted with
+	ItemIndex int          // Index of the item being interacted with (if applicable)
+	ItemID    ecs.EntityID // ID of the item being interacted with (if applicable)
+}
+
+// Type returns the event type
+func (e InventoryUIEvent) Type() ecs.EventType {
+	return EventInventoryUI
 }

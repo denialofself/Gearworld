@@ -35,8 +35,8 @@ type Game struct {
 	aiTurnProcessorSystem     *systems.AITurnProcessorSystem
 	effectsSystem             *systems.EffectsSystem
 	inventorySystem           *systems.InventorySystem
+	equipmentSystem           *systems.EquipmentSystem
 	fovSystem                 *systems.FOVSystem
-	// Equipment functionality is now handled by the inventory system
 }
 
 // NewGame creates a new game instance
@@ -60,8 +60,8 @@ func NewGame() *Game {
 	aiTurnProcessorSystem := systems.NewAITurnProcessorSystem()
 	effectsSystem := systems.NewEffectsSystem()
 	inventorySystem := systems.NewInventorySystem()
+	equipmentSystem := systems.NewEquipmentSystem()
 	fovSystem := systems.NewFOVSystem()
-	// Equipment functionality is now handled by the inventory system
 
 	// Initialize the entity template manager
 	templateManager := data.NewEntityTemplateManager()
@@ -81,11 +81,6 @@ func NewGame() *Game {
 	// Create entity spawner
 	entitySpawner := spawners.NewEntitySpawner(world, templateManager, systems.GetMessageLog().Add)
 
-	// Connect the camera system to the render system
-	renderSystem.SetCameraSystem(cameraSystem)
-	playerTurnProcessorSystem.SetRenderSystem(renderSystem)
-
-	// Register systems with the world that need to be updated during the game loop
 	// Register systems with the world
 	world.AddSystem(mapSystem)
 	world.AddSystem(mapRegistrySystem)
@@ -97,8 +92,9 @@ func NewGame() *Game {
 	world.AddSystem(aiTurnProcessorSystem)
 	world.AddSystem(effectsSystem)
 	world.AddSystem(inventorySystem)
+	world.AddSystem(equipmentSystem)
 	world.AddSystem(fovSystem)
-	// Equipment functionality is now handled by the inventory system
+	world.AddSystem(renderSystem) // Render system should be last to see all changes
 
 	// Create the game instance
 	game := &Game{
@@ -116,8 +112,8 @@ func NewGame() *Game {
 		aiTurnProcessorSystem:     aiTurnProcessorSystem,
 		effectsSystem:             effectsSystem,
 		inventorySystem:           inventorySystem,
+		equipmentSystem:           equipmentSystem,
 		fovSystem:                 fovSystem,
-		// Equipment functionality is now handled by the inventory system
 	}
 
 	// Initialize the game world
@@ -129,8 +125,9 @@ func NewGame() *Game {
 	aiTurnProcessorSystem.Initialize(world)
 	effectsSystem.Initialize(world)
 	inventorySystem.Initialize(world)
+	equipmentSystem.Initialize(world)
 	fovSystem.Initialize(world)
-	// Equipment system has been removed - functionality moved to inventory system
+	renderSystem.Initialize(world)
 
 	// Call the map debug function
 	components.DebugWallDetection()
