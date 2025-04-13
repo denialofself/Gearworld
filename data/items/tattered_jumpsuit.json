@@ -1,0 +1,21 @@
+{
+  "id": "tattered_jumpsuit",
+  "name": "Tattered Jumpsuit",
+  "description": "An old mechanics jumpsuit, worn and torn from years of use.",
+  "item_type": "armor",
+  "tile_x": 3, 
+  "tile_y": 2,
+  "color": "#A0A0A0",
+  "value": 25,
+  "weight": 8,
+  "tags": ["armor", "medium"],
+  "equip_slot": "body",
+  "effects": [
+    {
+      "component": "Stats",
+      "property": "Defense",
+      "operation": "add",
+      "value": 1
+    }
+  ]
+} 

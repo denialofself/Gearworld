@@ -232,14 +232,36 @@ func (s *EntitySpawner) CreateItem(x, y int, itemTemplateID string) (*ecs.Entity
 		itemColor,
 	))
 
-	// Add item component
-	s.world.AddComponent(itemEntity.ID, components.Item, components.NewItemComponentFromTemplate(
+	// Create the item component
+	itemComp := components.NewItemComponentFromTemplate(
 		template.ID,
 		template.ItemType,
 		template.Value,
 		template.Weight,
 		template.Description,
-	))
+	)
+
+	// If item has effects, process them
+	if len(template.Effects) > 0 {
+		effects := make([]components.ItemEffect, 0, len(template.Effects))
+
+		// Convert each effect from map to ItemEffect struct
+		for _, effectMap := range template.Effects {
+			effect := components.ItemEffect{
+				Component: effectMap["component"].(string),
+				Property:  effectMap["property"].(string),
+				Operation: effectMap["operation"].(string),
+				Value:     effectMap["value"],
+			}
+			effects = append(effects, effect)
+		}
+
+		// Store the effects in the item's Data field
+		itemComp.Data = effects
+	}
+
+	// Add the item component
+	s.world.AddComponent(itemEntity.ID, components.Item, itemComp)
 
 	// Add name component
 	s.world.AddComponent(itemEntity.ID, components.Name, components.NewNameComponent(template.Name))
@@ -373,4 +395,54 @@ func (s *EntitySpawner) getActiveMap() ecs.EntityID {
 
 	// No active map found
 	return 0
+}
+
+// CreateDoorEntity creates a door entity at the given position
+func (s *EntitySpawner) CreateDoorEntity(x, y int) *ecs.Entity {
+	// Create the door entity
+	doorEntity := s.world.CreateEntity()
+	doorEntity.AddTag("door")
+	s.world.TagEntity(doorEntity.ID, "door")
+
+	// Add position component
+	s.world.AddComponent(doorEntity.ID, components.Position, &components.PositionComponent{
+		X: x,
+		Y: y,
+	})
+
+	// Add map context component
+	if s.spawnMapID != 0 {
+		s.world.AddComponent(doorEntity.ID, components.MapContextID, components.NewMapContextComponent(s.spawnMapID))
+	}
+
+	return doorEntity
+}
+
+// CreateStairsEntity creates stairs at the given position
+func (s *EntitySpawner) CreateStairsEntity(x, y int, isUp bool) *ecs.Entity {
+	// Create the stairs entity
+	stairsEntity := s.world.CreateEntity()
+	stairsEntity.AddTag("stairs")
+	s.world.TagEntity(stairsEntity.ID, "stairs")
+
+	if isUp {
+		stairsEntity.AddTag("stairs_up")
+		s.world.TagEntity(stairsEntity.ID, "stairs_up")
+	} else {
+		stairsEntity.AddTag("stairs_down")
+		s.world.TagEntity(stairsEntity.ID, "stairs_down")
+	}
+
+	// Add position component
+	s.world.AddComponent(stairsEntity.ID, components.Position, &components.PositionComponent{
+		X: x,
+		Y: y,
+	})
+
+	// Add map context component
+	if s.spawnMapID != 0 {
+		s.world.AddComponent(stairsEntity.ID, components.MapContextID, components.NewMapContextComponent(s.spawnMapID))
+	}
+
+	return stairsEntity
 }

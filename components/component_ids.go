@@ -22,4 +22,5 @@ const (
 	Inventory  // Inventory component for storing items
 	Item       // Item component for collectible objects
 	FOV        // Field of vision component
+	Equipment  // Equipment component for equipped items
 )

@@ -110,31 +110,30 @@ func (s *CombatSystem) ProcessCombat(world *ecs.World, attackerID, defenderID ec
 
 	// Calculate damage (attack roll minus defender's defense)
 	damage := attackRoll - defenderStats.Defense
-
 	// Log the attack roll
 	rollMsg := fmt.Sprintf("%s attacks %s! (Roll: %d + %d = %d)",
 		attackerName, defenderName, d20Roll, attackerStats.Attack, attackRoll)
-	GetMessageLog().Add(rollMsg)
+	GetMessageLog().AddCombat(rollMsg)
 
 	// Handle the outcome
 	if damage <= 0 {
 		// Attack missed or was blocked
-		GetMessageLog().Add(fmt.Sprintf("%s's attack was ineffective!", attackerName))
+		GetMessageLog().AddCombat(fmt.Sprintf("%s's attack was ineffective!", attackerName))
 		return false
 	} else {
 		// Apply damage
 		defenderStats.Health -= damage
 		damageMsg := fmt.Sprintf("%s hit %s for %d damage! %s has %d/%d HP remaining.",
 			attackerName, defenderName, damage, defenderName, defenderStats.Health, defenderStats.MaxHealth)
-		GetMessageLog().Add(damageMsg)
+		GetMessageLog().AddCombat(damageMsg)
 
 		// Check if defender is defeated
 		if defenderStats.Health <= 0 {
-			GetMessageLog().Add(fmt.Sprintf("%s was defeated!", defenderName))
+			GetMessageLog().AddAlert(fmt.Sprintf("%s was defeated!", defenderName))
 
 			// Handle player death
 			if isPlayer(world, defenderID) {
-				GetMessageLog().Add("Game Over! You died.")
+				GetMessageLog().AddAlert("Game Over! You died.")
 				// Could trigger game over state here
 			} else {
 				// Remove the defeated entity

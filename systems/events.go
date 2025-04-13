@@ -149,3 +149,27 @@ type TurnCompletedEvent struct {
 func (e TurnCompletedEvent) Type() ecs.EventType {
 	return "turn_completed"
 }
+
+// ItemEquippedEvent is emitted when an item is equipped
+type ItemEquippedEvent struct {
+	EntityID ecs.EntityID // Entity that equipped the item
+	ItemID   ecs.EntityID // Item that was equipped
+	Slot     string       // Slot where the item was equipped
+}
+
+// Type returns the event type
+func (e ItemEquippedEvent) Type() ecs.EventType {
+	return "item_equipped"
+}
+
+// ItemUnequippedEvent is emitted when an item is unequipped
+type ItemUnequippedEvent struct {
+	EntityID ecs.EntityID // Entity that unequipped the item
+	ItemID   ecs.EntityID // Item that was unequipped
+	Slot     string       // Slot from which the item was unequipped
+}
+
+// Type returns the event type
+func (e ItemUnequippedEvent) Type() ecs.EventType {
+	return "item_unequipped"
+}

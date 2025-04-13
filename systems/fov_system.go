@@ -48,6 +48,26 @@ func (s *FOVSystem) Update(world *ecs.World, dt float64) {
 		return
 	}
 
+	// Check the map type
+	var isWorldMap bool = false
+	if comp, exists := world.GetComponent(activeMap.ID, components.MapType); exists {
+		mapTypeComp := comp.(*components.MapTypeComponent)
+		isWorldMap = mapTypeComp.MapType == "worldmap"
+	}
+
+	// If it's a world map, reveal everything and skip FOV calculations
+	if isWorldMap {
+		// Make all tiles visible and explored on the world map
+		for y := 0; y < mapComp.Height; y++ {
+			for x := 0; x < mapComp.Width; x++ {
+				mapComp.Visible[y][x] = true
+				mapComp.Explored[y][x] = true
+			}
+		}
+		return
+	}
+
+	// For interior maps, proceed with normal FOV calculations
 	// Reset visibility for all map tiles
 	for y := 0; y < mapComp.Height; y++ {
 		for x := 0; x < mapComp.Width; x++ {

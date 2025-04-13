@@ -36,6 +36,7 @@ type Game struct {
 	passiveEffectsSystem      *systems.PassiveEffectsSystem
 	inventorySystem           *systems.InventorySystem
 	fovSystem                 *systems.FOVSystem
+	// Equipment functionality is now handled by the inventory system
 }
 
 // NewGame creates a new game instance
@@ -56,10 +57,11 @@ func NewGame() *Game {
 	cameraSystem := systems.NewCameraSystem()
 	renderSystem := systems.NewRenderSystem(tileset)
 	aiPathfindingSystem := systems.NewAIPathfindingSystem()
-	aiTurnProcessorSystem := systems.NewAITurnProcessorSystem()
+	aiTurnProcessorSystem := systems.NewAITurnProcessorSystem()	
 	passiveEffectsSystem := systems.NewPassiveEffectsSystem()
 	inventorySystem := systems.NewInventorySystem()
 	fovSystem := systems.NewFOVSystem()
+	// Equipment functionality is now handled by the inventory system
 
 	// Initialize the entity template manager
 	templateManager := data.NewEntityTemplateManager()
@@ -91,11 +93,13 @@ func NewGame() *Game {
 	world.AddSystem(playerTurnProcessorSystem)
 	world.AddSystem(combatSystem)
 	world.AddSystem(cameraSystem)
-	world.AddSystem(aiPathfindingSystem)
+	world.AddSystem(aiPathfindingSystem)	
 	world.AddSystem(aiTurnProcessorSystem)
 	world.AddSystem(passiveEffectsSystem)
 	world.AddSystem(inventorySystem)
 	world.AddSystem(fovSystem)
+	// Equipment functionality is now handled by the inventory system
+
 	// Create the game instance
 	game := &Game{
 		world:                     world,
@@ -111,8 +115,9 @@ func NewGame() *Game {
 		aiPathfindingSystem:       aiPathfindingSystem,
 		aiTurnProcessorSystem:     aiTurnProcessorSystem,
 		passiveEffectsSystem:      passiveEffectsSystem,
-		inventorySystem:           inventorySystem,
+		inventorySystem:           inventorySystem,		
 		fovSystem:                 fovSystem,
+		// Equipment functionality is now handled by the inventory system
 	}
 
 	// Initialize the game world
@@ -122,9 +127,10 @@ func NewGame() *Game {
 	combatSystem.Initialize(world)
 	aiPathfindingSystem.Initialize(world)
 	aiTurnProcessorSystem.Initialize(world)
-	passiveEffectsSystem.Initialize(world)
+	passiveEffectsSystem.Initialize(world)	
 	inventorySystem.Initialize(world)
 	fovSystem.Initialize(world)
+	// Equipment system has been removed - functionality moved to inventory system
 
 	// Call the map debug function
 	components.DebugWallDetection()
@@ -239,8 +245,12 @@ func (g *Game) initialize() {
 	if _, err := g.entitySpawner.CreateItem(testItemX+1, testItemY, "health_potion"); err != nil {
 		systems.GetMessageLog().Add(fmt.Sprintf("Failed to create health potion: %v", err))
 	}
-	if _, err := g.entitySpawner.CreateItem(testItemX, testItemY+1, "leather_armor"); err != nil {
-		systems.GetMessageLog().Add(fmt.Sprintf("Failed to create leather armor: %v", err))
+	// Add our new equipment items
+	if _, err := g.entitySpawner.CreateItem(testItemX+1, testItemY+1, "miners_headlamp"); err != nil {
+		systems.GetMessageLog().Add(fmt.Sprintf("Failed to create miner's headlamp: %v", err))
+	}
+	if _, err := g.entitySpawner.CreateItem(testItemX+2, testItemY+1, "tattered_jumpsuit"); err != nil {
+		systems.GetMessageLog().Add(fmt.Sprintf("Failed to create jumpsuit: %v", err))
 	}
 
 	// Create a camera entity for the player

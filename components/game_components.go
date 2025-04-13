@@ -191,28 +191,109 @@ func NewItemComponentFromTemplate(templateID string, itemType string, value int,
 
 // FOVComponent represents an entity's field of vision capabilities
 type FOVComponent struct {
-	Range          int  // How far the entity can see in tiles
-	LightSource    bool // Whether this entity emits light
-	LightRange     int  // How far the light reaches if this is a light source
-	LightIntensity int  // Intensity of the light (affects brightness)
+	Range       int  // How far the entity can see in tiles
+	LightSource bool // Whether this entity emits light
+	LightRange  int  // How far the light reaches if this is a light source
 }
 
 // NewFOVComponent creates a new FOV component with the specified range
 func NewFOVComponent(visionRange int) *FOVComponent {
 	return &FOVComponent{
-		Range:          visionRange,
-		LightSource:    false,
-		LightRange:     0,
-		LightIntensity: 0,
+		Range:       visionRange,
+		LightSource: false,
+		LightRange:  0,
 	}
 }
 
 // NewLightSourceFOVComponent creates a new FOV component for a light source
-func NewLightSourceFOVComponent(visionRange, lightRange, intensity int) *FOVComponent {
+func NewLightSourceFOVComponent(visionRange, lightRange int) *FOVComponent {
 	return &FOVComponent{
-		Range:          visionRange,
-		LightSource:    true,
-		LightRange:     lightRange,
-		LightIntensity: intensity,
+		Range:       visionRange,
+		LightSource: true,
+		LightRange:  lightRange,
 	}
+}
+
+// EquipmentSlot defines possible equipment slots
+type EquipmentSlot string
+
+const (
+	SlotHead      EquipmentSlot = "head"
+	SlotBody      EquipmentSlot = "body"
+	SlotMainHand  EquipmentSlot = "mainhand"
+	SlotOffHand   EquipmentSlot = "offhand"
+	SlotFeet      EquipmentSlot = "feet"
+	SlotAccessory EquipmentSlot = "accessory"
+)
+
+// ItemEffect represents an effect that an item can have on an entity
+type ItemEffect struct {
+	Component string      // Component name to affect
+	Property  string      // Property name within the component
+	Operation string      // Operation to perform: "add", "multiply", "set", etc.
+	Value     interface{} // Value to apply in the operation
+}
+
+// EquipmentComponent represents equipped items
+type EquipmentComponent struct {
+	EquippedItems map[EquipmentSlot]ecs.EntityID // Map of slot to item entity ID
+	ActiveEffects map[ecs.EntityID][]ItemEffect  // Map of item entity ID to active effects
+}
+
+// NewEquipmentComponent creates a new equipment component
+func NewEquipmentComponent() *EquipmentComponent {
+	return &EquipmentComponent{
+		EquippedItems: make(map[EquipmentSlot]ecs.EntityID),
+		ActiveEffects: make(map[ecs.EntityID][]ItemEffect),
+	}
+}
+
+// IsSlotOccupied checks if a slot is currently occupied
+func (e *EquipmentComponent) IsSlotOccupied(slot EquipmentSlot) bool {
+	_, occupied := e.EquippedItems[slot]
+	return occupied
+}
+
+// GetEquippedItem returns the item ID equipped in a slot, or 0 if empty
+func (e *EquipmentComponent) GetEquippedItem(slot EquipmentSlot) ecs.EntityID {
+	if itemID, ok := e.EquippedItems[slot]; ok {
+		return itemID
+	}
+	return 0
+}
+
+// EquipItem equips an item in a slot
+func (e *EquipmentComponent) EquipItem(slot EquipmentSlot, itemID ecs.EntityID) {
+	e.EquippedItems[slot] = itemID
+}
+
+// UnequipItem removes an item from a slot
+func (e *EquipmentComponent) UnequipItem(slot EquipmentSlot) ecs.EntityID {
+	if itemID, ok := e.EquippedItems[slot]; ok {
+		delete(e.EquippedItems, slot)
+		return itemID
+	}
+	return 0
+}
+
+// AddEffect adds an effect for an item
+func (e *EquipmentComponent) AddEffect(itemID ecs.EntityID, effect ItemEffect) {
+	if _, ok := e.ActiveEffects[itemID]; !ok {
+		e.ActiveEffects[itemID] = make([]ItemEffect, 0)
+	}
+	e.ActiveEffects[itemID] = append(e.ActiveEffects[itemID], effect)
+}
+
+// RemoveEffects removes all effects for an item
+func (e *EquipmentComponent) RemoveEffects(itemID ecs.EntityID) {
+	delete(e.ActiveEffects, itemID)
+}
+
+// GetAllEffects returns all active effects
+func (e *EquipmentComponent) GetAllEffects() []ItemEffect {
+	allEffects := make([]ItemEffect, 0)
+	for _, effects := range e.ActiveEffects {
+		allEffects = append(allEffects, effects...)
+	}
+	return allEffects
 }

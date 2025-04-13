@@ -1,0 +1,39 @@
+{
+  "id": "miners_headlamp",
+  "name": "Miner's Headlamp",
+  "description": "A bright headlamp that extends vision range and provides light.",
+  "item_type": "helmet",
+  "tile_x": 5,
+  "tile_y": 2,
+  "color": "#FFFF00",
+  "value": 15,
+  "weight": 2,
+  "tags": ["equipment", "light"],
+  "equip_slot": "head",
+  "effects": [
+    {
+      "component": "FOV",
+      "property": "Range",
+      "operation": "add",
+      "value": 3
+    },
+    {
+      "component": "FOV",
+      "property": "LightSource",
+      "operation": "set",
+      "value": true
+    },
+    {
+      "component": "FOV",
+      "property": "LightRange",
+      "operation": "set",
+      "value": 5
+    },    
+    {
+      "component": "Stats",
+      "property": "Defense",
+      "operation": "add",
+      "value": 1
+    }
+  ]
+} 

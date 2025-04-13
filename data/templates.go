@@ -169,16 +169,18 @@ func ParseHexColor(hex string) (c color.RGBA) {
 
 // ItemTemplate defines a template for creating items
 type ItemTemplate struct {
-	ID          string   `json:"id"`          // Unique identifier for the item type
-	Name        string   `json:"name"`        // Display name
-	Description string   `json:"description"` // Item description
-	ItemType    string   `json:"item_type"`   // Type of item: "weapon", "armor", "potion", etc.
-	TileX       int      `json:"tile_x"`      // X position in the tileset
-	TileY       int      `json:"tile_y"`      // Y position in the tileset
-	Color       string   `json:"color"`       // Item color in hex format
-	Value       int      `json:"value"`       // Base value/power of the item
-	Weight      int      `json:"weight"`      // Weight of the item
-	Tags        []string `json:"tags"`        // Additional tags for the item
+	ID          string                   `json:"id"`          // Unique identifier for the item type
+	Name        string                   `json:"name"`        // Display name
+	Description string                   `json:"description"` // Item description
+	ItemType    string                   `json:"item_type"`   // Type of item: "weapon", "armor", "potion", etc.
+	TileX       int                      `json:"tile_x"`      // X position in the tileset
+	TileY       int                      `json:"tile_y"`      // Y position in the tileset
+	Color       string                   `json:"color"`       // Item color in hex format
+	Value       int                      `json:"value"`       // Base value/power of the item
+	Weight      int                      `json:"weight"`      // Weight of the item
+	Tags        []string                 `json:"tags"`        // Additional tags for the item
+	EquipSlot   string                   `json:"equip_slot"`  // Optional slot for equippable items
+	Effects     []map[string]interface{} `json:"effects"`     // Optional effects when equipped
 }
 
 // ValidateItemTemplate ensures that the item template has all required fields
