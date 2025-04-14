@@ -70,9 +70,13 @@ classDiagram
     Entity --> AIComponent
     Entity --> ItemComponent
     Entity --> InventoryComponent
+    Entity --> EquipmentComponent
+    Entity --> EffectsComponent
     Entity --> MapComponent
+    Entity --> MapTypeComponent
     Entity --> CameraComponent
     Entity --> NameComponent
+    Entity --> FOVComponent
     
     class PositionComponent {
         X, Y int
@@ -118,12 +122,23 @@ classDiagram
         Weight int
         Description string
         TemplateID string
-        Data interface{}
+        Data any
     }
     
     class InventoryComponent {
         Items []EntityID
         MaxCapacity int
+    }
+    
+    class EquipmentComponent {
+        EquippedItems map[EquipmentSlot]EntityID
+        ActiveEffects map[EntityID][]ItemEffect
+    }
+    
+    class EffectsComponent {
+        ActiveEffects []Effect
+        PassiveEffects []Effect
+        TemporaryEffects map[string]Effect
     }
     
     class MapComponent {
@@ -134,6 +149,10 @@ classDiagram
         Explored [][]bool
     }
     
+    class MapTypeComponent {
+        MapType string
+    }
+    
     class CameraComponent {
         X, Y int
         Target uint64
@@ -141,6 +160,12 @@ classDiagram
     
     class NameComponent {
         Name string
+    }
+    
+    class FOVComponent {
+        Radius int
+        LightSource bool
+        LightIntensity int
     }
 ```
 
@@ -152,9 +177,13 @@ classDiagram
 - **AI**: Controls NPC behavior like pathfinding and targeting
 - **Item**: Defines an item's properties like value, weight and type
 - **Inventory**: Stores and manages a collection of items
+- **Equipment**: Manages equipped items and their effects
+- **Effects**: Tracks active, passive, and temporary effects on an entity
 - **Map**: Contains the tile data for a map
+- **MapType**: Specifies the type of map (worldmap, dungeon)
 - **Camera**: Controls the viewport for map scrolling
 - **Name**: Provides a display name for the entity
+- **FOV**: Manages field of view and lighting properties
 
 ## Systems
 
@@ -173,8 +202,11 @@ graph TD
     World --> CameraSystem[CameraSystem]
     World --> AIPathfindingSystem[AIPathfindingSystem]
     World --> AITurnSystem[AITurnProcessorSystem]
-    World --> PassiveEffectsSystem[PassiveEffectsSystem]
+    World --> EffectsSystem[EffectsSystem]
     World --> InventorySystem[InventorySystem]
+    World --> EquipmentSystem[EquipmentSystem]
+    World --> FOVSystem[FOVSystem]
+    World --> MessageSystem[MessageSystem]
     
     RenderSystem --> Tileset[Tileset]
     MapRegistrySystem --> MapTransitions[Map Transitions]
@@ -182,6 +214,11 @@ graph TD
     AIPathfindingSystem --> MovementSystem
     PlayerTurnSystem --> Events[Events]
     Events --> AITurnSystem
+    EquipmentSystem --> EffectsSystem
+    EffectsSystem --> Stats[Stats Component]
+    InventorySystem --> EquipmentSystem
+    FOVSystem --> MapSystem
+    MessageSystem --> UI[UI Display]
 ```
 
 ### Key Systems
@@ -194,8 +231,19 @@ graph TD
 - **CameraSystem**: Controls viewport for map scrolling
 - **AIPathfindingSystem**: Manages pathfinding for AI entities
 - **AITurnProcessorSystem**: Controls AI entity behavior and turn processing
-- **PassiveEffectsSystem**: Handles passive effects like health regeneration
+- **EffectsSystem**: Handles all types of effects (passive, active, temporary)
 - **InventorySystem**: Manages inventory operations like adding/removing items
+- **EquipmentSystem**: Handles equipping/unequipping items and managing equipment effects
+- **FOVSystem**: Manages field of view calculations and lighting
+- **MessageSystem**: Handles game messages and logging
+
+### System Interactions
+The systems communicate through an event-based architecture:
+- **Equipment Events**: `EventEquipItem`, `EventUnequipItem`, `EventEquipmentQuery`
+- **Effect Events**: `EventEffects`, `EventRest`
+- **Combat Events**: `EventCombat`, `EventDeath`
+- **Movement Events**: `EventMovement`, `EventCollision`
+- **UI Events**: `EventInventoryUI`
 
 ## Generation Systems
 
