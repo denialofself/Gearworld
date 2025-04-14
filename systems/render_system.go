@@ -138,16 +138,28 @@ func (s *RenderSystem) Draw(world *ecs.World, screen *ebiten.Image) {
 	// Clear the screen
 	screen.Fill(color.RGBA{0, 0, 0, 255})
 
+	// Check if we're in world map mode
+	var isWorldMap bool
+	mapEntities := world.GetEntitiesWithTag("map")
+	if len(mapEntities) > 0 {
+		if comp, exists := world.GetComponent(mapEntities[0].ID, components.MapType); exists {
+			mapTypeComp := comp.(*components.MapTypeComponent)
+			isWorldMap = mapTypeComp.MapType == "worldmap"
+		}
+	}
+
 	// Draw the game area (map)
 	s.drawGameScreen(world, screen)
 
-	// Draw UI elements
-	if s.showInventory {
-		s.drawInventoryPanel(world, screen)
-	} else {
-		s.drawStatsPanel(world, screen)
+	// Only draw UI elements if not in world map mode
+	if !isWorldMap {
+		if s.showInventory {
+			s.drawInventoryPanel(world, screen)
+		} else {
+			s.drawStatsPanel(world, screen)
+		}
+		s.drawMessagesPanel(screen)
 	}
-	s.drawMessagesPanel(screen)
 }
 
 // drawGameScreen draws the game map and entities
@@ -232,9 +244,12 @@ func (s *RenderSystem) drawStandardMap(world *ecs.World, screen *ebiten.Image, m
 		isWorldMap = mapTypeComp.MapType == "worldmap"
 	}
 
+	// Get screen dimensions
+	screenWidth, screenHeight := screen.Bounds().Dx()/s.tileset.TileSize, screen.Bounds().Dy()/s.tileset.TileSize
+
 	// Draw map tiles that are visible in the viewport
-	for y := 0; y < config.GameScreenHeight; y++ {
-		for x := 0; x < config.GameScreenWidth; x++ {
+	for y := 0; y < screenHeight; y++ {
+		for x := 0; x < screenWidth; x++ {
 			// Convert screen position to world position
 			worldX := x + cameraX
 			worldY := y + cameraY

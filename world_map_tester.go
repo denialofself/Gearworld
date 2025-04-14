@@ -11,6 +11,7 @@ import (
 	"ebiten-rogue/ecs"
 	"ebiten-rogue/generation"
 	"ebiten-rogue/systems"
+	"image/color"
 )
 
 // WorldMapTester implements ebiten.Game interface for testing the world map.
@@ -149,14 +150,14 @@ func (g *WorldMapTester) Update() error {
 			if camera.X < 0 {
 				camera.X = 0
 			}
-			if camera.X >= g.mapComp.Width-config.GameScreenWidth {
-				camera.X = g.mapComp.Width - config.GameScreenWidth
+			if camera.X >= g.mapComp.Width {
+				camera.X = g.mapComp.Width - 1
 			}
 			if camera.Y < 0 {
 				camera.Y = 0
 			}
-			if camera.Y >= g.mapComp.Height-config.GameScreenHeight {
-				camera.Y = g.mapComp.Height - config.GameScreenHeight
+			if camera.Y >= g.mapComp.Height {
+				camera.Y = g.mapComp.Height - 1
 			}
 
 			// Handle fullscreen toggle
@@ -173,6 +174,9 @@ func (g *WorldMapTester) Update() error {
 
 // Draw draws the game screen
 func (g *WorldMapTester) Draw(screen *ebiten.Image) {
+	// Clear the screen with black background
+	screen.Fill(color.RGBA{0, 0, 0, 255})
+
 	// Use the render system to draw the world map
 	g.renderSystem.Draw(g.world, screen)
 }
