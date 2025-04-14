@@ -331,12 +331,12 @@ func (s *MapRegistrySystem) transitionBetweenMaps(world *ecs.World, tileType int
 		targetMapType = components.NewMapTypeComponent("dungeon", 1) // Level 1 dungeon
 		targetMap = s.GetMapByType("dungeon", 1)
 
-		// If no dungeon exists yet, create one
+		// If no dungeon exists, this is an error since all maps should be created during init
 		if targetMap == nil {
-			fmt.Println("Creating new dungeon because it doesn't exist yet")
-			GetDebugLog().Add("Creating new dungeon because it doesn't exist yet")
-			targetMap = s.createNewDungeon(world, true) // Add stairs up
-			s.RegisterMap(targetMap)
+			fmt.Println("ERROR: Attempted to transition to non-existent dungeon")
+			GetDebugLog().Add("ERROR: Attempted to transition to non-existent dungeon")
+			s.transitionInProgress = false
+			return
 		}
 
 		fmt.Printf("TRANSITION TARGET: Going from worldmap to dungeon (ID: %d)\n", targetMap.ID)
@@ -347,12 +347,12 @@ func (s *MapRegistrySystem) transitionBetweenMaps(world *ecs.World, tileType int
 		targetMapType = components.NewMapTypeComponent("worldmap", 0)
 		targetMap = s.GetMapByType("worldmap", 0)
 
-		// If no world map exists yet, create one (shouldn't happen in normal gameplay)
+		// If no world map exists, this is an error since all maps should be created during init
 		if targetMap == nil {
-			fmt.Println("Creating new world map because it doesn't exist yet (unusual)")
-			GetDebugLog().Add("Creating new world map because it doesn't exist yet (unusual)")
-			targetMap = s.createWorldMap(world)
-			s.RegisterMap(targetMap)
+			fmt.Println("ERROR: Attempted to transition to non-existent world map")
+			GetDebugLog().Add("ERROR: Attempted to transition to non-existent world map")
+			s.transitionInProgress = false
+			return
 		}
 
 		fmt.Printf("TRANSITION TARGET: Going from dungeon to worldmap (ID: %d)\n", targetMap.ID)
@@ -364,18 +364,12 @@ func (s *MapRegistrySystem) transitionBetweenMaps(world *ecs.World, tileType int
 		targetMapType = components.NewMapTypeComponent("dungeon", nextLevel)
 		targetMap = s.GetMapByType("dungeon", nextLevel)
 
-		// If no dungeon at this level exists yet, create one
+		// If no dungeon at this level exists, this is an error since all maps should be created during init
 		if targetMap == nil {
-			fmt.Printf("Creating new dungeon level %d because it doesn't exist yet\n", nextLevel)
-			GetDebugLog().Add(fmt.Sprintf("Creating new dungeon level %d because it doesn't exist yet", nextLevel))
-			targetMap = s.createNewDungeon(world, true) // Add stairs up
-			// Set the level
-			targetMapTypeComp, _ := world.GetComponent(targetMap.ID, components.MapType)
-			if targetMapTypeComp != nil {
-				targetMapType := targetMapTypeComp.(*components.MapTypeComponent)
-				targetMapType.Level = nextLevel
-			}
-			s.RegisterMap(targetMap)
+			fmt.Printf("ERROR: Attempted to transition to non-existent dungeon level %d\n", nextLevel)
+			GetDebugLog().Add(fmt.Sprintf("ERROR: Attempted to transition to non-existent dungeon level %d", nextLevel))
+			s.transitionInProgress = false
+			return
 		}
 
 		fmt.Printf("TRANSITION TARGET: Going from dungeon level %d to level %d (ID: %d)\n",
@@ -624,32 +618,6 @@ func (s *MapRegistrySystem) transitionBetweenMaps(world *ecs.World, tileType int
 
 	// Reset the transition flag now that we're done
 	s.transitionInProgress = false
-}
-
-// createNewDungeon generates a new dungeon map with an option to include stairs up
-func (s *MapRegistrySystem) createNewDungeon(world *ecs.World, addStairsUp bool) *ecs.Entity {
-	// Create a new dungeon using the MapSystem
-	mapSystem := s.getMapSystem()
-	if mapSystem != nil {
-		return mapSystem.createNewDungeon(world, addStairsUp)
-	}
-
-	// Fallback if MapSystem isn't available
-	GetMessageLog().Add("Error: Map system not found when creating dungeon")
-	return nil
-}
-
-// createWorldMap generates a new world map
-func (s *MapRegistrySystem) createWorldMap(world *ecs.World) *ecs.Entity {
-	// Create a new world map using the MapSystem
-	mapSystem := s.getMapSystem()
-	if mapSystem != nil {
-		return mapSystem.createWorldMap(world)
-	}
-
-	// Fallback if MapSystem isn't available
-	GetMessageLog().Add("Error: Map system not found when creating world map")
-	return nil
 }
 
 // updateCameraPosition centers the camera on the given position

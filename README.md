@@ -223,8 +223,8 @@ graph TD
 
 ### Key Systems
 - **RenderSystem**: Handles drawing entities to the screen
-- **MapSystem**: Manages map generation and map-related queries
-- **MapRegistrySystem**: Manages multiple maps and transitions between them
+- **MapSystem**: Provides map generation and basic map operations (now primarily used as a helper system)
+- **MapRegistrySystem**: Manages multiple maps, transitions between them, and tracks the active map
 - **MovementSystem**: Processes movement requests and collisions
 - **PlayerTurnProcessorSystem**: Handles player input and turn processing
 - **CombatSystem**: Manages attacks and damage calculation
@@ -244,6 +244,33 @@ The systems communicate through an event-based architecture:
 - **Combat Events**: `EventCombat`, `EventDeath`
 - **Movement Events**: `EventMovement`, `EventCollision`
 - **UI Events**: `EventInventoryUI`
+
+### Map Management
+The game uses a two-tier map management system:
+
+1. **Initial Map Creation** (in `game.go`):
+   - World map is created using `WorldMapGenerator`
+   - Starting dungeon is created using `DungeonThemer`
+   - Both maps are registered with the `MapRegistrySystem`
+
+2. **Map Registry System**:
+   - Primary system for managing maps and transitions
+   - Handles map transitions between:
+     - World map and dungeons
+     - Different dungeon levels
+   - Creates new maps on demand when:
+     - Transitioning to a non-existent map
+     - Moving to a deeper dungeon level
+   - Manages:
+     - Active map tracking
+     - Map context management
+     - Camera position updates
+
+3. **Map System**:
+   - Helper system providing:
+     - Basic map operations
+     - Utility functions for map manipulation
+     - Fallback map creation (used by MapRegistrySystem when needed)
 
 ## Generation Systems
 
