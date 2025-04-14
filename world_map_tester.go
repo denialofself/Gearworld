@@ -1,11 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 
 	"ebiten-rogue/components"
 	"ebiten-rogue/config"
@@ -16,12 +15,13 @@ import (
 
 // WorldMapTester implements ebiten.Game interface for testing the world map.
 type WorldMapTester struct {
-	world        *ecs.World
-	renderSystem *systems.RenderSystem
-	mapSystem    *systems.MapSystem
-	cameraSystem *systems.CameraSystem
-	worldMap     *ecs.Entity
-	mapComp      *components.MapComponent
+	world             *ecs.World
+	renderSystem      *systems.RenderSystem
+	mapSystem         *systems.MapSystem
+	cameraSystem      *systems.CameraSystem
+	mapRegistrySystem *systems.MapRegistrySystem
+	worldMap          *ecs.Entity
+	mapComp           *components.MapComponent
 }
 
 // NewWorldMapTester creates a new world map tester
@@ -39,18 +39,26 @@ func NewWorldMapTester() *WorldMapTester {
 	mapSystem := systems.NewMapSystem()
 	cameraSystem := systems.NewCameraSystem()
 	renderSystem := systems.NewRenderSystem(tileset)
+	mapRegistrySystem := systems.NewMapRegistrySystem()
+
+	// Initialize systems that need the world reference
+	mapRegistrySystem.Initialize(world)
 
 	// Register systems with the world that need to be updated during the game loop
 	world.AddSystem(mapSystem)
 	world.AddSystem(cameraSystem)
+	world.AddSystem(renderSystem)
+	world.AddSystem(mapRegistrySystem)
 
 	// Create the tester
 	tester := &WorldMapTester{
-		world:        world,
-		renderSystem: renderSystem,
-		mapSystem:    mapSystem,
-		cameraSystem: cameraSystem,
+		world:             world,
+		renderSystem:      renderSystem,
+		mapSystem:         mapSystem,
+		cameraSystem:      cameraSystem,
+		mapRegistrySystem: mapRegistrySystem,
 	}
+
 	// Create a tile mapping entity first (needed by the render system)
 	tileMapEntity := tester.world.CreateEntity()
 	tileMapEntity.AddTag("tilemap")
@@ -62,11 +70,15 @@ func NewWorldMapTester() *WorldMapTester {
 	// Initialize the world map
 	tester.initialize()
 
+	// Initialize the render system
+	renderSystem.Initialize(world)
+
 	return tester
 }
 
 // initialize creates the world map for testing
-func (g *WorldMapTester) initialize() { // First, generate the world map
+func (g *WorldMapTester) initialize() {
+	// First, generate the world map
 	worldMapGenerator := generation.NewWorldMapGenerator(time.Now().UnixNano())
 	g.worldMap = worldMapGenerator.CreateWorldMapEntity(g.world, 200, 200)
 
@@ -86,10 +98,15 @@ func (g *WorldMapTester) initialize() { // First, generate the world map
 		return
 	}
 
-	// Set the active map in the map system
+	// Set the active map in both map system and map registry
 	g.mapSystem.SetActiveMap(g.worldMap)
+	g.mapRegistrySystem.RegisterMap(g.worldMap)
+	g.mapRegistrySystem.SetActiveMap(g.worldMap)
+
 	// Create a camera entity for viewing the world map
 	cameraEntity := g.world.CreateEntity()
+	cameraEntity.AddTag("camera") // Add camera tag
+	g.world.TagEntity(cameraEntity.ID, "camera")
 	g.world.AddComponent(cameraEntity.ID, components.Camera, &components.CameraComponent{
 		X:      100, // Center of the world map (200x200)
 		Y:      100,
@@ -98,6 +115,7 @@ func (g *WorldMapTester) initialize() { // First, generate the world map
 
 	// Add instruction message
 	systems.GetMessageLog().Add("World Map Tester - Use arrow keys to move the camera")
+	systems.GetMessageLog().Add("Press F to toggle fullscreen")
 }
 
 // Update updates the game state
@@ -126,6 +144,25 @@ func (g *WorldMapTester) Update() error {
 			if ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
 				camera.X += moveSpeed
 			}
+
+			// Keep camera within map bounds
+			if camera.X < 0 {
+				camera.X = 0
+			}
+			if camera.X >= g.mapComp.Width-config.GameScreenWidth {
+				camera.X = g.mapComp.Width - config.GameScreenWidth
+			}
+			if camera.Y < 0 {
+				camera.Y = 0
+			}
+			if camera.Y >= g.mapComp.Height-config.GameScreenHeight {
+				camera.Y = g.mapComp.Height - config.GameScreenHeight
+			}
+
+			// Handle fullscreen toggle
+			if inpututil.IsKeyJustPressed(ebiten.KeyF) {
+				ebiten.SetFullscreen(!ebiten.IsFullscreen())
+			}
 		}
 	}
 
@@ -138,26 +175,10 @@ func (g *WorldMapTester) Update() error {
 func (g *WorldMapTester) Draw(screen *ebiten.Image) {
 	// Use the render system to draw the world map
 	g.renderSystem.Draw(g.world, screen)
-
-	// Print FPS and coordinates for debugging
-	camX, camY := 0, 0
-
-	// Get camera position from the camera entity
-	cameraEntities := g.world.GetEntitiesWithTag("camera")
-	if len(cameraEntities) > 0 {
-		cameraID := cameraEntities[0].ID
-		cameraComp, exists := g.world.GetComponent(cameraID, components.Camera)
-		if exists {
-			camera := cameraComp.(*components.CameraComponent)
-			camX, camY = camera.X, camera.Y
-		}
-	}
-
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS: %.1f | Camera: %d,%d",
-		ebiten.ActualFPS(), camX, camY))
 }
 
 // Layout implements ebiten.Game's Layout
 func (g *WorldMapTester) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return config.ScreenWidth * config.TileSize, config.ScreenHeight * config.TileSize
+	// Use the full screen size
+	return outsideWidth, outsideHeight
 }

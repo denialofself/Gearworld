@@ -208,6 +208,272 @@ func (g *WorldMapGenerator) PlaceCenterSubstation(mapComp *components.MapCompone
 	fmt.Printf("Placed substation at center: (%d, %d)\n", centerX, centerY)
 }
 
+// PlaceAdditionalSubstations places additional substations at random locations on the map
+func (g *WorldMapGenerator) PlaceAdditionalSubstations(mapComp *components.MapComponent, count int) []struct{ x, y int } {
+	substations := make([]struct{ x, y int }, 0, count+1) // +1 for center substation
+
+	// Add the center substation first
+	centerX := mapComp.Width / 2
+	centerY := mapComp.Height / 2
+	substations = append(substations, struct{ x, y int }{centerX, centerY})
+
+	// Try to place additional substations
+	attempts := 0
+	maxAttempts := count * 10 // Limit attempts to avoid infinite loop
+
+	for len(substations) < count+1 && attempts < maxAttempts {
+		attempts++
+		x := g.rng.Intn(mapComp.Width)
+		y := g.rng.Intn(mapComp.Height)
+
+		// Skip if this is a mountain tile
+		if mapComp.Tiles[y][x] == components.TileMountains {
+			continue
+		}
+
+		// Check minimum distance from other substations
+		tooClose := false
+		for _, s := range substations {
+			dx := x - s.x
+			dy := y - s.y
+			distance := dx*dx + dy*dy
+			if distance < 400 { // Minimum distance of 20 tiles squared
+				tooClose = true
+				break
+			}
+		}
+
+		if tooClose {
+			continue
+		}
+
+		// Place the substation
+		mapComp.SetTile(x, y, components.TileSubstation)
+		substations = append(substations, struct{ x, y int }{x, y})
+		fmt.Printf("Placed additional substation at: (%d, %d)\n", x, y)
+	}
+
+	return substations
+}
+
+// Node represents a position in the pathfinding grid
+type Node struct {
+	x, y    int
+	parent  *Node
+	g, h, f float64
+}
+
+// NewNode creates a new pathfinding node
+func NewNode(x, y int) *Node {
+	return &Node{
+		x: x,
+		y: y,
+	}
+}
+
+// getNeighbors returns valid neighboring nodes for pathfinding
+func (g *WorldMapGenerator) getNeighbors(mapComp *components.MapComponent, node *Node) []*Node {
+	neighbors := make([]*Node, 0, 4) // Changed from 8 to 4 for orthogonal only
+	directions := [][2]int{
+		{0, -1}, // North
+		{1, 0},  // East
+		{0, 1},  // South
+		{-1, 0}, // West
+	}
+
+	for _, dir := range directions {
+		nx, ny := node.x+dir[0], node.y+dir[1]
+		// Check bounds and if the tile is walkable (not a mountain)
+		if nx >= 0 && nx < mapComp.Width && ny >= 0 && ny < mapComp.Height &&
+			mapComp.Tiles[ny][nx] != components.TileMountains {
+			neighbors = append(neighbors, NewNode(nx, ny))
+		}
+	}
+
+	return neighbors
+}
+
+// heuristic calculates the Manhattan distance between two nodes
+func heuristic(a, b *Node) float64 {
+	dx := float64(a.x - b.x)
+	dy := float64(a.y - b.y)
+	return math.Abs(dx) + math.Abs(dy)
+}
+
+// findPath finds a path from start to end avoiding mountains
+func (g *WorldMapGenerator) findPath(mapComp *components.MapComponent, startX, startY, endX, endY int) []*Node {
+	start := NewNode(startX, startY)
+	end := NewNode(endX, endY)
+
+	openSet := make(map[string]*Node)
+	closedSet := make(map[string]*Node)
+	openSet[fmt.Sprintf("%d,%d", start.x, start.y)] = start
+
+	for len(openSet) > 0 {
+		// Find node with lowest f score
+		var current *Node
+		lowestF := math.MaxFloat64
+		for _, node := range openSet {
+			if node.f < lowestF {
+				lowestF = node.f
+				current = node
+			}
+		}
+
+		// If we reached the end, reconstruct and return the path
+		if current.x == end.x && current.y == end.y {
+			path := make([]*Node, 0)
+			for current != nil {
+				path = append([]*Node{current}, path...)
+				current = current.parent
+			}
+			return path
+		}
+
+		// Move current from open to closed set
+		delete(openSet, fmt.Sprintf("%d,%d", current.x, current.y))
+		closedSet[fmt.Sprintf("%d,%d", current.x, current.y)] = current
+
+		// Check neighbors
+		for _, neighbor := range g.getNeighbors(mapComp, current) {
+			// Skip if already in closed set
+			if _, exists := closedSet[fmt.Sprintf("%d,%d", neighbor.x, neighbor.y)]; exists {
+				continue
+			}
+
+			// Calculate tentative g score
+			tentativeG := current.g + 1.0
+
+			// If neighbor not in open set or found a better path
+			if _, exists := openSet[fmt.Sprintf("%d,%d", neighbor.x, neighbor.y)]; !exists || tentativeG < neighbor.g {
+				neighbor.parent = current
+				neighbor.g = tentativeG
+				neighbor.h = heuristic(neighbor, end)
+				neighbor.f = neighbor.g + neighbor.h
+
+				if !exists {
+					openSet[fmt.Sprintf("%d,%d", neighbor.x, neighbor.y)] = neighbor
+				}
+			}
+		}
+	}
+
+	// No path found
+	return nil
+}
+
+// drawRailwayLine draws a railway line between two points using box drawing characters
+func (g *WorldMapGenerator) drawRailwayLine(mapComp *components.MapComponent, x0, y0, x1, y1 int) {
+	// Find a path that avoids mountains
+	path := g.findPath(mapComp, x0, y0, x1, y1)
+	if path == nil {
+		return
+	}
+
+	// Draw railway along the path
+	for i := 0; i < len(path)-1; i++ {
+		current := path[i]
+		next := path[i+1]
+
+		// Skip if this is a substation
+		if mapComp.Tiles[current.y][current.x] == components.TileSubstation {
+			continue
+		}
+
+		// Check if next tile is a substation
+		isNextSubstation := mapComp.Tiles[next.y][next.x] == components.TileSubstation
+
+		// Check connections in all four directions
+		connTop := current.y > 0 && (mapComp.Tiles[current.y-1][current.x] == components.TileRailwayVertical ||
+			mapComp.Tiles[current.y-1][current.x] == components.TileRailwayTopLeft ||
+			mapComp.Tiles[current.y-1][current.x] == components.TileRailwayTopRight ||
+			mapComp.Tiles[current.y-1][current.x] == components.TileRailwayTeeLeft ||
+			mapComp.Tiles[current.y-1][current.x] == components.TileRailwayTeeRight ||
+			mapComp.Tiles[current.y-1][current.x] == components.TileRailwayTeeBottom ||
+			mapComp.Tiles[current.y-1][current.x] == components.TileRailwayCross ||
+			(isNextSubstation && next.y == current.y-1))
+
+		connRight := current.x < mapComp.Width-1 && (mapComp.Tiles[current.y][current.x+1] == components.TileRailwayHorizontal ||
+			mapComp.Tiles[current.y][current.x+1] == components.TileRailwayTopRight ||
+			mapComp.Tiles[current.y][current.x+1] == components.TileRailwayBottomRight ||
+			mapComp.Tiles[current.y][current.x+1] == components.TileRailwayTeeLeft ||
+			mapComp.Tiles[current.y][current.x+1] == components.TileRailwayTeeTop ||
+			mapComp.Tiles[current.y][current.x+1] == components.TileRailwayTeeBottom ||
+			mapComp.Tiles[current.y][current.x+1] == components.TileRailwayCross ||
+			(isNextSubstation && next.x == current.x+1))
+
+		connBottom := current.y < mapComp.Height-1 && (mapComp.Tiles[current.y+1][current.x] == components.TileRailwayVertical ||
+			mapComp.Tiles[current.y+1][current.x] == components.TileRailwayBottomLeft ||
+			mapComp.Tiles[current.y+1][current.x] == components.TileRailwayBottomRight ||
+			mapComp.Tiles[current.y+1][current.x] == components.TileRailwayTeeLeft ||
+			mapComp.Tiles[current.y+1][current.x] == components.TileRailwayTeeRight ||
+			mapComp.Tiles[current.y+1][current.x] == components.TileRailwayTeeTop ||
+			mapComp.Tiles[current.y+1][current.x] == components.TileRailwayCross ||
+			(isNextSubstation && next.y == current.y+1))
+
+		connLeft := current.x > 0 && (mapComp.Tiles[current.y][current.x-1] == components.TileRailwayHorizontal ||
+			mapComp.Tiles[current.y][current.x-1] == components.TileRailwayTopLeft ||
+			mapComp.Tiles[current.y][current.x-1] == components.TileRailwayBottomLeft ||
+			mapComp.Tiles[current.y][current.x-1] == components.TileRailwayTeeRight ||
+			mapComp.Tiles[current.y][current.x-1] == components.TileRailwayTeeTop ||
+			mapComp.Tiles[current.y][current.x-1] == components.TileRailwayTeeBottom ||
+			mapComp.Tiles[current.y][current.x-1] == components.TileRailwayCross ||
+			(isNextSubstation && next.x == current.x-1))
+
+		// Determine direction of movement
+		dx := next.x - current.x
+		dy := next.y - current.y
+
+		// Determine the appropriate railway tile type based on connections and movement
+		var tileType int
+		switch {
+		case dx > 0: // Moving right
+			if connTop && connBottom {
+				tileType = components.TileRailwayTeeLeft
+			} else if connTop {
+				tileType = components.TileRailwayBottomLeft
+			} else if connBottom {
+				tileType = components.TileRailwayTopLeft
+			} else {
+				tileType = components.TileRailwayHorizontal
+			}
+		case dx < 0: // Moving left
+			if connTop && connBottom {
+				tileType = components.TileRailwayTeeRight
+			} else if connTop {
+				tileType = components.TileRailwayBottomRight
+			} else if connBottom {
+				tileType = components.TileRailwayTopRight
+			} else {
+				tileType = components.TileRailwayHorizontal
+			}
+		case dy > 0: // Moving down
+			if connLeft && connRight {
+				tileType = components.TileRailwayTeeTop
+			} else if connLeft {
+				tileType = components.TileRailwayTopRight
+			} else if connRight {
+				tileType = components.TileRailwayTopLeft
+			} else {
+				tileType = components.TileRailwayVertical
+			}
+		case dy < 0: // Moving up
+			if connLeft && connRight {
+				tileType = components.TileRailwayTeeBottom
+			} else if connLeft {
+				tileType = components.TileRailwayBottomRight
+			} else if connRight {
+				tileType = components.TileRailwayBottomLeft
+			} else {
+				tileType = components.TileRailwayVertical
+			}
+		}
+
+		// Set the tile type
+		mapComp.SetTile(current.x, current.y, tileType)
+	}
+}
+
 // CreateWorldMapEntity creates a new entity with a MapComponent for the world map
 func (g *WorldMapGenerator) CreateWorldMapEntity(world *ecs.World, width, height int) *ecs.Entity {
 	// Create the map entity
@@ -222,14 +488,144 @@ func (g *WorldMapGenerator) CreateWorldMapEntity(world *ecs.World, width, height
 	// Generate the world map
 	g.GenerateWorldMap(mapComp)
 
-	// Place a single substation at the center of the map
-	g.PlaceCenterSubstation(mapComp)
+	// Calculate center coordinates
+	centerX := mapComp.Width / 2
+	centerY := mapComp.Height / 2
+
+	// Place additional substations first (excluding center)
+	substations := make([]struct{ x, y int }, 0, 4) // 3 additional + 1 center
+	attempts := 0
+	maxAttempts := 30 // Limit attempts to avoid infinite loop
+
+	for len(substations) < 3 && attempts < maxAttempts {
+		attempts++
+		x := g.rng.Intn(mapComp.Width)
+		y := g.rng.Intn(mapComp.Height)
+
+		// Skip if this is the center or a mountain tile
+		if (x == centerX && y == centerY) || mapComp.Tiles[y][x] == components.TileMountains {
+			continue
+		}
+
+		// Check minimum distance from other substations
+		tooClose := false
+		for _, s := range substations {
+			dx := x - s.x
+			dy := y - s.y
+			distance := dx*dx + dy*dy
+			if distance < 400 { // Minimum distance of 20 tiles squared
+				tooClose = true
+				break
+			}
+		}
+
+		if tooClose {
+			continue
+		}
+
+		// Place the substation
+		mapComp.SetTile(x, y, components.TileSubstation)
+		substations = append(substations, struct{ x, y int }{x, y})
+		fmt.Printf("Placed additional substation at: (%d, %d)\n", x, y)
+	}
+
+	// Finally, place the center substation
+	mapComp.SetTile(centerX, centerY, components.TileSubstation)
+	fmt.Printf("Placed center substation at: (%d, %d)\n", centerX, centerY)
+
+	// Group stations by primary direction from center
+	northStations := make([]struct{ x, y int }, 0)
+	southStations := make([]struct{ x, y int }, 0)
+	eastStations := make([]struct{ x, y int }, 0)
+	westStations := make([]struct{ x, y int }, 0)
+
+	for _, s := range substations {
+		dx := s.x - centerX
+		dy := s.y - centerY
+
+		// Determine primary direction based on larger delta and angle
+		if math.Abs(float64(dx)) > math.Abs(float64(dy)) {
+			if dx > 0 {
+				eastStations = append(eastStations, s)
+			} else {
+				westStations = append(westStations, s)
+			}
+		} else {
+			if dy > 0 {
+				southStations = append(southStations, s)
+			} else {
+				northStations = append(northStations, s)
+			}
+		}
+	}
+
+	// Create trunk lines in each direction where we have stations
+	if len(northStations) > 0 {
+		// Find furthest north station
+		maxY := centerY
+		for _, s := range northStations {
+			if s.y < maxY {
+				maxY = s.y
+			}
+		}
+		// Draw north trunk
+		g.drawRailwayLine(mapComp, centerX, centerY-1, centerX, maxY)
+	}
+
+	if len(southStations) > 0 {
+		// Find furthest south station
+		maxY := centerY
+		for _, s := range southStations {
+			if s.y > maxY {
+				maxY = s.y
+			}
+		}
+		// Draw south trunk
+		g.drawRailwayLine(mapComp, centerX, centerY+1, centerX, maxY)
+	}
+
+	if len(eastStations) > 0 {
+		// Find furthest east station
+		maxX := centerX
+		for _, s := range eastStations {
+			if s.x > maxX {
+				maxX = s.x
+			}
+		}
+		// Draw east trunk
+		g.drawRailwayLine(mapComp, centerX+1, centerY, maxX, centerY)
+	}
+
+	if len(westStations) > 0 {
+		// Find furthest west station
+		maxX := centerX
+		for _, s := range westStations {
+			if s.x < maxX {
+				maxX = s.x
+			}
+		}
+		// Draw west trunk
+		g.drawRailwayLine(mapComp, centerX-1, centerY, maxX, centerY)
+	}
+
+	// Connect stations to their nearest trunk line
+	connectToTrunk := func(s struct{ x, y int }, trunkX, trunkY int) {
+		g.drawRailwayLine(mapComp, trunkX, trunkY, s.x, s.y)
+	}
+
+	// Connect each station to its trunk
+	for _, s := range northStations {
+		connectToTrunk(s, centerX, s.y)
+	}
+	for _, s := range southStations {
+		connectToTrunk(s, centerX, s.y)
+	}
+	for _, s := range eastStations {
+		connectToTrunk(s, s.x, centerY)
+	}
+	for _, s := range westStations {
+		connectToTrunk(s, s.x, centerY)
+	}
 
 	return mapEntity
 }
-
-// No railway generation functions needed anymore
-
-// No additional station placement functions needed with simplified approach
-
-// No railway drawing functions needed anymore

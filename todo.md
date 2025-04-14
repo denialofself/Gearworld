@@ -13,7 +13,7 @@ CRAFTING:
 MAP GEN:
 [] fix the bsp wall smoothing
 [] look at the other ascii chars for walls, rails etc
-[] get world map gen creating railways and other stations
+[x] get world map gen creating railways and other stations
 
 TRAIN STUFF:
 [] off-road mode? costs more fuel? upgrades for legs?
@@ -37,6 +37,7 @@ SYSTEMS:
 [] saving / loading
 [] handle player death
 [] handle monster death - loot tables?
+[] standardize using RBGA or hex color codes
 
 UI:
 [] start screen

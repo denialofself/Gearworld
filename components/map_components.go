@@ -46,6 +46,18 @@ const (
 	TileMountains     = 103
 	TileRuinedRailway = 104
 	TileSubstation    = 105
+	// New railway tile types for smooth turns
+	TileRailwayHorizontal  = 106
+	TileRailwayVertical    = 107
+	TileRailwayTopLeft     = 108
+	TileRailwayTopRight    = 109
+	TileRailwayBottomLeft  = 110
+	TileRailwayBottomRight = 111
+	TileRailwayTeeLeft     = 112
+	TileRailwayTeeRight    = 113
+	TileRailwayTeeTop      = 114
+	TileRailwayTeeBottom   = 115
+	TileRailwayCross       = 116
 )
 
 // TileDefinition describes the visual appearance of a tile type
@@ -128,6 +140,19 @@ func NewTileMappingComponent() *TileMappingComponent {
 	mapping.Definitions[TileMountains] = NewTileDefinitionByPos(14, 1, color.RGBA{120, 120, 120, 255})     // Mountains: gray
 	mapping.Definitions[TileRuinedRailway] = NewTileDefinitionByPos(13, 3, color.RGBA{100, 100, 110, 255}) // Railway: rusty tracks
 	mapping.Definitions[TileSubstation] = NewTileDefinitionByPos(15, 0, color.RGBA{200, 200, 0, 255})      // Substation: industrial yellow
+	// New railway tile definitions
+	railwayColor := color.RGBA{184, 49, 42, 255}                                            // Same rusty color as ruined railway
+	mapping.Definitions[TileRailwayHorizontal] = NewTileDefinitionByPos(4, 12, railwayColor)  // Box drawing horizontal
+	mapping.Definitions[TileRailwayVertical] = NewTileDefinitionByPos(3, 11, railwayColor)    // Box drawing vertical
+	mapping.Definitions[TileRailwayTopLeft] = NewTileDefinitionByPos(10, 13, railwayColor)    // Box drawing top left corner
+	mapping.Definitions[TileRailwayTopRight] = NewTileDefinitionByPos(15, 11, railwayColor)   // Box drawing top right corner
+	mapping.Definitions[TileRailwayBottomLeft] = NewTileDefinitionByPos(0, 12, railwayColor)  // Box drawing bottom left corner
+	mapping.Definitions[TileRailwayBottomRight] = NewTileDefinitionByPos(9, 13, railwayColor) // Box drawing bottom right corner
+	mapping.Definitions[TileRailwayTeeLeft] = NewTileDefinitionByPos(3, 12, railwayColor)     // Box drawing tee left
+	mapping.Definitions[TileRailwayTeeRight] = NewTileDefinitionByPos(4, 11, railwayColor)    // Box drawing tee right
+	mapping.Definitions[TileRailwayTeeTop] = NewTileDefinitionByPos(2, 12, railwayColor)      // Box drawing tee up
+	mapping.Definitions[TileRailwayTeeBottom] = NewTileDefinitionByPos(1, 12, railwayColor)   // Box drawing tee down
+	mapping.Definitions[TileRailwayCross] = NewTileDefinitionByPos(5, 12, railwayColor)       // Box drawing cross
 
 	return mapping
 }

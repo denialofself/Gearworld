@@ -67,6 +67,7 @@ func main() {
 		windowWidth, windowHeight := config.GetWindowSize()
 		ebiten.SetWindowSize(windowWidth, windowHeight)
 		ebiten.SetWindowTitle("Ebiten Roguelike - World Map Tester")
+		ebiten.SetFullscreen(true)
 		if err := ebiten.RunGame(worldMapTester); err != nil {
 			log.Fatal(err)
 		}
