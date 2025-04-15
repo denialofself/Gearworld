@@ -1900,3 +1900,698 @@
 [17:08:10.605] DEBUG: Player moved to: 30,18 AI can now recalculate paths
 [17:08:10.737] DEBUG: Player moved to: 30,19 AI can now recalculate paths
 [17:08:10.873] DEBUG: Player moved to: 30,20 AI can now recalculate paths
+===== DEBUG LOG STARTED AT 2025-04-15 17:44:56 =====
+[17:44:56.922] Successfully loaded title screen image from filesystem: assets/start_screen.png
+[17:44:59.920] DEBUG: Created world map with ID: 2
+[17:44:59.920] REGISTRY: Registered worldmap (Level 0) with ID: 2
+[17:44:59.921] DEBUG: Creating enemy with MapContext ID: 3
+[17:44:59.921] DEBUG: Creating enemy with MapContext ID: 3
+[17:44:59.921] DEBUG: Creating enemy with MapContext ID: 3
+[17:44:59.921] DEBUG: Creating enemy with MapContext ID: 3
+[17:44:59.921] DEBUG: Created dungeon with ID: 3
+[17:44:59.921] REGISTRY: Registered dungeon (Level 1) with ID: 3
+[17:44:59.921] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
+[17:44:59.921] SET ACTIVE MAP: Propagated to MapSystem
+[17:44:59.921] Processing initial item entry: template_id=bandage, count=3
+[17:44:59.921] Successfully added item bandage (ID: 11) to container
+[17:44:59.921] Successfully added item bandage (ID: 12) to container
+[17:44:59.921] Successfully added item bandage (ID: 13) to container
+[17:44:59.921] Processing initial item entry: template_id=miners_headlamp, count=1
+[17:44:59.921] Successfully added item miners_headlamp (ID: 14) to container
+[17:44:59.921] Processing initial item entry: template_id=rusty_spanner, count=1
+[17:44:59.921] Successfully added item rusty_spanner (ID: 15) to container
+[17:44:59.921] Processing initial item entry: template_id=tattered_jumpsuit, count=1
+[17:44:59.921] Successfully added item tattered_jumpsuit (ID: 16) to container
+[17:44:59.921] Created container with 6 items total
+[17:44:59.921] --- MAP SUMMARY ---
+[17:44:59.921] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[17:44:59.921] Map: dungeon (Level 1, ID: 3, Size: 40x30)
+[17:44:59.921] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[17:44:59.921] Active map ID: 3
+[17:45:01.083] DEBUG: Player moved to: 33,6 AI can now recalculate paths
+[17:45:01.216] DEBUG: Player moved to: 32,6 AI can now recalculate paths
+[17:45:01.361] DEBUG: Player moved to: 31,6 AI can now recalculate paths
+[17:45:01.694] DEBUG: Player moved to: 32,6 AI can now recalculate paths
+[17:45:01.848] DEBUG: Player moved to: 33,6 AI can now recalculate paths
+[17:45:02.133] DEBUG: Player moved to: 33,5 AI can now recalculate paths
+[17:45:02.315] DEBUG: Player moved to: 33,4 AI can now recalculate paths
+[17:45:02.398] DEBUG: Player moved to: 32,4 AI can now recalculate paths
+[17:45:02.565] DEBUG: Player moved to: 31,4 AI can now recalculate paths
+[17:45:02.682] DEBUG: Player moved to: 30,4 AI can now recalculate paths
+[17:45:02.835] DEBUG: Player moved to: 29,4 AI can now recalculate paths
+===== DEBUG LOG STARTED AT 2025-04-15 17:48:13 =====
+[17:48:13.067] Successfully loaded title screen image from filesystem: assets/start_screen.png
+[17:48:16.062] DEBUG: Created world map with ID: 2
+[17:48:16.062] REGISTRY: Registered worldmap (Level 0) with ID: 2
+[17:48:16.063] DEBUG: Creating enemy with MapContext ID: 3
+[17:48:16.063] DEBUG: Creating enemy with MapContext ID: 3
+[17:48:16.063] DEBUG: Creating enemy with MapContext ID: 3
+[17:48:16.063] DEBUG: Creating enemy with MapContext ID: 3
+[17:48:16.063] DEBUG: Created dungeon with ID: 3
+[17:48:16.063] REGISTRY: Registered dungeon (Level 1) with ID: 3
+[17:48:16.063] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
+[17:48:16.063] SET ACTIVE MAP: Propagated to MapSystem
+[17:48:16.063] Processing initial item entry: template_id=bandage, count=3
+[17:48:16.063] Successfully added item bandage (ID: 11) to container
+[17:48:16.063] Successfully added item bandage (ID: 12) to container
+[17:48:16.063] Successfully added item bandage (ID: 13) to container
+[17:48:16.063] Processing initial item entry: template_id=miners_headlamp, count=1
+[17:48:16.063] Successfully added item miners_headlamp (ID: 14) to container
+[17:48:16.063] Processing initial item entry: template_id=rusty_spanner, count=1
+[17:48:16.063] Successfully added item rusty_spanner (ID: 15) to container
+[17:48:16.063] Processing initial item entry: template_id=tattered_jumpsuit, count=1
+[17:48:16.063] Successfully added item tattered_jumpsuit (ID: 16) to container
+[17:48:16.063] Created container with 6 items total
+[17:48:16.063] --- MAP SUMMARY ---
+[17:48:16.063] Map: dungeon (Level 1, ID: 3, Size: 40x30)
+[17:48:16.063] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[17:48:16.063] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[17:48:16.063] Active map ID: 3
+[17:48:20.922] DEBUG: Player moved to: 8,3 AI can now recalculate paths
+[17:48:21.861] DEBUG: Player moved to: 9,2 AI can now recalculate paths
+[17:48:21.993] DEBUG: Player moved to: 10,1 AI can now recalculate paths
+[17:48:23.576] DEBUG: Player moved to: 10,2 AI can now recalculate paths
+[17:48:23.709] DEBUG: Player moved to: 10,3 AI can now recalculate paths
+[17:48:23.709] DEBUG: AI turn processor - Next step: 15,9, AP: 6
+[17:48:23.709] DEBUG: AI moved from 16,9 to 15,9 (AP: 4)
+[17:48:23.861] DEBUG: Player moved to: 10,4 AI can now recalculate paths
+[17:48:23.862] DEBUG: AI turn processor - Next step: 14,9, AP: 4
+[17:48:23.862] DEBUG: AI moved from 15,9 to 14,9 (AP: 2)
+[17:48:24.056] DEBUG: Player moved to: 9,4 AI can now recalculate paths
+[17:48:24.056] DEBUG: AI turn processor - Next step: 13,9, AP: 2
+[17:48:24.056] DEBUG: AI moved from 14,9 to 13,9 (AP: 0)
+[17:48:24.245] DEBUG: Player moved to: 9,3 AI can now recalculate paths
+[17:48:24.245] DEBUG: AI turn processor - Next step: 13,8, AP: 0
+[17:48:24.245] DEBUG: AI recovering 3 points (AP: 3)
+[17:48:24.411] DEBUG: Player moved to: 9,2 AI can now recalculate paths
+[17:48:24.411] DEBUG: AI turn processor - Next step: 13,8, AP: 3
+[17:48:24.411] DEBUG: AI skipped movement
+[17:48:24.556] DEBUG: Player moved to: 9,1 AI can now recalculate paths
+[17:48:24.556] DEBUG: AI turn processor - Next step: 13,8, AP: 2
+[17:48:24.556] DEBUG: AI moved from 13,9 to 13,8 (AP: 0)
+[17:48:24.709] DEBUG: Player moved to: 8,1 AI can now recalculate paths
+[17:48:24.709] DEBUG: AI turn processor - Next step: 13,7, AP: 0
+[17:48:24.709] DEBUG: AI recovering 3 points (AP: 3)
+[17:48:25.113] DEBUG: Player moved to: 8,2 AI can now recalculate paths
+[17:48:25.113] DEBUG: AI turn processor - Next step: 12,8, AP: 3
+[17:48:25.113] DEBUG: AI skipped movement
+[17:48:25.272] DEBUG: Player moved to: 8,3 AI can now recalculate paths
+[17:48:25.272] DEBUG: AI turn processor - Next step: 12,8, AP: 2
+[17:48:25.272] DEBUG: AI moved from 13,8 to 12,8 (AP: 0)
+===== DEBUG LOG STARTED AT 2025-04-15 17:50:28 =====
+===== DEBUG LOG STARTED AT 2025-04-15 17:51:09 =====
+[17:51:16.104] DEBUG: Created world map with ID: 2
+[17:51:16.104] REGISTRY: Registered worldmap (Level 0) with ID: 2
+[17:51:16.105] DEBUG: Creating enemy with MapContext ID: 3
+[17:51:16.105] DEBUG: Creating enemy with MapContext ID: 3
+[17:51:16.105] DEBUG: Creating enemy with MapContext ID: 3
+[17:51:16.105] DEBUG: Created dungeon with ID: 3
+[17:51:16.105] REGISTRY: Registered dungeon (Level 1) with ID: 3
+[17:51:16.105] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
+[17:51:16.105] SET ACTIVE MAP: Propagated to MapSystem
+[17:51:16.105] Processing initial item entry: template_id=bandage, count=3
+[17:51:16.105] Successfully added item bandage (ID: 10) to container
+[17:51:16.105] Successfully added item bandage (ID: 11) to container
+[17:51:16.105] Successfully added item bandage (ID: 12) to container
+[17:51:16.105] Processing initial item entry: template_id=miners_headlamp, count=1
+[17:51:16.105] Successfully added item miners_headlamp (ID: 13) to container
+[17:51:16.105] Processing initial item entry: template_id=rusty_spanner, count=1
+[17:51:16.105] Successfully added item rusty_spanner (ID: 14) to container
+[17:51:16.105] Processing initial item entry: template_id=tattered_jumpsuit, count=1
+[17:51:16.105] Successfully added item tattered_jumpsuit (ID: 15) to container
+[17:51:16.105] Created container with 6 items total
+[17:51:16.105] --- MAP SUMMARY ---
+[17:51:16.105] Map: dungeon (Level 1, ID: 3, Size: 40x30)
+[17:51:16.105] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[17:51:16.105] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[17:51:16.105] Active map ID: 3
+[17:51:18.346] DEBUG: Player moved to: 32,22 AI can now recalculate paths
+[17:51:18.513] DEBUG: Player moved to: 31,22 AI can now recalculate paths
+[17:51:18.644] DEBUG: Player moved to: 30,22 AI can now recalculate paths
+[17:51:18.791] DEBUG: Player moved to: 29,22 AI can now recalculate paths
+[17:51:18.943] DEBUG: Player moved to: 28,22 AI can now recalculate paths
+[17:51:19.256] DEBUG: Player moved to: 28,23 AI can now recalculate paths
+[17:51:19.492] DEBUG: Player moved to: 27,23 AI can now recalculate paths
+[17:51:19.659] DEBUG: Player moved to: 26,23 AI can now recalculate paths
+===== DEBUG LOG STARTED AT 2025-04-15 17:54:13 =====
+===== DEBUG LOG STARTED AT 2025-04-15 17:54:24 =====
+[17:54:26.290] DEBUG: Created world map with ID: 2
+[17:54:26.290] REGISTRY: Registered worldmap (Level 0) with ID: 2
+[17:54:26.291] DEBUG: Creating enemy with MapContext ID: 3
+[17:54:26.291] DEBUG: Creating enemy with MapContext ID: 3
+[17:54:26.291] DEBUG: Creating enemy with MapContext ID: 3
+[17:54:26.291] DEBUG: Creating enemy with MapContext ID: 3
+[17:54:26.292] DEBUG: Created dungeon with ID: 3
+[17:54:26.292] REGISTRY: Registered dungeon (Level 1) with ID: 3
+[17:54:26.292] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
+[17:54:26.292] SET ACTIVE MAP: Propagated to MapSystem
+[17:54:26.292] Processing initial item entry: template_id=bandage, count=3
+[17:54:26.292] Successfully added item bandage (ID: 11) to container
+[17:54:26.292] Successfully added item bandage (ID: 12) to container
+[17:54:26.292] Successfully added item bandage (ID: 13) to container
+[17:54:26.292] Processing initial item entry: template_id=miners_headlamp, count=1
+[17:54:26.292] Successfully added item miners_headlamp (ID: 14) to container
+[17:54:26.292] Processing initial item entry: template_id=rusty_spanner, count=1
+[17:54:26.292] Successfully added item rusty_spanner (ID: 15) to container
+[17:54:26.292] Processing initial item entry: template_id=tattered_jumpsuit, count=1
+[17:54:26.292] Successfully added item tattered_jumpsuit (ID: 16) to container
+[17:54:26.292] Created container with 6 items total
+[17:54:26.292] --- MAP SUMMARY ---
+[17:54:26.292] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[17:54:26.292] Map: dungeon (Level 1, ID: 3, Size: 40x30)
+[17:54:26.292] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[17:54:26.292] Active map ID: 3
+[17:54:29.791] DEBUG: Player moved to: 3,24 AI can now recalculate paths
+[17:54:30.007] DEBUG: Player moved to: 3,25 AI can now recalculate paths
+[17:54:30.312] DEBUG: Player moved to: 3,24 AI can now recalculate paths
+[17:54:30.458] DEBUG: Player moved to: 3,23 AI can now recalculate paths
+[17:54:30.611] DEBUG: Player moved to: 3,22 AI can now recalculate paths
+[17:54:30.911] DEBUG: Player moved to: 3,21 AI can now recalculate paths
+[17:54:31.160] DEBUG: Player moved to: 3,22 AI can now recalculate paths
+[17:54:31.306] DEBUG: Player moved to: 3,23 AI can now recalculate paths
+===== DEBUG LOG STARTED AT 2025-04-15 17:55:29 =====
+[17:55:31.163] DEBUG: Created world map with ID: 2
+[17:55:31.163] REGISTRY: Registered worldmap (Level 0) with ID: 2
+[17:55:31.164] DEBUG: Creating enemy with MapContext ID: 3
+[17:55:31.164] DEBUG: Creating enemy with MapContext ID: 3
+[17:55:31.164] DEBUG: Creating enemy with MapContext ID: 3
+[17:55:31.164] DEBUG: Created dungeon with ID: 3
+[17:55:31.164] REGISTRY: Registered dungeon (Level 1) with ID: 3
+[17:55:31.164] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
+[17:55:31.164] SET ACTIVE MAP: Propagated to MapSystem
+[17:55:31.164] Processing initial item entry: template_id=bandage, count=3
+[17:55:31.164] Successfully added item bandage (ID: 10) to container
+[17:55:31.164] Successfully added item bandage (ID: 11) to container
+[17:55:31.164] Successfully added item bandage (ID: 12) to container
+[17:55:31.164] Processing initial item entry: template_id=miners_headlamp, count=1
+[17:55:31.164] Successfully added item miners_headlamp (ID: 13) to container
+[17:55:31.164] Processing initial item entry: template_id=rusty_spanner, count=1
+[17:55:31.164] Successfully added item rusty_spanner (ID: 14) to container
+[17:55:31.164] Processing initial item entry: template_id=tattered_jumpsuit, count=1
+[17:55:31.164] Successfully added item tattered_jumpsuit (ID: 15) to container
+[17:55:31.164] Created container with 6 items total
+[17:55:31.164] --- MAP SUMMARY ---
+[17:55:31.164] Map: dungeon (Level 1, ID: 3, Size: 40x30)
+[17:55:31.164] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[17:55:31.164] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[17:55:31.164] Active map ID: 3
+[17:55:31.165] DEBUG: AI turn processor - Next step: 24,20, AP: 6
+[17:55:31.165] DEBUG: AI moved from 25,20 to 24,20 (AP: 4)
+===== DEBUG LOG STARTED AT 2025-04-15 17:57:06 =====
+[17:57:08.338] DEBUG: Created world map with ID: 2
+[17:57:08.338] REGISTRY: Registered worldmap (Level 0) with ID: 2
+[17:57:08.339] DEBUG: Creating enemy with MapContext ID: 3
+[17:57:08.339] DEBUG: Creating enemy with MapContext ID: 3
+[17:57:08.339] DEBUG: Creating enemy with MapContext ID: 3
+[17:57:08.339] DEBUG: Creating enemy with MapContext ID: 3
+[17:57:08.339] DEBUG: Created dungeon with ID: 3
+[17:57:08.339] REGISTRY: Registered dungeon (Level 1) with ID: 3
+[17:57:08.339] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
+[17:57:08.339] SET ACTIVE MAP: Propagated to MapSystem
+[17:57:08.339] Processing initial item entry: template_id=bandage, count=3
+[17:57:08.339] Successfully added item bandage (ID: 11) to container
+[17:57:08.339] Successfully added item bandage (ID: 12) to container
+[17:57:08.339] Successfully added item bandage (ID: 13) to container
+[17:57:08.339] Processing initial item entry: template_id=miners_headlamp, count=1
+[17:57:08.339] Successfully added item miners_headlamp (ID: 14) to container
+[17:57:08.339] Processing initial item entry: template_id=rusty_spanner, count=1
+[17:57:08.339] Successfully added item rusty_spanner (ID: 15) to container
+[17:57:08.339] Processing initial item entry: template_id=tattered_jumpsuit, count=1
+[17:57:08.339] Successfully added item tattered_jumpsuit (ID: 16) to container
+[17:57:08.339] Created container with 6 items total
+[17:57:08.339] --- MAP SUMMARY ---
+[17:57:08.339] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[17:57:08.339] Map: dungeon (Level 1, ID: 3, Size: 40x30)
+[17:57:08.339] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[17:57:08.339] Active map ID: 3
+[17:57:08.339] DEBUG: AI turn processor - Next step: 29,18, AP: 6
+[17:57:08.339] DEBUG: AI moved from 30,18 to 29,18 (AP: 4)
+[17:57:10.809] DEBUG: Player moved to: 22,20 AI can now recalculate paths
+[17:57:10.809] DEBUG: AI turn processor - Next step: 28,18, AP: 4
+[17:57:10.809] DEBUG: AI moved from 29,18 to 28,18 (AP: 2)
+[17:57:10.976] DEBUG: Player moved to: 22,21 AI can now recalculate paths
+[17:57:10.976] DEBUG: AI turn processor - Next step: 27,18, AP: 2
+[17:57:10.976] DEBUG: AI moved from 28,18 to 27,18 (AP: 0)
+[17:57:11.323] DEBUG: Player moved to: 22,20 AI can now recalculate paths
+[17:57:11.323] DEBUG: AI turn processor - Next step: 26,18, AP: 0
+[17:57:11.323] DEBUG: AI recovering 3 points (AP: 3)
+[17:57:11.490] DEBUG: Player moved to: 22,19 AI can now recalculate paths
+[17:57:11.490] DEBUG: AI turn processor - Next step: 26,18, AP: 3
+[17:57:11.490] DEBUG: AI skipped movement
+[17:57:13.054] DEBUG: Player moved to: 22,20 AI can now recalculate paths
+[17:57:13.054] DEBUG: AI turn processor - Next step: 26,18, AP: 2
+[17:57:13.054] DEBUG: AI skipped movement
+[17:57:13.206] DEBUG: Player moved to: 22,21 AI can now recalculate paths
+[17:57:13.207] DEBUG: AI turn processor - Next step: 26,18, AP: 1
+[17:57:13.207] DEBUG: AI waiting (AP: 0)
+[17:57:13.359] DEBUG: Player moved to: 22,22 AI can now recalculate paths
+[17:57:13.360] DEBUG: AI turn processor - Next step: 26,18, AP: 0
+[17:57:13.360] DEBUG: AI recovering 3 points (AP: 3)
+[17:57:13.755] DEBUG: Player moved to: 22,21 AI can now recalculate paths
+[17:57:13.755] DEBUG: AI turn processor - Next step: 26,18, AP: 3
+[17:57:13.755] DEBUG: AI moved from 27,18 to 26,18 (AP: 1)
+===== DEBUG LOG STARTED AT 2025-04-15 17:58:24 =====
+[17:58:26.357] DEBUG: Created world map with ID: 2
+[17:58:26.357] REGISTRY: Registered worldmap (Level 0) with ID: 2
+[17:58:26.358] DEBUG: Creating enemy with MapContext ID: 3
+[17:58:26.359] DEBUG: Creating enemy with MapContext ID: 3
+[17:58:26.359] DEBUG: Creating enemy with MapContext ID: 3
+[17:58:26.359] DEBUG: Creating enemy with MapContext ID: 3
+[17:58:26.359] DEBUG: Created dungeon with ID: 3
+[17:58:26.359] REGISTRY: Registered dungeon (Level 1) with ID: 3
+[17:58:26.359] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
+[17:58:26.359] SET ACTIVE MAP: Propagated to MapSystem
+[17:58:26.359] Processing initial item entry: template_id=bandage, count=3
+[17:58:26.359] Successfully added item bandage (ID: 11) to container
+[17:58:26.359] Successfully added item bandage (ID: 12) to container
+[17:58:26.359] Successfully added item bandage (ID: 13) to container
+[17:58:26.359] Processing initial item entry: template_id=miners_headlamp, count=1
+[17:58:26.359] Successfully added item miners_headlamp (ID: 14) to container
+[17:58:26.359] Processing initial item entry: template_id=rusty_spanner, count=1
+[17:58:26.359] Successfully added item rusty_spanner (ID: 15) to container
+[17:58:26.359] Processing initial item entry: template_id=tattered_jumpsuit, count=1
+[17:58:26.359] Successfully added item tattered_jumpsuit (ID: 16) to container
+[17:58:26.359] Created container with 6 items total
+[17:58:26.359] --- MAP SUMMARY ---
+[17:58:26.359] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[17:58:26.359] Map: dungeon (Level 1, ID: 3, Size: 40x30)
+[17:58:26.359] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[17:58:26.359] Active map ID: 3
+[17:58:28.014] DEBUG: Player moved to: 25,3 AI can now recalculate paths
+[17:58:28.160] DEBUG: Player moved to: 25,4 AI can now recalculate paths
+[17:58:28.319] DEBUG: Player moved to: 25,5 AI can now recalculate paths
+[17:58:28.543] DEBUG: Player moved to: 25,4 AI can now recalculate paths
+[17:58:28.730] DEBUG: Player moved to: 25,3 AI can now recalculate paths
+[17:58:28.862] DEBUG: Player moved to: 25,2 AI can now recalculate paths
+[17:58:29.411] DEBUG: Player moved to: 25,3 AI can now recalculate paths
+[17:58:29.564] DEBUG: Player moved to: 25,4 AI can now recalculate paths
+[17:58:29.731] DEBUG: Player moved to: 25,5 AI can now recalculate paths
+[17:58:29.875] DEBUG: Player moved to: 25,6 AI can now recalculate paths
+[17:58:30.029] DEBUG: Player moved to: 25,7 AI can now recalculate paths
+[17:58:30.328] DEBUG: Player moved to: 25,6 AI can now recalculate paths
+[17:58:30.446] DEBUG: Player moved to: 25,5 AI can now recalculate paths
+[17:58:30.622] DEBUG: Player moved to: 25,4 AI can now recalculate paths
+[17:58:30.829] DEBUG: Player moved to: 25,3 AI can now recalculate paths
+[17:58:31.093] DEBUG: Player moved to: 25,2 AI can now recalculate paths
+[17:58:31.815] DEBUG: Player moved to: 25,3 AI can now recalculate paths
+[17:58:31.961] DEBUG: Player moved to: 25,4 AI can now recalculate paths
+[17:58:33.296] DEBUG: Player moved to: 24,4 AI can now recalculate paths
+[17:58:33.477] DEBUG: Player moved to: 23,4 AI can now recalculate paths
+[17:58:33.742] DEBUG: Player moved to: 24,4 AI can now recalculate paths
+[17:58:33.863] DEBUG: Player moved to: 25,4 AI can now recalculate paths
+[17:58:34.179] DEBUG: Player moved to: 25,3 AI can now recalculate paths
+[17:58:34.429] DEBUG: Player moved to: 26,3 AI can now recalculate paths
+[17:58:34.727] Examining container at (26,2)
+[17:58:34.728] Starting item pickup from container
+[17:58:34.728] Container has 6 items before pickup
+[17:58:34.728] Attempting to pick up Bandage (type: first aid, ID: 11)
+[17:58:34.728] Successfully picked up Bandage
+[17:58:34.728] Attempting to pick up Bandage (type: first aid, ID: 12)
+[17:58:34.728] Successfully picked up Bandage
+[17:58:34.728] Attempting to pick up Bandage (type: first aid, ID: 13)
+[17:58:34.728] Successfully picked up Bandage
+[17:58:34.728] Attempting to pick up Miner's Headlamp (type: headgear, ID: 14)
+[17:58:34.728] Successfully picked up Miner's Headlamp
+[17:58:34.728] Attempting to pick up Rusty Spanner (type: weapon, ID: 15)
+[17:58:34.728] Successfully picked up Rusty Spanner
+[17:58:34.728] Attempting to pick up Tattered Jumpsuit (type: armor, ID: 16)
+[17:58:34.728] Successfully picked up Tattered Jumpsuit
+[17:58:34.728] Container has 0 items after pickup
+[17:58:34.728] Emitted examine event for container at (26,2)
+[17:58:35.144] DEBUG: Player moved to: 25,3 AI can now recalculate paths
+[17:58:35.297] DEBUG: Player moved to: 24,3 AI can now recalculate paths
+[17:58:35.431] DEBUG: Player moved to: 23,3 AI can now recalculate paths
+[17:58:35.577] DEBUG: Player moved to: 22,3 AI can now recalculate paths
+[17:58:35.728] DEBUG: Player moved to: 21,3 AI can now recalculate paths
+[17:58:37.659] Equipment change detected: Equipped item 14 in slot head
+[17:58:38.076] Equipment change detected: Equipped item 15 in slot mainhand
+[17:58:38.383] Equipment change detected: Equipped item 16 in slot body
+[17:58:40.362] DEBUG: Player moved to: 21,4 AI can now recalculate paths
+[17:58:40.515] DEBUG: Player moved to: 21,5 AI can now recalculate paths
+[17:58:40.660] DEBUG: Player moved to: 21,6 AI can now recalculate paths
+[17:58:41.053] DEBUG: Player moved to: 21,5 AI can now recalculate paths
+[17:58:41.314] DEBUG: Player moved to: 21,4 AI can now recalculate paths
+[17:58:41.425] DEBUG: Player moved to: 21,3 AI can now recalculate paths
+[17:58:42.244] DEBUG: Player moved to: 22,2 AI can now recalculate paths
+[17:58:42.648] DEBUG: Player moved to: 22,3 AI can now recalculate paths
+[17:58:42.910] DEBUG: Player moved to: 22,4 AI can now recalculate paths
+[17:58:43.031] DEBUG: Player moved to: 22,5 AI can now recalculate paths
+[17:58:43.148] DEBUG: Player moved to: 22,6 AI can now recalculate paths
+[17:58:43.259] DEBUG: Player moved to: 22,7 AI can now recalculate paths
+[17:58:43.377] DEBUG: Player moved to: 22,8 AI can now recalculate paths
+[17:58:43.495] DEBUG: Player moved to: 22,9 AI can now recalculate paths
+[17:58:43.614] DEBUG: Player moved to: 22,10 AI can now recalculate paths
+[17:58:43.732] DEBUG: Player moved to: 22,11 AI can now recalculate paths
+[17:58:43.732] DEBUG: AI turn processor - Next step: 22,14, AP: 6
+[17:58:43.732] DEBUG: AI moved from 23,14 to 22,14 (AP: 4)
+[17:58:43.975] DEBUG: Player moved to: 22,10 AI can now recalculate paths
+[17:58:43.975] DEBUG: AI turn processor - Next step: 22,13, AP: 4
+[17:58:43.975] DEBUG: AI moved from 22,14 to 22,13 (AP: 2)
+[17:58:44.246] DEBUG: Player moved to: 22,9 AI can now recalculate paths
+[17:58:44.246] DEBUG: AI turn processor - Next step: 22,12, AP: 2
+[17:58:44.246] DEBUG: AI moved from 22,13 to 22,12 (AP: 0)
+[17:58:44.364] DEBUG: Player moved to: 22,8 AI can now recalculate paths
+[17:58:44.364] DEBUG: AI turn processor - Next step: 22,11, AP: 0
+[17:58:44.364] DEBUG: AI recovering 3 points (AP: 3)
+[17:58:44.475] DEBUG: Player moved to: 22,7 AI can now recalculate paths
+[17:58:44.475] DEBUG: AI turn processor - Next step: 22,11, AP: 3
+[17:58:44.475] DEBUG: AI skipped movement
+[17:58:44.593] DEBUG: Player moved to: 22,6 AI can now recalculate paths
+[17:58:44.593] DEBUG: AI turn processor - Next step: 22,11, AP: 2
+[17:58:44.593] DEBUG: AI moved from 22,12 to 22,11 (AP: 0)
+[17:58:44.712] DEBUG: Player moved to: 22,5 AI can now recalculate paths
+[17:58:44.712] DEBUG: AI turn processor - Next step: 22,10, AP: 0
+[17:58:44.712] DEBUG: AI recovering 3 points (AP: 3)
+[17:58:44.830] DEBUG: Player moved to: 22,4 AI can now recalculate paths
+[17:58:44.830] DEBUG: AI turn processor - Next step: 22,10, AP: 3
+[17:58:44.830] DEBUG: AI moved from 22,11 to 22,10 (AP: 1)
+[17:58:44.942] DEBUG: Player moved to: 22,3 AI can now recalculate paths
+[17:58:44.942] DEBUG: AI turn processor - Next step: 22,9, AP: 1
+[17:58:44.942] DEBUG: AI waiting (AP: 0)
+[17:58:45.059] DEBUG: Player moved to: 22,2 AI can now recalculate paths
+[17:58:45.059] DEBUG: AI turn processor - Next step: 22,9, AP: 0
+[17:58:45.059] DEBUG: AI recovering 3 points (AP: 3)
+[17:58:47.164] DEBUG: Player moved to: 22,3 AI can now recalculate paths
+[17:58:47.164] DEBUG: AI turn processor - Next step: 22,9, AP: 3
+[17:58:47.164] DEBUG: AI skipped movement
+[17:58:47.429] DEBUG: Player moved to: 22,4 AI can now recalculate paths
+[17:58:47.429] DEBUG: AI turn processor - Next step: 22,9, AP: 2
+[17:58:47.429] DEBUG: AI moved from 22,10 to 22,9 (AP: 0)
+[17:58:47.547] DEBUG: Player moved to: 22,5 AI can now recalculate paths
+[17:58:47.547] DEBUG: AI turn processor - Next step: 22,8, AP: 0
+[17:58:47.547] DEBUG: AI recovering 3 points (AP: 3)
+[17:58:47.665] DEBUG: Player moved to: 22,6 AI can now recalculate paths
+[17:58:47.665] DEBUG: AI turn processor - Next step: 22,8, AP: 3
+[17:58:47.665] DEBUG: AI moved from 22,9 to 22,8 (AP: 1)
+[17:58:47.776] DEBUG: Player moved to: 22,7 AI can now recalculate paths
+[17:58:47.776] DEBUG: AI turn processor - Next step: 22,7, AP: 1
+[17:58:47.776] DEBUG: AI waiting (AP: 0)
+[17:58:48.012] DEBUG: Player moved to: 22,8 AI can now recalculate paths
+[17:58:48.131] DEBUG: Player moved to: 22,9 AI can now recalculate paths
+[17:58:48.547] DEBUG: Player moved to: 22,10 AI can now recalculate paths
+[17:58:49.277] DEBUG: Player moved to: 22,11 AI can now recalculate paths
+[17:58:50.277] DEBUG: Player moved to: 22,10 AI can now recalculate paths
+[17:58:50.430] DEBUG: Player moved to: 22,9 AI can now recalculate paths
+[17:58:50.694] DEBUG: Player moved to: 22,8 AI can now recalculate paths
+[17:58:50.812] DEBUG: Player moved to: 22,7 AI can now recalculate paths
+[17:58:50.931] DEBUG: Player moved to: 22,6 AI can now recalculate paths
+[17:58:51.049] DEBUG: Player moved to: 22,5 AI can now recalculate paths
+[17:58:51.160] DEBUG: Player moved to: 22,4 AI can now recalculate paths
+[17:58:51.278] DEBUG: Player moved to: 22,3 AI can now recalculate paths
+[17:58:51.396] DEBUG: Player moved to: 22,2 AI can now recalculate paths
+[17:58:54.412] DEBUG: Player moved to: 22,3 AI can now recalculate paths
+[17:58:54.677] DEBUG: Player moved to: 22,4 AI can now recalculate paths
+[17:58:54.794] DEBUG: Player moved to: 22,5 AI can now recalculate paths
+[17:58:55.079] DEBUG: Player moved to: 23,5 AI can now recalculate paths
+[17:58:55.232] DEBUG: Player moved to: 24,5 AI can now recalculate paths
+[17:58:55.364] DEBUG: Player moved to: 25,5 AI can now recalculate paths
+[17:58:55.510] DEBUG: Player moved to: 26,5 AI can now recalculate paths
+[17:58:56.781] DEBUG: Player moved to: 26,6 AI can now recalculate paths
+[17:58:57.045] DEBUG: Player moved to: 26,7 AI can now recalculate paths
+[17:58:57.614] DEBUG: Player moved to: 26,6 AI can now recalculate paths
+[17:58:57.796] DEBUG: Player moved to: 26,5 AI can now recalculate paths
+[17:58:59.526] DEBUG: Player moved to: 26,6 AI can now recalculate paths
+[17:58:59.713] DEBUG: Player moved to: 26,7 AI can now recalculate paths
+[17:59:01.763] DEBUG: Player moved to: 26,6 AI can now recalculate paths
+[17:59:01.881] DEBUG: Player moved to: 26,5 AI can now recalculate paths
+[17:59:02.048] DEBUG: Player moved to: 26,4 AI can now recalculate paths
+[17:59:02.194] DEBUG: Player moved to: 26,3 AI can now recalculate paths
+[17:59:02.347] DEBUG: Player moved to: 26,2 AI can now recalculate paths
+[17:59:02.826] DEBUG: Player moved to: 26,3 AI can now recalculate paths
+[17:59:02.944] DEBUG: Player moved to: 26,4 AI can now recalculate paths
+[17:59:03.111] DEBUG: Player moved to: 26,5 AI can now recalculate paths
+[17:59:03.264] DEBUG: Player moved to: 26,6 AI can now recalculate paths
+[17:59:03.410] DEBUG: Player moved to: 26,7 AI can now recalculate paths
+[17:59:04.028] DEBUG: Player moved to: 26,6 AI can now recalculate paths
+[17:59:04.181] DEBUG: Player moved to: 26,5 AI can now recalculate paths
+[17:59:04.327] DEBUG: Player moved to: 26,4 AI can now recalculate paths
+[17:59:04.495] DEBUG: Player moved to: 26,3 AI can now recalculate paths
+[17:59:04.661] DEBUG: Player moved to: 26,2 AI can now recalculate paths
+[17:59:05.543] DEBUG: Player moved to: 26,3 AI can now recalculate paths
+[17:59:05.675] DEBUG: Player moved to: 26,4 AI can now recalculate paths
+[17:59:05.814] DEBUG: Player moved to: 26,5 AI can now recalculate paths
+[17:59:05.960] DEBUG: Player moved to: 26,6 AI can now recalculate paths
+[17:59:06.128] DEBUG: Player moved to: 26,7 AI can now recalculate paths
+[17:59:06.879] DEBUG: Player moved to: 26,6 AI can now recalculate paths
+[17:59:07.044] DEBUG: Player moved to: 26,5 AI can now recalculate paths
+[17:59:07.260] DEBUG: Player moved to: 26,4 AI can now recalculate paths
+[17:59:07.447] DEBUG: Player moved to: 26,3 AI can now recalculate paths
+[17:59:07.614] DEBUG: Player moved to: 26,2 AI can now recalculate paths
+[17:59:08.246] DEBUG: Player moved to: 26,3 AI can now recalculate paths
+[17:59:08.378] DEBUG: Player moved to: 26,4 AI can now recalculate paths
+[17:59:08.545] DEBUG: Player moved to: 26,5 AI can now recalculate paths
+[17:59:08.698] DEBUG: Player moved to: 26,6 AI can now recalculate paths
+[17:59:08.865] DEBUG: Player moved to: 26,7 AI can now recalculate paths
+[17:59:09.310] DEBUG: Player moved to: 26,6 AI can now recalculate paths
+[17:59:09.476] DEBUG: Player moved to: 26,5 AI can now recalculate paths
+[17:59:09.643] DEBUG: Player moved to: 26,4 AI can now recalculate paths
+[17:59:09.795] DEBUG: Player moved to: 26,3 AI can now recalculate paths
+[17:59:09.962] DEBUG: Player moved to: 26,2 AI can now recalculate paths
+[17:59:10.581] DEBUG: Player moved to: 26,3 AI can now recalculate paths
+[17:59:10.831] DEBUG: Player moved to: 26,4 AI can now recalculate paths
+[17:59:11.047] DEBUG: Player moved to: 26,5 AI can now recalculate paths
+[17:59:11.248] DEBUG: Player moved to: 26,6 AI can now recalculate paths
+[17:59:11.443] DEBUG: Player moved to: 26,7 AI can now recalculate paths
+[17:59:12.394] DEBUG: Player moved to: 26,6 AI can now recalculate paths
+[17:59:12.596] DEBUG: Player moved to: 26,5 AI can now recalculate paths
+[17:59:12.763] DEBUG: Player moved to: 26,4 AI can now recalculate paths
+[17:59:12.950] DEBUG: Player moved to: 26,3 AI can now recalculate paths
+[17:59:13.131] DEBUG: Player moved to: 26,2 AI can now recalculate paths
+[17:59:14.431] DEBUG: Player moved to: 26,3 AI can now recalculate paths
+[17:59:14.577] DEBUG: Player moved to: 26,4 AI can now recalculate paths
+[17:59:14.730] DEBUG: Player moved to: 26,5 AI can now recalculate paths
+[17:59:14.896] DEBUG: Player moved to: 26,6 AI can now recalculate paths
+[17:59:15.348] DEBUG: Player moved to: 26,5 AI can now recalculate paths
+[17:59:15.508] DEBUG: Player moved to: 26,4 AI can now recalculate paths
+[17:59:15.661] DEBUG: Player moved to: 26,3 AI can now recalculate paths
+[17:59:15.897] DEBUG: Player moved to: 26,4 AI can now recalculate paths
+[17:59:16.063] DEBUG: Player moved to: 26,5 AI can now recalculate paths
+===== DEBUG LOG STARTED AT 2025-04-15 18:00:03 =====
+[18:00:03.926] DEBUG: Created world map with ID: 2
+[18:00:03.926] REGISTRY: Registered worldmap (Level 0) with ID: 2
+[18:00:03.928] DEBUG: Creating enemy with MapContext ID: 3
+[18:00:03.928] DEBUG: Creating enemy with MapContext ID: 3
+[18:00:03.928] DEBUG: Creating enemy with MapContext ID: 3
+[18:00:03.928] DEBUG: Created dungeon with ID: 3
+[18:00:03.928] REGISTRY: Registered dungeon (Level 1) with ID: 3
+[18:00:03.928] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
+[18:00:03.928] SET ACTIVE MAP: Propagated to MapSystem
+[18:00:03.928] Processing initial item entry: template_id=bandage, count=3
+[18:00:03.928] Successfully added item bandage (ID: 10) to container
+[18:00:03.928] Successfully added item bandage (ID: 11) to container
+[18:00:03.928] Successfully added item bandage (ID: 12) to container
+[18:00:03.928] Processing initial item entry: template_id=miners_headlamp, count=1
+[18:00:03.928] Successfully added item miners_headlamp (ID: 13) to container
+[18:00:03.928] Processing initial item entry: template_id=rusty_spanner, count=1
+[18:00:03.928] Successfully added item rusty_spanner (ID: 14) to container
+[18:00:03.928] Processing initial item entry: template_id=tattered_jumpsuit, count=1
+[18:00:03.928] Successfully added item tattered_jumpsuit (ID: 15) to container
+[18:00:03.928] Created container with 6 items total
+[18:00:03.928] --- MAP SUMMARY ---
+[18:00:03.928] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[18:00:03.928] Map: dungeon (Level 1, ID: 3, Size: 40x30)
+[18:00:03.928] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[18:00:03.928] Active map ID: 3
+[18:00:03.928] DEBUG: AI turn processor - Next step: 13,22, AP: 6
+[18:00:03.928] DEBUG: AI moved from 14,22 to 13,22 (AP: 4)
+[18:00:05.274] Examining container at (14,20)
+[18:00:05.274] Starting item pickup from container
+[18:00:05.274] Container has 6 items before pickup
+[18:00:05.274] Attempting to pick up Bandage (type: first aid, ID: 10)
+[18:00:05.274] Successfully picked up Bandage
+[18:00:05.274] Attempting to pick up Bandage (type: first aid, ID: 11)
+[18:00:05.274] Successfully picked up Bandage
+[18:00:05.274] Attempting to pick up Bandage (type: first aid, ID: 12)
+[18:00:05.274] Successfully picked up Bandage
+[18:00:05.274] Attempting to pick up Miner's Headlamp (type: headgear, ID: 13)
+[18:00:05.274] Successfully picked up Miner's Headlamp
+[18:00:05.274] Attempting to pick up Rusty Spanner (type: weapon, ID: 14)
+[18:00:05.274] Successfully picked up Rusty Spanner
+[18:00:05.274] Attempting to pick up Tattered Jumpsuit (type: armor, ID: 15)
+[18:00:05.274] Successfully picked up Tattered Jumpsuit
+[18:00:05.274] Container has 0 items after pickup
+[18:00:05.274] Emitted examine event for container at (14,20)
+[18:00:05.690] DEBUG: Player moved to: 13,21 AI can now recalculate paths
+[18:00:05.690] DEBUG: AI attacked player (AP: 1)
+[18:00:06.191] DEBUG: Player moved to: 13,22 AI can now recalculate paths
+[18:00:16.552] DEBUG: Player moved to: 14,22 AI can now recalculate paths
+[18:00:16.738] DEBUG: Player moved to: 15,22 AI can now recalculate paths
+[18:00:16.884] DEBUG: Player moved to: 16,22 AI can now recalculate paths
+[18:00:17.072] DEBUG: Player moved to: 17,22 AI can now recalculate paths
+[18:00:17.273] DEBUG: Player moved to: 17,21 AI can now recalculate paths
+[18:00:17.440] DEBUG: Player moved to: 17,20 AI can now recalculate paths
+[18:00:17.635] DEBUG: Player moved to: 18,20 AI can now recalculate paths
+[18:00:17.789] DEBUG: Player moved to: 19,20 AI can now recalculate paths
+[18:00:18.018] DEBUG: Player moved to: 20,20 AI can now recalculate paths
+[18:00:18.185] DEBUG: Player moved to: 21,20 AI can now recalculate paths
+[18:00:18.386] DEBUG: Player moved to: 22,20 AI can now recalculate paths
+[18:00:18.601] DEBUG: Player moved to: 22,21 AI can now recalculate paths
+[18:00:18.767] DEBUG: Player moved to: 22,22 AI can now recalculate paths
+[18:00:18.887] DEBUG: Player moved to: 22,23 AI can now recalculate paths
+[18:00:19.075] DEBUG: Player moved to: 22,24 AI can now recalculate paths
+[18:00:19.201] DEBUG: Player moved to: 21,24 AI can now recalculate paths
+[18:00:19.372] DEBUG: Player moved to: 20,24 AI can now recalculate paths
+[18:00:19.520] DEBUG: Player moved to: 19,24 AI can now recalculate paths
+[18:00:19.787] DEBUG: Player moved to: 19,23 AI can now recalculate paths
+[18:00:19.935] DEBUG: Player moved to: 19,22 AI can now recalculate paths
+[18:00:20.089] DEBUG: Player moved to: 19,21 AI can now recalculate paths
+[18:00:20.220] DEBUG: Player moved to: 19,20 AI can now recalculate paths
+[18:00:20.387] DEBUG: Player moved to: 20,20 AI can now recalculate paths
+[18:00:25.437] DEBUG: Player moved to: 19,20 AI can now recalculate paths
+[18:00:25.605] DEBUG: Player moved to: 18,20 AI can now recalculate paths
+[18:00:25.890] DEBUG: Player moved to: 18,21 AI can now recalculate paths
+[18:00:26.056] DEBUG: Player moved to: 18,22 AI can now recalculate paths
+[18:00:26.202] DEBUG: Player moved to: 18,23 AI can now recalculate paths
+[18:00:26.473] DEBUG: Player moved to: 17,23 AI can now recalculate paths
+[18:00:26.640] DEBUG: Player moved to: 16,23 AI can now recalculate paths
+[18:00:26.787] DEBUG: Player moved to: 15,23 AI can now recalculate paths
+[18:00:26.938] DEBUG: Player moved to: 14,23 AI can now recalculate paths
+[18:00:27.105] DEBUG: Player moved to: 13,23 AI can now recalculate paths
+[18:00:27.335] DEBUG: Player moved to: 12,23 AI can now recalculate paths
+[18:00:27.488] DEBUG: Player moved to: 12,22 AI can now recalculate paths
+[18:00:27.640] DEBUG: Player moved to: 11,22 AI can now recalculate paths
+[18:00:27.772] DEBUG: Player moved to: 10,22 AI can now recalculate paths
+[18:00:27.953] DEBUG: Player moved to: 9,22 AI can now recalculate paths
+[18:00:28.085] DEBUG: Player moved to: 8,22 AI can now recalculate paths
+[18:00:28.253] DEBUG: Player moved to: 7,22 AI can now recalculate paths
+[18:00:30.038] Equipment change detected: Equipped item 13 in slot head
+[18:00:30.469] Equipment change detected: Equipped item 14 in slot mainhand
+[18:00:30.907] Equipment change detected: Equipped item 15 in slot body
+[18:00:31.921] DEBUG: Player moved to: 6,22 AI can now recalculate paths
+[18:00:32.123] DEBUG: Player moved to: 6,21 AI can now recalculate paths
+[18:00:32.255] DEBUG: Player moved to: 6,20 AI can now recalculate paths
+[18:00:32.373] DEBUG: Player moved to: 6,19 AI can now recalculate paths
+[18:00:32.505] DEBUG: Player moved to: 6,18 AI can now recalculate paths
+[18:00:32.672] DEBUG: Player moved to: 5,18 AI can now recalculate paths
+[18:00:32.804] DEBUG: Player moved to: 5,17 AI can now recalculate paths
+[18:00:32.957] DEBUG: Player moved to: 5,16 AI can now recalculate paths
+[18:00:33.088] DEBUG: Player moved to: 5,15 AI can now recalculate paths
+[18:00:33.234] DEBUG: Player moved to: 5,14 AI can now recalculate paths
+[18:00:33.422] DEBUG: Player moved to: 5,13 AI can now recalculate paths
+[18:00:33.589] DEBUG: Player moved to: 5,12 AI can now recalculate paths
+[18:00:33.722] DEBUG: Player moved to: 5,11 AI can now recalculate paths
+[18:00:33.889] DEBUG: Player moved to: 5,10 AI can now recalculate paths
+[18:00:34.068] DEBUG: Player moved to: 5,9 AI can now recalculate paths
+[18:00:34.221] DEBUG: Player moved to: 5,8 AI can now recalculate paths
+[18:00:34.375] DEBUG: Player moved to: 5,7 AI can now recalculate paths
+[18:00:34.568] DEBUG: Player moved to: 6,7 AI can now recalculate paths
+[18:00:34.839] DEBUG: Player moved to: 7,7 AI can now recalculate paths
+[18:00:34.951] DEBUG: Player moved to: 8,7 AI can now recalculate paths
+[18:00:35.069] DEBUG: Player moved to: 9,7 AI can now recalculate paths
+[18:00:35.188] DEBUG: Player moved to: 10,7 AI can now recalculate paths
+[18:00:35.305] DEBUG: Player moved to: 11,7 AI can now recalculate paths
+[18:00:35.424] DEBUG: Player moved to: 12,7 AI can now recalculate paths
+[18:00:35.424] DEBUG: AI turn processor - Next step: 14,4, AP: 6
+[18:00:35.424] DEBUG: AI moved from 15,4 to 14,4 (AP: 4)
+[18:00:35.534] DEBUG: Player moved to: 13,7 AI can now recalculate paths
+[18:00:35.534] DEBUG: AI turn processor - Next step: 13,4, AP: 4
+[18:00:35.534] DEBUG: AI moved from 14,4 to 13,4 (AP: 2)
+[18:00:35.654] DEBUG: Player moved to: 14,7 AI can now recalculate paths
+[18:00:35.654] DEBUG: AI turn processor - Next step: 14,4, AP: 2
+[18:00:35.654] DEBUG: AI moved from 13,4 to 14,4 (AP: 0)
+[18:00:35.771] DEBUG: Player moved to: 15,7 AI can now recalculate paths
+[18:00:35.771] DEBUG: AI turn processor - Next step: 15,4, AP: 0
+[18:00:35.771] DEBUG: AI recovering 3 points (AP: 3)
+[18:00:35.889] DEBUG: Player moved to: 16,7 AI can now recalculate paths
+[18:00:35.889] DEBUG: AI turn processor - Next step: 15,4, AP: 3
+[18:00:35.889] DEBUG: AI moved from 14,4 to 15,4 (AP: 1)
+[18:00:36.104] DEBUG: Player moved to: 16,6 AI can now recalculate paths
+[18:00:36.104] DEBUG: AI turn processor - Next step: 16,4, AP: 1
+[18:00:36.104] DEBUG: AI waiting (AP: 0)
+[18:00:36.456] DEBUG: Player moved to: 16,5 AI can now recalculate paths
+[18:00:36.456] DEBUG: AI turn processor - Next step: 16,4, AP: 0
+[18:00:36.456] DEBUG: AI recovering 3 points (AP: 3)
+[18:00:36.771] DEBUG: Player moved to: 16,4 AI can now recalculate paths
+[18:00:36.771] DEBUG: AI attacked player (AP: 0)
+===== DEBUG LOG STARTED AT 2025-04-15 18:01:24 =====
+[18:01:25.868] DEBUG: Created world map with ID: 2
+[18:01:25.868] REGISTRY: Registered worldmap (Level 0) with ID: 2
+[18:01:25.869] DEBUG: Creating enemy with MapContext ID: 3
+[18:01:25.869] DEBUG: Creating enemy with MapContext ID: 3
+[18:01:25.869] DEBUG: Creating enemy with MapContext ID: 3
+[18:01:25.869] DEBUG: Created dungeon with ID: 3
+[18:01:25.869] REGISTRY: Registered dungeon (Level 1) with ID: 3
+[18:01:25.869] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
+[18:01:25.869] SET ACTIVE MAP: Propagated to MapSystem
+[18:01:25.869] Processing initial item entry: template_id=bandage, count=3
+[18:01:25.869] Successfully added item bandage (ID: 10) to container
+[18:01:25.869] Successfully added item bandage (ID: 11) to container
+[18:01:25.869] Successfully added item bandage (ID: 12) to container
+[18:01:25.869] Processing initial item entry: template_id=miners_headlamp, count=1
+[18:01:25.869] Successfully added item miners_headlamp (ID: 13) to container
+[18:01:25.869] Processing initial item entry: template_id=rusty_spanner, count=1
+[18:01:25.869] Successfully added item rusty_spanner (ID: 14) to container
+[18:01:25.869] Processing initial item entry: template_id=tattered_jumpsuit, count=1
+[18:01:25.869] Successfully added item tattered_jumpsuit (ID: 15) to container
+[18:01:25.869] Created container with 6 items total
+[18:01:25.869] --- MAP SUMMARY ---
+[18:01:25.869] Map: dungeon (Level 1, ID: 3, Size: 40x30)
+[18:01:25.870] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[18:01:25.870] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[18:01:25.870] Active map ID: 3
+[18:01:25.870] DEBUG: AI turn processor - Next step: 19,22, AP: 6
+[18:01:25.870] DEBUG: AI moved from 20,22 to 19,22 (AP: 4)
+[18:01:27.237] Examining container at (19,25)
+[18:01:27.237] Starting item pickup from container
+[18:01:27.237] Container has 6 items before pickup
+[18:01:27.237] Attempting to pick up Bandage (type: first aid, ID: 10)
+[18:01:27.237] Successfully picked up Bandage
+[18:01:27.237] Attempting to pick up Bandage (type: first aid, ID: 11)
+[18:01:27.237] Successfully picked up Bandage
+[18:01:27.237] Attempting to pick up Bandage (type: first aid, ID: 12)
+[18:01:27.237] Successfully picked up Bandage
+[18:01:27.237] Attempting to pick up Miner's Headlamp (type: headgear, ID: 13)
+[18:01:27.237] Successfully picked up Miner's Headlamp
+[18:01:27.237] Attempting to pick up Rusty Spanner (type: weapon, ID: 14)
+[18:01:27.237] Successfully picked up Rusty Spanner
+[18:01:27.237] Attempting to pick up Tattered Jumpsuit (type: armor, ID: 15)
+[18:01:27.237] Successfully picked up Tattered Jumpsuit
+[18:01:27.238] Container has 0 items after pickup
+[18:01:27.238] Emitted examine event for container at (19,25)
+[18:01:27.655] DEBUG: Player moved to: 19,25 AI can now recalculate paths
+[18:01:27.655] DEBUG: AI turn processor - Next step: 19,23, AP: 4
+[18:01:27.655] DEBUG: AI moved from 19,22 to 19,23 (AP: 2)
+[18:01:27.919] DEBUG: Player moved to: 19,24 AI can now recalculate paths
+[18:01:27.920] DEBUG: AI turn processor - Next step: 19,24, AP: 2
+[18:01:27.920] DEBUG: AI waiting (AP: 1)
+[18:01:28.273] Examining container at (19,25)
+[18:01:28.273] Starting item pickup from container
+[18:01:28.273] Container has 0 items before pickup
+[18:01:28.273] Container has 0 items after pickup
+[18:01:28.273] Emitted examine event for container at (19,25)
+[18:01:28.525] Examining container at (19,25)
+[18:01:28.525] Starting item pickup from container
+[18:01:28.525] Container has 0 items before pickup
+[18:01:28.525] Container has 0 items after pickup
+[18:01:28.525] Emitted examine event for container at (19,25)
+[18:01:29.156] DEBUG: Player moved to: 19,23 AI can now recalculate paths
+[18:01:29.303] DEBUG: Player moved to: 19,22 AI can now recalculate paths
+[18:01:29.572] DEBUG: Player moved to: 18,22 AI can now recalculate paths
+[18:01:29.706] DEBUG: Player moved to: 17,22 AI can now recalculate paths
+[18:01:30.017] DEBUG: Player moved to: 17,21 AI can now recalculate paths
+[18:01:30.241] DEBUG: Player moved to: 17,20 AI can now recalculate paths
+[18:01:30.241] DEBUG: AI turn processor - Next step: 17,13, AP: 6
+[18:01:30.241] DEBUG: AI moved from 17,12 to 17,13 (AP: 4)
+[18:01:30.457] DEBUG: Player moved to: 18,20 AI can now recalculate paths
+[18:01:30.457] DEBUG: AI turn processor - Next step: 18,13, AP: 4
+[18:01:30.457] DEBUG: AI moved from 17,13 to 18,13 (AP: 2)
+[18:01:30.601] DEBUG: Player moved to: 19,20 AI can now recalculate paths
+[18:01:30.602] DEBUG: AI turn processor - Next step: 19,13, AP: 2
+[18:01:30.602] DEBUG: AI skipped movement
+[18:01:36.806] DEBUG: Player moved to: 19,19 AI can now recalculate paths
+[18:01:36.806] DEBUG: AI turn processor - Next step: 19,13, AP: 1
+[18:01:36.806] DEBUG: AI waiting (AP: 0)
+[18:01:36.952] DEBUG: Player moved to: 19,18 AI can now recalculate paths
+[18:01:36.952] DEBUG: AI turn processor - Next step: 19,13, AP: 0
+[18:01:36.952] DEBUG: AI recovering 3 points (AP: 3)
+[18:01:37.226] DEBUG: Player moved to: 19,17 AI can now recalculate paths
+[18:01:37.227] DEBUG: AI turn processor - Next step: 19,13, AP: 3
+[18:01:37.227] DEBUG: AI skipped movement
+[18:01:44.053] DEBUG: Player moved to: 19,16 AI can now recalculate paths
+[18:01:44.053] DEBUG: AI turn processor - Next step: 19,13, AP: 2
+[18:01:44.053] DEBUG: AI moved from 18,13 to 19,13 (AP: 0)
+[18:01:44.206] DEBUG: Player moved to: 19,15 AI can now recalculate paths
+[18:01:44.206] DEBUG: AI turn processor - Next step: 19,14, AP: 0
+[18:01:44.206] DEBUG: AI recovering 3 points (AP: 3)
+[18:01:44.339] DEBUG: Player moved to: 19,14 AI can now recalculate paths
+[18:01:44.339] DEBUG: AI attacked player (AP: 0)
