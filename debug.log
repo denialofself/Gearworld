@@ -1706,3 +1706,197 @@
 [16:54:13.975] Successfully picked up Tattered Jumpsuit
 [16:54:13.975] Container has 0 items after pickup
 [16:54:13.975] Emitted examine event for container at (33,1)
+===== DEBUG LOG STARTED AT 2025-04-15 16:56:21 =====
+[16:56:21.901] Successfully loaded title screen image from filesystem: assets/start_screen.png
+[16:56:21.904] Game initialization complete
+[16:56:23.024] DEBUG: Created world map with ID: 2
+[16:56:23.024] REGISTRY: Registered worldmap (Level 0) with ID: 2
+[16:56:23.026] DEBUG: Creating enemy with MapContext ID: 3
+[16:56:23.026] DEBUG: Creating enemy with MapContext ID: 3
+[16:56:23.026] DEBUG: Creating enemy with MapContext ID: 3
+[16:56:23.026] DEBUG: Creating enemy with MapContext ID: 3
+[16:56:23.026] DEBUG: Created dungeon with ID: 3
+[16:56:23.026] REGISTRY: Registered dungeon (Level 1) with ID: 3
+[16:56:23.026] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
+[16:56:23.026] SET ACTIVE MAP: Propagated to MapSystem
+[16:56:23.026] Processing initial item entry: template_id=bandage, count=3
+[16:56:23.026] Successfully added item bandage (ID: 11) to container
+[16:56:23.026] Successfully added item bandage (ID: 12) to container
+[16:56:23.026] Successfully added item bandage (ID: 13) to container
+[16:56:23.026] Processing initial item entry: template_id=miners_headlamp, count=1
+[16:56:23.026] Successfully added item miners_headlamp (ID: 14) to container
+[16:56:23.026] Processing initial item entry: template_id=rusty_spanner, count=1
+[16:56:23.026] Successfully added item rusty_spanner (ID: 15) to container
+[16:56:23.026] Processing initial item entry: template_id=tattered_jumpsuit, count=1
+[16:56:23.026] Successfully added item tattered_jumpsuit (ID: 16) to container
+[16:56:23.026] Created container with 6 items total
+[16:56:23.026] --- MAP SUMMARY ---
+[16:56:23.026] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[16:56:23.026] Map: dungeon (Level 1, ID: 3, Size: 40x30)
+[16:56:23.026] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[16:56:23.026] Active map ID: 3
+[16:56:24.078] Examining container at (12,27)
+[16:56:24.079] Starting item pickup from container
+[16:56:24.079] Container has 6 items before pickup
+[16:56:24.079] Attempting to pick up Bandage (type: first aid, ID: 11)
+[16:56:24.079] Successfully picked up Bandage
+[16:56:24.079] Attempting to pick up Bandage (type: first aid, ID: 12)
+[16:56:24.079] Successfully picked up Bandage
+[16:56:24.079] Attempting to pick up Bandage (type: first aid, ID: 13)
+[16:56:24.079] Successfully picked up Bandage
+[16:56:24.079] Attempting to pick up Miner's Headlamp (type: headgear, ID: 14)
+[16:56:24.079] Successfully picked up Miner's Headlamp
+[16:56:24.079] Attempting to pick up Rusty Spanner (type: weapon, ID: 15)
+[16:56:24.079] Successfully picked up Rusty Spanner
+[16:56:24.079] Attempting to pick up Tattered Jumpsuit (type: armor, ID: 16)
+[16:56:24.079] Successfully picked up Tattered Jumpsuit
+[16:56:24.079] Container has 0 items after pickup
+[16:56:24.079] Emitted examine event for container at (12,27)
+===== DEBUG LOG STARTED AT 2025-04-15 17:00:48 =====
+[17:00:48.778] Successfully loaded title screen image from filesystem: assets/start_screen.png
+[17:00:48.779] Game initialization complete
+[17:00:49.651] DEBUG: Created world map with ID: 2
+[17:00:49.651] REGISTRY: Registered worldmap (Level 0) with ID: 2
+[17:00:49.652] DEBUG: Creating enemy with MapContext ID: 3
+[17:00:49.652] DEBUG: Creating enemy with MapContext ID: 3
+[17:00:49.652] DEBUG: Creating enemy with MapContext ID: 3
+[17:00:49.652] DEBUG: Creating enemy with MapContext ID: 3
+[17:00:49.652] DEBUG: Created dungeon with ID: 3
+[17:00:49.652] REGISTRY: Registered dungeon (Level 1) with ID: 3
+[17:00:49.652] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
+[17:00:49.652] SET ACTIVE MAP: Propagated to MapSystem
+[17:00:49.652] Processing initial item entry: template_id=bandage, count=3
+[17:00:49.652] Successfully added item bandage (ID: 11) to container
+[17:00:49.652] Successfully added item bandage (ID: 12) to container
+[17:00:49.652] Successfully added item bandage (ID: 13) to container
+[17:00:49.652] Processing initial item entry: template_id=miners_headlamp, count=1
+[17:00:49.652] Successfully added item miners_headlamp (ID: 14) to container
+[17:00:49.652] Processing initial item entry: template_id=rusty_spanner, count=1
+[17:00:49.652] Successfully added item rusty_spanner (ID: 15) to container
+[17:00:49.652] Processing initial item entry: template_id=tattered_jumpsuit, count=1
+[17:00:49.652] Successfully added item tattered_jumpsuit (ID: 16) to container
+[17:00:49.652] Created container with 6 items total
+[17:00:49.652] --- MAP SUMMARY ---
+[17:00:49.652] Map: dungeon (Level 1, ID: 3, Size: 40x30)
+[17:00:49.652] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[17:00:49.652] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[17:00:49.652] Active map ID: 3
+[17:00:49.658] DEBUG: AI turn processor - Next step: 7,25, AP: 6
+[17:00:49.658] DEBUG: AI moved from 8,25 to 7,25 (AP: 4)
+[17:00:50.541] Examining container at (5,27)
+[17:00:50.541] Starting item pickup from container
+[17:00:50.541] Container has 6 items before pickup
+[17:00:50.541] Attempting to pick up Bandage (type: first aid, ID: 11)
+[17:00:50.541] Successfully picked up Bandage
+[17:00:50.541] Attempting to pick up Bandage (type: first aid, ID: 12)
+[17:00:50.541] Successfully picked up Bandage
+[17:00:50.541] Attempting to pick up Bandage (type: first aid, ID: 13)
+[17:00:50.541] Successfully picked up Bandage
+[17:00:50.541] Attempting to pick up Miner's Headlamp (type: headgear, ID: 14)
+[17:00:50.541] Successfully picked up Miner's Headlamp
+[17:00:50.541] Attempting to pick up Rusty Spanner (type: weapon, ID: 15)
+[17:00:50.541] Successfully picked up Rusty Spanner
+[17:00:50.541] Attempting to pick up Tattered Jumpsuit (type: armor, ID: 16)
+[17:00:50.541] Successfully picked up Tattered Jumpsuit
+[17:00:50.541] Container has 0 items after pickup
+[17:00:50.541] Emitted examine event for container at (5,27)
+[17:00:50.902] DEBUG: Player moved to: 4,26 AI can now recalculate paths
+[17:00:50.902] DEBUG: AI turn processor - Next step: 6,25, AP: 4
+[17:00:50.902] DEBUG: AI moved from 7,25 to 6,25 (AP: 2)
+[17:00:51.020] DEBUG: Player moved to: 4,25 AI can now recalculate paths
+[17:00:51.020] DEBUG: AI turn processor - Next step: 5,25, AP: 2
+[17:00:51.020] DEBUG: AI moved from 6,25 to 5,25 (AP: 0)
+===== DEBUG LOG STARTED AT 2025-04-15 17:06:39 =====
+[17:06:39.912] Successfully loaded title screen image from filesystem: assets/start_screen.png
+[17:06:39.914] Game initialization complete
+[17:06:41.351] DEBUG: Created world map with ID: 2
+[17:06:41.351] REGISTRY: Registered worldmap (Level 0) with ID: 2
+[17:06:41.353] DEBUG: Creating enemy with MapContext ID: 3
+[17:06:41.353] DEBUG: Creating enemy with MapContext ID: 3
+[17:06:41.353] DEBUG: Creating enemy with MapContext ID: 3
+[17:06:41.353] DEBUG: Created dungeon with ID: 3
+[17:06:41.353] REGISTRY: Registered dungeon (Level 1) with ID: 3
+[17:06:41.353] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
+[17:06:41.353] SET ACTIVE MAP: Propagated to MapSystem
+[17:06:41.353] Processing initial item entry: template_id=bandage, count=3
+[17:06:41.353] Successfully added item bandage (ID: 10) to container
+[17:06:41.353] Successfully added item bandage (ID: 11) to container
+[17:06:41.353] Successfully added item bandage (ID: 12) to container
+[17:06:41.353] Processing initial item entry: template_id=miners_headlamp, count=1
+[17:06:41.353] Successfully added item miners_headlamp (ID: 13) to container
+[17:06:41.353] Processing initial item entry: template_id=rusty_spanner, count=1
+[17:06:41.353] Successfully added item rusty_spanner (ID: 14) to container
+[17:06:41.353] Processing initial item entry: template_id=tattered_jumpsuit, count=1
+[17:06:41.353] Successfully added item tattered_jumpsuit (ID: 15) to container
+[17:06:41.353] Created container with 6 items total
+[17:06:41.353] --- MAP SUMMARY ---
+[17:06:41.353] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[17:06:41.353] Map: dungeon (Level 1, ID: 3, Size: 40x30)
+[17:06:41.353] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[17:06:41.353] Active map ID: 3
+[17:06:41.359] DEBUG: AI turn processor - Next step: 31,22, AP: 6
+[17:06:41.359] DEBUG: AI moved from 30,22 to 31,22 (AP: 4)
+[17:06:41.359] DEBUG: AI turn processor - Next step: 29,19, AP: 6
+[17:06:41.359] DEBUG: AI moved from 28,19 to 29,19 (AP: 4)
+[17:06:43.018] Examining container at (34,20)
+[17:06:43.018] Starting item pickup from container
+[17:06:43.018] Container has 6 items before pickup
+[17:06:43.018] Attempting to pick up Bandage (type: first aid, ID: 10)
+[17:06:43.018] Successfully picked up Bandage
+[17:06:43.018] Attempting to pick up Bandage (type: first aid, ID: 11)
+[17:06:43.018] Successfully picked up Bandage
+[17:06:43.018] Attempting to pick up Bandage (type: first aid, ID: 12)
+[17:06:43.018] Successfully picked up Bandage
+[17:06:43.018] Attempting to pick up Miner's Headlamp (type: headgear, ID: 13)
+[17:06:43.018] Successfully picked up Miner's Headlamp
+[17:06:43.018] Attempting to pick up Rusty Spanner (type: weapon, ID: 14)
+[17:06:43.018] Successfully picked up Rusty Spanner
+[17:06:43.018] Attempting to pick up Tattered Jumpsuit (type: armor, ID: 15)
+[17:06:43.018] Successfully picked up Tattered Jumpsuit
+[17:06:43.018] Container has 0 items after pickup
+[17:06:43.018] Emitted examine event for container at (34,20)
+[17:06:55.505] Equipment change detected: Equipped item 13 in slot head
+[17:06:59.403] Equipment change detected: Equipped item 14 in slot mainhand
+[17:07:05.949] Equipment change detected: Equipped item 15 in slot body
+[17:08:02.574] DEBUG: Player moved to: 33,19 AI can now recalculate paths
+[17:08:02.574] DEBUG: AI turn processor - Next step: 31,21, AP: 4
+[17:08:02.574] DEBUG: AI moved from 31,22 to 31,21 (AP: 2)
+[17:08:02.574] DEBUG: AI turn processor - Next step: 30,19, AP: 4
+[17:08:02.574] DEBUG: AI moved from 29,19 to 30,19 (AP: 2)
+[17:08:02.954] DEBUG: Player moved to: 33,18 AI can now recalculate paths
+[17:08:02.954] DEBUG: AI turn processor - Next step: 31,20, AP: 2
+[17:08:02.954] DEBUG: AI moved from 31,21 to 31,20 (AP: 0)
+[17:08:02.954] DEBUG: AI turn processor - Next step: 31,19, AP: 2
+[17:08:02.954] DEBUG: AI moved from 30,19 to 31,19 (AP: 0)
+[17:08:03.373] DEBUG: Player moved to: 32,18 AI can now recalculate paths
+[17:08:03.373] DEBUG: AI turn processor - Next step: 32,20, AP: 0
+[17:08:03.373] DEBUG: AI recovering 3 points (AP: 3)
+[17:08:03.373] DEBUG: AI turn processor - Next step: 32,19, AP: 0
+[17:08:03.373] DEBUG: AI recovering 3 points (AP: 3)
+[17:08:03.699] DEBUG: Player moved to: 31,18 AI can now recalculate paths
+[17:08:03.699] DEBUG: AI turn processor - Next step: 31,19, AP: 3
+[17:08:03.699] DEBUG: AI waiting (AP: 2)
+[17:08:03.699] DEBUG: AI attacked player (AP: 0)
+[17:08:05.720] DEBUG: Player moved to: 31,19 AI can now recalculate paths
+[17:08:05.720] DEBUG: AI turn processor - Next step: 31,19, AP: 2
+[17:08:05.720] DEBUG: AI waiting (AP: 1)
+[17:08:06.422] DEBUG: Player moved to: 31,20 AI can now recalculate paths
+[17:08:06.936] DEBUG: Player moved to: 31,21 AI can now recalculate paths
+[17:08:07.756] DEBUG: Player moved to: 32,21 AI can now recalculate paths
+[17:08:07.917] DEBUG: Player moved to: 33,21 AI can now recalculate paths
+[17:08:08.091] DEBUG: Player moved to: 34,21 AI can now recalculate paths
+[17:08:08.273] DEBUG: Player moved to: 35,21 AI can now recalculate paths
+[17:08:08.452] DEBUG: Player moved to: 36,21 AI can now recalculate paths
+[17:08:08.749] DEBUG: Player moved to: 36,20 AI can now recalculate paths
+[17:08:08.951] DEBUG: Player moved to: 36,19 AI can now recalculate paths
+[17:08:09.105] DEBUG: Player moved to: 36,18 AI can now recalculate paths
+[17:08:09.235] DEBUG: Player moved to: 36,17 AI can now recalculate paths
+[17:08:09.402] DEBUG: Player moved to: 35,17 AI can now recalculate paths
+[17:08:09.571] DEBUG: Player moved to: 34,17 AI can now recalculate paths
+[17:08:09.751] DEBUG: Player moved to: 33,17 AI can now recalculate paths
+[17:08:09.890] DEBUG: Player moved to: 32,17 AI can now recalculate paths
+[17:08:10.056] DEBUG: Player moved to: 31,17 AI can now recalculate paths
+[17:08:10.202] DEBUG: Player moved to: 30,17 AI can now recalculate paths
+[17:08:10.605] DEBUG: Player moved to: 30,18 AI can now recalculate paths
+[17:08:10.737] DEBUG: Player moved to: 30,19 AI can now recalculate paths
+[17:08:10.873] DEBUG: Player moved to: 30,20 AI can now recalculate paths

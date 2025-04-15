@@ -881,17 +881,13 @@ func (s *RenderSystem) drawItemDetailsView(world *ecs.World, screen *ebiten.Imag
 	s.tileset.DrawString(screen, "ESC: Return to inventory", config.GameScreenWidth+2, config.GameScreenHeight-4, color.RGBA{200, 200, 200, 255})
 	s.tileset.DrawString(screen, "E: Equip item", config.GameScreenWidth+2, config.GameScreenHeight-3, color.RGBA{200, 200, 200, 255})
 	s.tileset.DrawString(screen, "U: Use item", config.GameScreenWidth+2, config.GameScreenHeight-2, color.RGBA{200, 200, 200, 255})
-	s.tileset.DrawString(screen, "←/→: Previous/Next item", config.GameScreenWidth+2, config.GameScreenHeight-1, color.RGBA{200, 200, 200, 255})
+	s.tileset.DrawString(screen, "Up/Down: Previous/Next item", config.GameScreenWidth+2, config.GameScreenHeight-1, color.RGBA{200, 200, 200, 255})
 }
 
 // formatItemEffect formats an item effect in a user-friendly way
 func (s *RenderSystem) formatItemEffect(effect components.ItemEffect) string {
-	// Start with a symbol to indicate the effect type
-	var symbol string
-	var changeSymbol string
-	var valueStr string
-
 	// Set operation symbol
+	var changeSymbol string
 	if effect.Operation == "add" {
 		changeSymbol = "+"
 	} else {
@@ -899,6 +895,7 @@ func (s *RenderSystem) formatItemEffect(effect components.ItemEffect) string {
 	}
 
 	// Convert value to string
+	var valueStr string
 	if value, ok := effect.Value.(float64); ok {
 		valueStr = fmt.Sprintf("%d", int(value))
 	} else if value, ok := effect.Value.(int); ok {
@@ -913,36 +910,8 @@ func (s *RenderSystem) formatItemEffect(effect components.ItemEffect) string {
 		valueStr = fmt.Sprintf("%v", effect.Value)
 	}
 
-	// Format based on component and property
-	switch effect.Component {
-	case "Stats":
-		symbol = "⚔️"
-		switch effect.Property {
-		case "Health", "MaxHealth":
-			return fmt.Sprintf("❤️ %s%s%s Health", effect.Property, changeSymbol, valueStr)
-		case "Attack":
-			return fmt.Sprintf("⚔️ %s%s%s Attack", effect.Property, changeSymbol, valueStr)
-		case "Defense":
-			return fmt.Sprintf("🛡️ %s%s%s Defense", effect.Property, changeSymbol, valueStr)
-		default:
-			return fmt.Sprintf("%s %s%s%s", effect.Property, changeSymbol, valueStr, effect.Component)
-		}
-	case "FOV":
-		symbol = "👁️"
-		switch effect.Property {
-		case "Range":
-			return fmt.Sprintf("👁️ %s%s%s Vision Range", changeSymbol, valueStr, effect.Property)
-		case "LightSource":
-			return fmt.Sprintf("🔦 %s Light Source", valueStr)
-		case "LightRange":
-			return fmt.Sprintf("🔦 %s%s%s Light Range", changeSymbol, valueStr, effect.Property)
-		default:
-			return fmt.Sprintf("%s %s%s%s %s", symbol, effect.Property, changeSymbol, valueStr, effect.Component)
-		}
-	default:
-		symbol = "✨"
-		return fmt.Sprintf("%s %s%s%s %s", symbol, effect.Property, changeSymbol, valueStr, effect.Component)
-	}
+	// Format the effect in a consistent way
+	return fmt.Sprintf("%s %s%s%s", effect.Property, changeSymbol, valueStr, effect.Component)
 }
 
 // drawMessagesPanel draws the message log panel
