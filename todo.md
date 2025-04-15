@@ -1,5 +1,5 @@
 ITEMS:
-[] items should mod stats and affect combat
+[x] items should mod stats and affect combat
 [] fix item spawning properly with a dedicated spawning routine that also figures in dungeon level, loot rarity, dungeon theme
 [] make sure items don't spawn in walls
 [] other components for items? durability? complexity? 
@@ -22,7 +22,7 @@ TRAIN STUFF:
 PROC GEN:
 [] markov chains
 [] wfc maps?
-[] vornoi hives
+[] voronoi hives
 [] overworld sub maps
 
 TILES

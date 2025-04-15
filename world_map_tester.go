@@ -91,6 +91,11 @@ func (g *WorldMapTester) initialize() {
 	g.world.AddComponent(g.worldMap.ID, components.MapType,
 		components.NewMapTypeComponent("worldmap", 0))
 
+	// Add a tag to indicate we're in the world map tester
+	testerEntity := g.world.CreateEntity()
+	testerEntity.AddTag("worldmap_tester")
+	g.world.TagEntity(testerEntity.ID, "worldmap_tester")
+
 	// Get the map component
 	if comp, exists := g.world.GetComponent(g.worldMap.ID, components.MapComponentID); exists {
 		g.mapComp = comp.(*components.MapComponent)

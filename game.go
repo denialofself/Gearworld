@@ -37,6 +37,9 @@ type Game struct {
 	inventorySystem           *systems.InventorySystem
 	equipmentSystem           *systems.EquipmentSystem
 	fovSystem                 *systems.FOVSystem
+	state                     GameState
+	startScreen               *StartScreen
+	audioSystem               *systems.AudioSystem
 }
 
 // NewGame creates a new game instance
@@ -81,6 +84,9 @@ func NewGame() *Game {
 	// Create entity spawner
 	entitySpawner := spawners.NewEntitySpawner(world, templateManager, systems.GetMessageLog().Add)
 
+	// Create audio system first since it needs to be shared
+	audioSystem := systems.NewAudioSystem()
+
 	// Register systems with the world
 	world.AddSystem(mapSystem)
 	world.AddSystem(mapRegistrySystem)
@@ -114,10 +120,11 @@ func NewGame() *Game {
 		inventorySystem:           inventorySystem,
 		equipmentSystem:           equipmentSystem,
 		fovSystem:                 fovSystem,
+		state:                     StateStartScreen,
+		startScreen:               NewStartScreen(audioSystem),
+		audioSystem:               audioSystem,
 	}
 
-	// Initialize the game world
-	game.initialize()
 	// Initialize event listeners
 	movementSystem.Initialize(world)
 	combatSystem.Initialize(world)
@@ -258,6 +265,8 @@ func (g *Game) initialize() {
 
 	// Add welcome message
 	systems.GetMessageLog().Add("Welcome to the dungeon! Use arrow keys to move.")
+	systems.GetMessageLog().AddEnvironment("You awaken in a cracked cryogenic pod, the walls of the pod are covered in frost.")
+	systems.GetMessageLog().AddEnvironment("The chmaber is dimly lit, and something scuttles in the dark")
 }
 
 // Flag to track if we need to redraw the screen
@@ -265,56 +274,67 @@ var needsRedraw = true
 
 // Update updates the game state.
 func (g *Game) Update() error {
-	// Toggle debug message window with F1 key
-	if inpututil.IsKeyJustPressed(ebiten.KeyF1) {
-		g.renderSystem.ToggleDebugWindow()
-		needsRedraw = true
-	}
-
-	// If debug window is active
-	if g.renderSystem.IsDebugWindowActive() {
-		// ESC to close debug window
-		if ebiten.IsKeyPressed(ebiten.KeyEscape) {
+	// Handle different game states
+	switch g.state {
+	case StateStartScreen:
+		// Check if player pressed Enter to start the game
+		if g.startScreen.Update() {
+			g.state = StatePlaying
+			g.audioSystem.StopBGM() // Stop the background music
+			g.initialize()          // Initialize the game world
+		}
+	case StatePlaying:
+		// Toggle debug message window with F1 key
+		if inpututil.IsKeyJustPressed(ebiten.KeyF1) {
 			g.renderSystem.ToggleDebugWindow()
 			needsRedraw = true
 		}
 
-		// Handle scrolling through debug messages with arrow keys
-		if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
-			g.renderSystem.ScrollDebugUp()
-			needsRedraw = true
-		}
-		if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) {
-			g.renderSystem.ScrollDebugDown()
-			needsRedraw = true
-		}
-
-		return nil
-	}
-
-	// Check if the user wants to view the tileset
-	if ebiten.IsKeyPressed(ebiten.KeyF12) {
-		go func() {
-			cmd := exec.Command(os.Args[0], "--view-tileset")
-			err := cmd.Start()
-			if err != nil {
-				systems.GetMessageLog().Add("Error launching tileset viewer: " + err.Error())
+		// If debug window is active
+		if g.renderSystem.IsDebugWindowActive() {
+			// ESC to close debug window
+			if ebiten.IsKeyPressed(ebiten.KeyEscape) {
+				g.renderSystem.ToggleDebugWindow()
 				needsRedraw = true
 			}
-		}()
+
+			// Handle scrolling through debug messages with arrow keys
+			if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
+				g.renderSystem.ScrollDebugUp()
+				needsRedraw = true
+			}
+			if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) {
+				g.renderSystem.ScrollDebugDown()
+				needsRedraw = true
+			}
+
+			return nil
+		}
+
+		// Check if the user wants to view the tileset
+		if ebiten.IsKeyPressed(ebiten.KeyF12) {
+			go func() {
+				cmd := exec.Command(os.Args[0], "--view-tileset")
+				err := cmd.Start()
+				if err != nil {
+					systems.GetMessageLog().Add("Error launching tileset viewer: " + err.Error())
+					needsRedraw = true
+				}
+			}()
+		}
+
+		// Don't process input if a map transition is in progress
+		if g.mapRegistrySystem.IsTransitionInProgress() {
+			systems.GetDebugLog().Add("Update skipped: map transition in progress")
+			return nil
+		}
+
+		// Update all systems - player input will be handled by PlayerTurnProcessorSystem
+		g.world.Update(1.0 / 60.0)
+
+		// Always redraw after updating systems
+		needsRedraw = true
 	}
-
-	// Don't process input if a map transition is in progress
-	if g.mapRegistrySystem.IsTransitionInProgress() {
-		systems.GetDebugLog().Add("Update skipped: map transition in progress")
-		return nil
-	}
-
-	// Update all systems - player input will be handled by PlayerTurnProcessorSystem
-	g.world.Update(1.0 / 60.0)
-
-	// Always redraw after updating systems
-	needsRedraw = true
 
 	return nil
 }
@@ -324,29 +344,35 @@ var cachedScreen *ebiten.Image
 
 // Draw draws the game screen.
 func (g *Game) Draw(screen *ebiten.Image) {
-	// Only redraw if necessary
-	if needsRedraw || cachedScreen == nil {
-		// Create a new buffer image if we don't have one yet
-		if cachedScreen == nil {
-			cachedScreen = ebiten.NewImage(config.ScreenWidth*config.TileSize, config.ScreenHeight*config.TileSize)
+	// Handle different game states
+	switch g.state {
+	case StateStartScreen:
+		g.startScreen.Draw(screen)
+	case StatePlaying:
+		// Only redraw if necessary
+		if needsRedraw || cachedScreen == nil {
+			// Create a new buffer image if we don't have one yet
+			if cachedScreen == nil {
+				cachedScreen = ebiten.NewImage(config.ScreenWidth*config.TileSize, config.ScreenHeight*config.TileSize)
+			}
+
+			// Clear the cached screen before drawing
+			cachedScreen.Clear()
+
+			// Use the render system to draw to our cached image
+			g.renderSystem.Draw(g.world, cachedScreen)
+
+			// Add FPS counter to the cached image
+			ebitenutil.DebugPrintAt(cachedScreen, fmt.Sprintf("FPS: %.1f", ebiten.ActualFPS()), 0, 0)
+
+			// Reset the flag since we've redrawn
+			needsRedraw = false
 		}
 
-		// Clear the cached screen before drawing
-		cachedScreen.Clear()
-
-		// Use the render system to draw to our cached image
-		g.renderSystem.Draw(g.world, cachedScreen)
-
-		// Add FPS counter to the cached image
-		ebitenutil.DebugPrintAt(cachedScreen, fmt.Sprintf("FPS: %.1f", ebiten.ActualFPS()), 0, 0)
-
-		// Reset the flag since we've redrawn
-		needsRedraw = false
+		// Draw the cached screen to the actual screen
+		op := &ebiten.DrawImageOptions{}
+		screen.DrawImage(cachedScreen, op)
 	}
-
-	// Draw the cached screen to the actual screen
-	op := &ebiten.DrawImageOptions{}
-	screen.DrawImage(cachedScreen, op)
 }
 
 // Layout implements ebiten.Game's Layout.

@@ -138,21 +138,14 @@ func (s *RenderSystem) Draw(world *ecs.World, screen *ebiten.Image) {
 	// Clear the screen
 	screen.Fill(color.RGBA{0, 0, 0, 255})
 
-	// Check if we're in world map mode
-	var isWorldMap bool
-	mapEntities := world.GetEntitiesWithTag("map")
-	if len(mapEntities) > 0 {
-		if comp, exists := world.GetComponent(mapEntities[0].ID, components.MapType); exists {
-			mapTypeComp := comp.(*components.MapTypeComponent)
-			isWorldMap = mapTypeComp.MapType == "worldmap"
-		}
-	}
+	// Check if we're in world map tester mode
+	isWorldMapTester := len(world.GetEntitiesWithTag("worldmap_tester")) > 0
 
 	// Draw the game area (map)
 	s.drawGameScreen(world, screen)
 
-	// Only draw UI elements if not in world map mode
-	if !isWorldMap {
+	// Only draw UI elements if not in world map tester mode
+	if !isWorldMapTester {
 		if s.showInventory {
 			s.drawInventoryPanel(world, screen)
 		} else {
@@ -239,13 +232,24 @@ func (s *RenderSystem) drawStandardMap(world *ecs.World, screen *ebiten.Image, m
 
 	// Check if this is a world map (no FOV restrictions)
 	var isWorldMap bool = false
+	var isWorldMapTester bool = false
 	if comp, exists := world.GetComponent(mapID, components.MapType); exists {
 		mapTypeComp := comp.(*components.MapTypeComponent)
 		isWorldMap = mapTypeComp.MapType == "worldmap"
+		// Check if we're in the world map tester by looking for the "worldmap_tester" tag
+		testerEntities := world.GetEntitiesWithTag("worldmap_tester")
+		isWorldMapTester = len(testerEntities) > 0
 	}
 
-	// Get screen dimensions
-	screenWidth, screenHeight := screen.Bounds().Dx()/s.tileset.TileSize, screen.Bounds().Dy()/s.tileset.TileSize
+	// Get screen dimensions - use full screen only for world map tester
+	var screenWidth, screenHeight int
+	if isWorldMap && isWorldMapTester {
+		screenWidth = screen.Bounds().Dx() / s.tileset.TileSize
+		screenHeight = screen.Bounds().Dy() / s.tileset.TileSize
+	} else {
+		screenWidth = config.GameScreenWidth
+		screenHeight = config.GameScreenHeight
+	}
 
 	// Draw map tiles that are visible in the viewport
 	for y := 0; y < screenHeight; y++ {

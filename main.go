@@ -99,8 +99,9 @@ func main() {
 		}
 	}
 
-	// Run the normal game (dungeon mode)
+	// Create the main game instance
 	game := NewGame()
+
 	// Get window size from config
 	windowWidth, windowHeight := config.GetWindowSize()
 	ebiten.SetWindowSize(windowWidth, windowHeight)
