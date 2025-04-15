@@ -1,0 +1,43 @@
+{
+  "id": "wooden_chest",
+  "name": "Wooden Chest",
+  "description": "A sturdy wooden chest that may contain valuable items.",
+  "tile_x": 15,
+  "tile_y": 5,
+  "color": "#8B4513",
+  "capacity": 10,
+  "locked": false,
+  "key_id": "",
+  "initial_items": [
+    {
+      "template_id": "health_potion",
+      "count": 2
+    },
+    {
+      "template_id": "bandage",
+      "count": 1
+    }
+  ],
+  "loot_table": {
+    "entries": [
+      {
+        "template_id": "health_potion",
+        "weight": 30,
+        "min_count": 1,
+        "max_count": 2
+      },
+      {
+        "template_id": "bandage",
+        "weight": 20,
+        "min_count": 1,
+        "max_count": 1
+      },
+      {
+        "template_id": "rusty_spanner",
+        "weight": 10,
+        "min_count": 1,
+        "max_count": 1
+      }
+    ]
+  }
+} 

@@ -40,15 +40,17 @@ type EntityTemplate struct {
 
 // EntityTemplateManager manages all entity templates
 type EntityTemplateManager struct {
-	Templates     map[string]*EntityTemplate
-	ItemTemplates map[string]*ItemTemplate
+	Templates          map[string]*EntityTemplate
+	ItemTemplates      map[string]*ItemTemplate
+	ContainerTemplates map[string]*ContainerTemplate
 }
 
 // NewEntityTemplateManager creates a new template manager
 func NewEntityTemplateManager() *EntityTemplateManager {
 	return &EntityTemplateManager{
-		Templates:     make(map[string]*EntityTemplate),
-		ItemTemplates: make(map[string]*ItemTemplate),
+		Templates:          make(map[string]*EntityTemplate),
+		ItemTemplates:      make(map[string]*ItemTemplate),
+		ContainerTemplates: make(map[string]*ContainerTemplate),
 	}
 }
 
@@ -195,4 +197,89 @@ func ValidateItemTemplate(template *ItemTemplate) error {
 		return fmt.Errorf("item template '%s' missing item_type", template.ID)
 	}
 	return nil
+}
+
+// ContainerTemplate defines a template for creating containers
+type ContainerTemplate struct {
+	ID           string `json:"id"`          // Unique identifier for the container type
+	Name         string `json:"name"`        // Display name
+	Description  string `json:"description"` // Container description
+	TileX        int    `json:"tile_x"`      // X position in the tileset
+	TileY        int    `json:"tile_y"`      // Y position in the tileset
+	Color        string `json:"color"`       // Container color in hex format
+	Capacity     int    `json:"capacity"`    // Maximum number of items
+	Locked       bool   `json:"locked"`      // Whether the container starts locked
+	KeyID        string `json:"key_id"`      // ID of the key that unlocks this container
+	InitialItems []struct {
+		TemplateID string `json:"template_id"` // ID of the item template
+		Count      int    `json:"count"`       // Number of items to create
+	} `json:"initial_items"` // Items that start in the container
+	LootTable struct {
+		Entries []struct {
+			TemplateID string `json:"template_id"` // ID of the item template
+			Weight     int    `json:"weight"`      // Relative chance of dropping
+			MinCount   int    `json:"min_count"`   // Minimum number of items
+			MaxCount   int    `json:"max_count"`   // Maximum number of items
+		} `json:"entries"` // Possible items that can be generated
+	} `json:"loot_table"` // Table for generating random items
+}
+
+// ValidateContainerTemplate ensures that the container template has all required fields
+func ValidateContainerTemplate(template *ContainerTemplate) error {
+	if template.ID == "" {
+		return fmt.Errorf("container template missing ID")
+	}
+	if template.Name == "" {
+		return fmt.Errorf("container template '%s' missing name", template.ID)
+	}
+	return nil
+}
+
+// LoadContainerTemplateFromFile loads a single container template from a JSON file
+func (m *EntityTemplateManager) LoadContainerTemplateFromFile(filePath string) error {
+	data, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return err
+	}
+
+	var template ContainerTemplate
+	if err := json.Unmarshal(data, &template); err != nil {
+		return err
+	}
+
+	// Validate required fields
+	if err := ValidateContainerTemplate(&template); err != nil {
+		return fmt.Errorf("invalid container template in %s: %w", filePath, err)
+	}
+
+	// Add to templates map
+	m.ContainerTemplates[template.ID] = &template
+	return nil
+}
+
+// LoadContainerTemplatesFromDirectory loads all JSON container template files from a directory
+func (m *EntityTemplateManager) LoadContainerTemplatesFromDirectory(dirPath string) error {
+	files, err := ioutil.ReadDir(dirPath)
+	if err != nil {
+		return fmt.Errorf("failed to read container template directory: %w", err)
+	}
+
+	for _, file := range files {
+		if filepath.Ext(file.Name()) != ".json" {
+			continue
+		}
+
+		fullPath := filepath.Join(dirPath, file.Name())
+		if err := m.LoadContainerTemplateFromFile(fullPath); err != nil {
+			return fmt.Errorf("failed to load container template from %s: %w", file.Name(), err)
+		}
+	}
+
+	return nil
+}
+
+// GetContainerTemplate returns a container template by ID
+func (m *EntityTemplateManager) GetContainerTemplate(id string) (*ContainerTemplate, bool) {
+	template, ok := m.ContainerTemplates[id]
+	return template, ok
 }

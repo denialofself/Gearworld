@@ -31,6 +31,7 @@ type Game struct {
 	cameraSystem              *systems.CameraSystem
 	templateManager           *data.EntityTemplateManager
 	entitySpawner             *spawners.EntitySpawner
+	itemSpawner               *spawners.ItemSpawner
 	aiPathfindingSystem       *systems.AIPathfindingSystem
 	aiTurnProcessorSystem     *systems.AITurnProcessorSystem
 	effectsSystem             *systems.EffectsSystem
@@ -40,6 +41,7 @@ type Game struct {
 	state                     GameState
 	startScreen               *StartScreen
 	audioSystem               *systems.AudioSystem
+	containerSystem           *systems.ContainerSystem
 }
 
 // NewGame creates a new game instance
@@ -65,6 +67,7 @@ func NewGame() *Game {
 	inventorySystem := systems.NewInventorySystem()
 	equipmentSystem := systems.NewEquipmentSystem()
 	fovSystem := systems.NewFOVSystem()
+	containerSystem := systems.NewContainerSystem(world)
 
 	// Initialize the entity template manager
 	templateManager := data.NewEntityTemplateManager()
@@ -81,8 +84,17 @@ func NewGame() *Game {
 		fmt.Printf("Warning: Failed to load item templates: %v\n", err)
 	}
 
+	// Load container templates
+	err = templateManager.LoadContainerTemplatesFromDirectory("data/containers")
+	if err != nil {
+		fmt.Printf("Warning: Failed to load container templates: %v\n", err)
+	}
+
 	// Create entity spawner
 	entitySpawner := spawners.NewEntitySpawner(world, templateManager, systems.GetMessageLog().Add)
+
+	// Create item spawner
+	itemSpawner := spawners.NewItemSpawner(world, templateManager)
 
 	// Create audio system first since it needs to be shared
 	audioSystem := systems.NewAudioSystem()
@@ -100,6 +112,7 @@ func NewGame() *Game {
 	world.AddSystem(inventorySystem)
 	world.AddSystem(equipmentSystem)
 	world.AddSystem(fovSystem)
+	world.AddSystem(containerSystem)
 	world.AddSystem(renderSystem) // Render system should be last to see all changes
 
 	// Create the game instance
@@ -114,6 +127,7 @@ func NewGame() *Game {
 		cameraSystem:              cameraSystem,
 		templateManager:           templateManager,
 		entitySpawner:             entitySpawner,
+		itemSpawner:               itemSpawner,
 		aiPathfindingSystem:       aiPathfindingSystem,
 		aiTurnProcessorSystem:     aiTurnProcessorSystem,
 		effectsSystem:             effectsSystem,
@@ -123,6 +137,7 @@ func NewGame() *Game {
 		state:                     StateStartScreen,
 		startScreen:               NewStartScreen(audioSystem),
 		audioSystem:               audioSystem,
+		containerSystem:           containerSystem,
 	}
 
 	// Initialize event listeners
@@ -240,22 +255,10 @@ func (g *Game) initialize() {
 	g.world.AddComponent(playerEntity.ID, components.MapContextID,
 		components.NewMapContextComponent(startingStationEntity.ID))
 
-	// Create test items near the player
-	testItemX, testItemY := playerX+2, playerY
-	// Create items using templates
-	if _, err := g.entitySpawner.CreateItem(testItemX, testItemY, "rusty_spanner"); err != nil {
-		systems.GetMessageLog().Add(fmt.Sprintf("Failed to create rusty spanner: %v", err))
-	}
-	if _, err := g.entitySpawner.CreateItem(testItemX+1, testItemY, "bandage"); err != nil {
-		systems.GetMessageLog().Add(fmt.Sprintf("Failed to create bandage: %v", err))
-	}
-	// Add our new equipment items
-	if _, err := g.entitySpawner.CreateItem(testItemX+1, testItemY+1, "miners_headlamp"); err != nil {
-		systems.GetMessageLog().Add(fmt.Sprintf("Failed to create miner's headlamp: %v", err))
-	}
-	if _, err := g.entitySpawner.CreateItem(testItemX+2, testItemY+1, "tattered_jumpsuit"); err != nil {
-		systems.GetMessageLog().Add(fmt.Sprintf("Failed to create jumpsuit: %v", err))
-	}
+	// Create starter chest next to player
+	chestX, chestY := playerX+1, playerY
+	g.itemSpawner.SetSpawnMapID(startingStationEntity.ID)
+	g.itemSpawner.CreateContainer(chestX, chestY, "starter_chest")
 
 	// Create a camera entity for the player
 	g.entitySpawner.CreateCamera(uint64(playerEntity.ID), playerX, playerY)
@@ -266,7 +269,7 @@ func (g *Game) initialize() {
 	// Add welcome message
 	systems.GetMessageLog().Add("Welcome to the dungeon! Use arrow keys to move.")
 	systems.GetMessageLog().AddEnvironment("You awaken in a cracked cryogenic pod, the walls of the pod are covered in frost.")
-	systems.GetMessageLog().AddEnvironment("The chmaber is dimly lit, and something scuttles in the dark")
+	systems.GetMessageLog().AddEnvironment("The chamber is dimly lit, and something scuttles in the dark")
 }
 
 // Flag to track if we need to redraw the screen

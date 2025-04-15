@@ -41,12 +41,12 @@ func NewStartScreen(audioSystem *systems.AudioSystem) *StartScreen {
 
 		titleImage, _, err = ebitenutil.NewImageFromFile(path)
 		if err == nil {
-			systems.GetDebugLog().Add(fmt.Sprintf("Successfully loaded title screen image: %s", path))
+			systems.GetDebugLog().Add(fmt.Sprintf("Successfully loaded title screen image from filesystem: %s", path))
 			break
 		}
 	}
 
-	// If all formats failed, create a fallback
+	// If all loading attempts failed, create a fallback
 	if err != nil {
 		systems.GetDebugLog().Add("Failed to load title screen image. Tried formats: png, jpg, jpeg, gif")
 		titleImage = ebiten.NewImage(800, 600)

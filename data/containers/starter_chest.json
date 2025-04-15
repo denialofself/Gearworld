@@ -1,0 +1,29 @@
+{
+  "id": "starter_chest",
+  "name": "Starter Chest",
+  "description": "A chest containing essential supplies for your journey.",
+  "tile_x": 1,
+  "tile_y": 9,
+  "color": "#8B4513",
+  "capacity": 10,
+  "locked": false,
+  "key_id": "",
+  "initial_items": [
+    {
+      "template_id": "bandage",
+      "count": 3
+    },
+    {
+      "template_id": "miners_headlamp",
+      "count": 1
+    },
+    {
+      "template_id": "rusty_spanner",
+      "count": 1
+    },
+    {
+      "template_id": "tattered_jumpsuit",
+      "count": 1
+    }
+  ]
+} 

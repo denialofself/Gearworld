@@ -6,9 +6,9 @@
     "tags": ["insect"],
     "exclude_tags": ["undead", "demon", "dragon", "goblinoid", "humanoid"],
     
-    "water_chance": 0.08,
+    "water_chance": 0.20,
     "lava_chance": 0.0,
-    "grass_chance": 0.05,
+    "grass_chance": 0.00,
     "tree_chance": 0.00,
     "special_tiles": [
         {"tile_type": "furniture", "chance": 0.1},

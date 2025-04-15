@@ -297,3 +297,43 @@ func (e *EquipmentComponent) GetAllEffects() []ItemEffect {
 	}
 	return allEffects
 }
+
+// ContainerComponent represents a container that can hold items
+type ContainerComponent struct {
+	Items       []ecs.EntityID
+	MaxCapacity int
+	Locked      bool
+	KeyID       string
+	Looted      bool // Track if the container has been looted
+}
+
+// NewContainerComponent creates a new container component
+func NewContainerComponent(capacity int) *ContainerComponent {
+	return &ContainerComponent{
+		Items:       make([]ecs.EntityID, 0),
+		MaxCapacity: capacity,
+		Locked:      false,
+		KeyID:       "",
+		Looted:      false,
+	}
+}
+
+// AddItem adds an item to the container
+func (c *ContainerComponent) AddItem(itemID ecs.EntityID) bool {
+	if len(c.Items) >= c.MaxCapacity {
+		return false
+	}
+	c.Items = append(c.Items, itemID)
+	return true
+}
+
+// RemoveItem removes an item from the container
+func (c *ContainerComponent) RemoveItem(itemID ecs.EntityID) bool {
+	for i, id := range c.Items {
+		if id == itemID {
+			c.Items = append(c.Items[:i], c.Items[i+1:]...)
+			return true
+		}
+	}
+	return false
+}

@@ -269,14 +269,8 @@ func (g *DungeonGenerator) drawBSPDungeon(node *BSPNode, mapComp *components.Map
 	if node.Room != nil {
 		for y := node.Room.Y; y < node.Room.Y+node.Room.Height; y++ {
 			for x := node.Room.X; x < node.Room.X+node.Room.Width; x++ {
-				// Check bounds to prevent array out of bounds
 				if x >= 0 && x < mapComp.Width && y >= 0 && y < mapComp.Height {
 					mapComp.SetTile(x, y, components.TileFloor)
-
-					// Add grass tiles occasionally (5% chance)
-					if g.rng.Intn(100) < 5 {
-						mapComp.SetTile(x, y, components.TileGrass)
-					}
 				}
 			}
 		}
@@ -615,11 +609,6 @@ func (g *DungeonGenerator) drawRooms(node *BSPNode, mapComp *components.MapCompo
 			for x := node.Room.X; x < node.Room.X+node.Room.Width; x++ {
 				if x >= 0 && x < mapComp.Width && y >= 0 && y < mapComp.Height {
 					mapComp.SetTile(x, y, components.TileFloor)
-
-					// Occasionally add grass for variety (5% chance)
-					if g.rng.Intn(100) < 5 {
-						mapComp.SetTile(x, y, components.TileGrass)
-					}
 				}
 			}
 		}
