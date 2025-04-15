@@ -150,6 +150,7 @@ func NewGame() *Game {
 	equipmentSystem.Initialize(world)
 	fovSystem.Initialize(world)
 	renderSystem.Initialize(world)
+	containerSystem.Initialize(world)
 
 	// Call the map debug function
 	components.DebugWallDetection()

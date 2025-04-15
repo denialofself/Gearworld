@@ -21,6 +21,7 @@ const (
 	EventEquipmentResponse ecs.EventType = "equipment_response"
 	EventCameraUpdate      ecs.EventType = "camera_update"
 	EventInventoryUI       ecs.EventType = "inventory_ui"
+	EventExamine           ecs.EventType = "examine"
 )
 
 // Effect type constants
@@ -281,4 +282,14 @@ type InventoryUIEvent struct {
 // Type returns the event type
 func (e InventoryUIEvent) Type() ecs.EventType {
 	return EventInventoryUI
+}
+
+// ExamineEvent is emitted when an entity is examined
+type ExamineEvent struct {
+	TargetID ecs.EntityID // Entity being examined
+}
+
+// Type returns the event type
+func (e ExamineEvent) Type() ecs.EventType {
+	return EventExamine
 }

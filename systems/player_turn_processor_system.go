@@ -182,6 +182,38 @@ func (s *PlayerTurnProcessorSystem) processPlayerInput(world *ecs.World) bool {
 		return true
 	}
 
+	// Check for examine action (E)
+	if inpututil.IsKeyJustPressed(ebiten.KeyE) {
+		// Get player position
+		posComp, exists := world.GetComponent(playerID, components.Position)
+		if !exists {
+			return false
+		}
+		pos := posComp.(*components.PositionComponent)
+
+		// Check for adjacent containers
+		containerEntities := world.GetEntitiesWithTag("container")
+		for _, container := range containerEntities {
+			containerPos, exists := world.GetComponent(container.ID, components.Position)
+			if !exists {
+				continue
+			}
+			contPos := containerPos.(*components.PositionComponent)
+
+			// Check if player is adjacent to container
+			if s.isAdjacent(pos.X, pos.Y, contPos.X, contPos.Y) {
+				// Emit examine event
+				world.EmitEvent(ExamineEvent{
+					TargetID: container.ID,
+				})
+				GetDebugLog().Add(fmt.Sprintf("Emitted examine event for container at (%d,%d)", contPos.X, contPos.Y))
+				return true // Consume the turn
+			}
+		}
+		GetMessageLog().AddEnvironment("No container nearby to examine.")
+		return true // Consume the turn even if no container found
+	}
+
 	// Check for map transition (stairs) action
 	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
 		// Get the map registry system to handle the map transition
@@ -649,4 +681,11 @@ func (s *PlayerTurnProcessorSystem) ProcessPlayerTurn(world *ecs.World) bool {
 
 	// Return whether an action was taken
 	return actionTaken
+}
+
+// isAdjacent checks if two positions are adjacent (including diagonals)
+func (s *PlayerTurnProcessorSystem) isAdjacent(x1, y1, x2, y2 int) bool {
+	dx := x1 - x2
+	dy := y1 - y2
+	return dx >= -1 && dx <= 1 && dy >= -1 && dy <= 1
 }

@@ -7,9 +7,6 @@ import (
 	"image/color"
 	"log"
 	"strings"
-
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 // ContainerSystem handles container-related logic
@@ -24,43 +21,67 @@ func NewContainerSystem(world *ecs.World) *ContainerSystem {
 	}
 }
 
-// Update handles container interactions
+// Update is called every frame but only processes container interactions during player turns
 func (s *ContainerSystem) Update(world *ecs.World, dt float64) {
-	log.Printf("ContainerSystem Update called")
+	// No processing needed every frame in a turn-based game
+}
 
-	// Get player entity
-	playerEntities := world.GetEntitiesWithTag("player")
-	if len(playerEntities) == 0 {
-		log.Printf("No player entity found")
-		return
+// HandleEvent processes container-related events
+func (s *ContainerSystem) HandleEvent(world *ecs.World, event ecs.Event) {
+	switch e := event.(type) {
+	case ExamineEvent:
+		// Check if the examined entity is a container
+		container := s.world.GetEntity(e.TargetID)
+		if container != nil && container.HasTag("container") {
+			// Get player position
+			playerEntities := s.world.GetEntitiesWithTag("player")
+			if len(playerEntities) == 0 {
+				return
+			}
+			player := playerEntities[0]
+
+			playerPos, exists := s.world.GetComponent(player.ID, components.Position)
+			if !exists {
+				return
+			}
+			pos := playerPos.(*components.PositionComponent)
+
+			// Get container position
+			containerPos, exists := s.world.GetComponent(container.ID, components.Position)
+			if !exists {
+				return
+			}
+			contPos := containerPos.(*components.PositionComponent)
+
+			// Check if player is adjacent to container
+			if s.isAdjacent(pos.X, pos.Y, contPos.X, contPos.Y) {
+				GetDebugLog().Add(fmt.Sprintf("Examining container at (%d,%d)", contPos.X, contPos.Y))
+				s.handleContainerInteraction(container)
+			} else {
+				GetMessageLog().AddEnvironment("You need to be next to the container to examine it.")
+			}
+		}
 	}
-	player := playerEntities[0]
+}
 
-	// Get player position
-	posComp, exists := world.GetComponent(player.ID, components.Position)
-	if !exists {
-		return
-	}
-	pos := posComp.(*components.PositionComponent)
+// checkAdjacentContainers checks if the player is adjacent to any containers at the given position
+func (s *ContainerSystem) checkAdjacentContainers(playerX, playerY int) {
+	// Get all container entities
+	containerEntities := s.world.GetEntitiesWithTag("container")
 
-	// Check for adjacent containers
-	for _, entity := range world.GetEntitiesWithComponent(components.Container) {
-		containerPosComp, exists := world.GetComponent(entity.ID, components.Position)
+	for _, container := range containerEntities {
+		// Get container position
+		posComp, exists := s.world.GetComponent(container.ID, components.Position)
 		if !exists {
 			continue
 		}
-		containerPos := containerPosComp.(*components.PositionComponent)
+		containerPos := posComp.(*components.PositionComponent)
 
-		if s.isAdjacent(pos.X, pos.Y, containerPos.X, containerPos.Y) {
-			// Debug log when player is adjacent to container
-			log.Printf("Player adjacent to container at (%d,%d)", containerPos.X, containerPos.Y)
-
-			// Check for E key press to interact with container
-			if inpututil.IsKeyJustPressed(ebiten.KeyE) {
-				log.Printf("E key pressed, attempting to open container")
-				// Handle container interaction
-				s.handleContainerInteraction(entity)
-			}
+		// Check if player is adjacent to container
+		if s.isAdjacent(playerX, playerY, containerPos.X, containerPos.Y) {
+			GetDebugLog().Add(fmt.Sprintf("Player adjacent to container at (%d,%d)", containerPos.X, containerPos.Y))
+			// Handle container interaction
+			s.handleContainerInteraction(container)
 		}
 	}
 }
@@ -199,4 +220,16 @@ func (s *ContainerSystem) handleItemPickup(container *ecs.Entity) {
 
 	// Log final state
 	GetDebugLog().Add(fmt.Sprintf("Container has %d items after pickup", len(containerData.Items)))
+}
+
+// Initialize sets up event listeners for the container system
+func (s *ContainerSystem) Initialize(world *ecs.World) {
+	// Store world reference
+	s.world = world
+
+	// Subscribe to examine events
+	world.GetEventManager().Subscribe(EventExamine, func(event ecs.Event) {
+		examineEvent := event.(ExamineEvent)
+		s.HandleEvent(world, examineEvent)
+	})
 }

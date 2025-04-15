@@ -1,65 +1,418 @@
-===== DEBUG LOG STARTED AT 2025-04-14 23:49:27 =====
-[23:49:27.479] Successfully loaded title screen image from filesystem: assets/start_screen.png
-[23:49:27.481] Game initialization complete
-[23:49:28.493] DEBUG: Created world map with ID: 2
-[23:49:28.493] REGISTRY: Registered worldmap (Level 0) with ID: 2
-[23:49:28.495] DEBUG: Creating enemy with MapContext ID: 3
-[23:49:28.495] DEBUG: Creating enemy with MapContext ID: 3
-[23:49:28.495] DEBUG: Creating enemy with MapContext ID: 3
-[23:49:28.495] DEBUG: Creating enemy with MapContext ID: 3
-[23:49:28.495] DEBUG: Created dungeon with ID: 3
-[23:49:28.495] REGISTRY: Registered dungeon (Level 1) with ID: 3
-[23:49:28.495] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
-[23:49:28.495] SET ACTIVE MAP: Propagated to MapSystem
-[23:49:28.495] Processing initial item entry: template_id=bandage, count=3
-[23:49:28.495] Successfully added item bandage (ID: 11) to container
-[23:49:28.495] Successfully added item bandage (ID: 12) to container
-[23:49:28.495] Successfully added item bandage (ID: 13) to container
-[23:49:28.495] Processing initial item entry: template_id=miners_headlamp, count=1
-[23:49:28.495] Successfully added item miners_headlamp (ID: 14) to container
-[23:49:28.495] Processing initial item entry: template_id=rusty_spanner, count=1
-[23:49:28.495] Successfully added item rusty_spanner (ID: 15) to container
-[23:49:28.495] Processing initial item entry: template_id=tattered_jumpsuit, count=1
-[23:49:28.495] Successfully added item tattered_jumpsuit (ID: 16) to container
-[23:49:28.495] Created container with 6 items total
-[23:49:28.495] --- MAP SUMMARY ---
-[23:49:28.495] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[23:49:28.495] Map: dungeon (Level 1, ID: 3, Size: 40x30)
-[23:49:28.495] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[23:49:28.495] Active map ID: 3
-[23:49:29.786] Starting item pickup from container
-[23:49:29.786] Container has 6 items before pickup
-[23:49:29.786] Attempting to pick up Bandage (type: first aid, ID: 11)
-[23:49:29.786] Successfully picked up Bandage
-[23:49:29.786] Attempting to pick up Bandage (type: first aid, ID: 12)
-[23:49:29.786] Successfully picked up Bandage
-[23:49:29.786] Attempting to pick up Bandage (type: first aid, ID: 13)
-[23:49:29.786] Successfully picked up Bandage
-[23:49:29.786] Attempting to pick up Miner's Headlamp (type: headgear, ID: 14)
-[23:49:29.786] Successfully picked up Miner's Headlamp
-[23:49:29.786] Attempting to pick up Rusty Spanner (type: weapon, ID: 15)
-[23:49:29.786] Successfully picked up Rusty Spanner
-[23:49:29.786] Attempting to pick up Tattered Jumpsuit (type: armor, ID: 16)
-[23:49:29.786] Successfully picked up Tattered Jumpsuit
-[23:49:29.786] Container has 0 items after pickup
-[23:49:35.469] Equipment change detected: Equipped item 14 in slot head
-[23:49:35.470] Starting item pickup from container
-[23:49:35.470] Container has 0 items before pickup
-[23:49:35.470] Container has 0 items after pickup
-[23:49:36.374] Equipment change detected: Equipped item 15 in slot mainhand
-[23:49:36.374] Starting item pickup from container
-[23:49:36.374] Container has 0 items before pickup
-[23:49:36.374] Container has 0 items after pickup
-[23:49:36.824] Equipment change detected: Equipped item 16 in slot body
-[23:49:36.825] Starting item pickup from container
-[23:49:36.825] Container has 0 items before pickup
-[23:49:36.825] Container has 0 items after pickup
-[23:49:38.987] DEBUG: Player moved to: 18,5 AI can now recalculate paths
-[23:49:39.507] DEBUG: Player moved to: 18,6 AI can now recalculate paths
-[23:49:39.958] DEBUG: Player moved to: 18,7 AI can now recalculate paths
-[23:49:40.188] DEBUG: Player moved to: 17,7 AI can now recalculate paths
-[23:49:40.335] DEBUG: Player moved to: 16,7 AI can now recalculate paths
-[23:49:40.459] DEBUG: Player moved to: 15,7 AI can now recalculate paths
-[23:49:40.605] DEBUG: Player moved to: 14,7 AI can now recalculate paths
-[23:49:40.605] DEBUG: AI turn processor - Next step: 8,8, AP: 6
-[23:49:40.605] DEBUG: AI skipped movement
+===== DEBUG LOG STARTED AT 2025-04-15 16:24:49 =====
+[16:24:50.035] Successfully loaded title screen image from filesystem: assets/start_screen.png
+[16:24:50.037] Game initialization complete
+[16:24:51.435] DEBUG: Created world map with ID: 2
+[16:24:51.435] REGISTRY: Registered worldmap (Level 0) with ID: 2
+[16:24:51.437] DEBUG: Creating enemy with MapContext ID: 3
+[16:24:51.437] DEBUG: Creating enemy with MapContext ID: 3
+[16:24:51.437] DEBUG: Creating enemy with MapContext ID: 3
+[16:24:51.437] DEBUG: Creating enemy with MapContext ID: 3
+[16:24:51.437] DEBUG: Created dungeon with ID: 3
+[16:24:51.437] REGISTRY: Registered dungeon (Level 1) with ID: 3
+[16:24:51.437] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 3)
+[16:24:51.437] SET ACTIVE MAP: Propagated to MapSystem
+[16:24:51.437] Processing initial item entry: template_id=bandage, count=3
+[16:24:51.437] Successfully added item bandage (ID: 11) to container
+[16:24:51.437] Successfully added item bandage (ID: 12) to container
+[16:24:51.437] Successfully added item bandage (ID: 13) to container
+[16:24:51.437] Processing initial item entry: template_id=miners_headlamp, count=1
+[16:24:51.437] Successfully added item miners_headlamp (ID: 14) to container
+[16:24:51.437] Processing initial item entry: template_id=rusty_spanner, count=1
+[16:24:51.437] Successfully added item rusty_spanner (ID: 15) to container
+[16:24:51.437] Processing initial item entry: template_id=tattered_jumpsuit, count=1
+[16:24:51.437] Successfully added item tattered_jumpsuit (ID: 16) to container
+[16:24:51.437] Created container with 6 items total
+[16:24:51.437] --- MAP SUMMARY ---
+[16:24:51.437] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[16:24:51.437] Map: dungeon (Level 1, ID: 3, Size: 40x30)
+[16:24:51.437] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[16:24:51.437] Active map ID: 3
+[16:24:52.108] DEBUG: Player moved to: 25,5 AI can now recalculate paths
+[16:24:52.108] DEBUG: AI turn processor - Next step: 22,13, AP: 6
+[16:24:52.108] DEBUG: AI moved from 21,13 to 22,13 (AP: 4)
+[16:24:52.274] DEBUG: Player moved to: 24,5 AI can now recalculate paths
+[16:24:52.274] DEBUG: AI turn processor - Next step: 22,12, AP: 4
+[16:24:52.274] DEBUG: AI moved from 22,13 to 22,12 (AP: 2)
+[16:24:52.420] DEBUG: Player moved to: 23,5 AI can now recalculate paths
+[16:24:52.420] DEBUG: AI turn processor - Next step: 23,12, AP: 2
+[16:24:52.420] DEBUG: AI skipped movement
+[16:24:52.559] DEBUG: Player moved to: 22,5 AI can now recalculate paths
+[16:24:52.559] DEBUG: AI turn processor - Next step: 22,11, AP: 1
+[16:24:52.559] DEBUG: AI waiting (AP: 0)
+[16:24:52.739] DEBUG: Player moved to: 21,5 AI can now recalculate paths
+[16:24:52.739] DEBUG: AI turn processor - Next step: 21,12, AP: 0
+[16:24:52.739] DEBUG: AI recovering 3 points (AP: 3)
+[16:24:52.901] DEBUG: Player moved to: 21,4 AI can now recalculate paths
+[16:24:52.901] DEBUG: AI turn processor - Next step: 21,12, AP: 3
+[16:24:52.901] DEBUG: AI moved from 22,12 to 21,12 (AP: 1)
+[16:24:53.108] DEBUG: Player moved to: 21,3 AI can now recalculate paths
+[16:24:53.108] DEBUG: AI turn processor - Next step: 21,11, AP: 1
+[16:24:53.108] DEBUG: AI waiting (AP: 0)
+[16:24:53.240] DEBUG: Player moved to: 21,2 AI can now recalculate paths
+[16:24:53.240] DEBUG: AI turn processor - Next step: 21,11, AP: 0
+[16:24:53.240] DEBUG: AI recovering 3 points (AP: 3)
+[16:24:53.872] DEBUG: Player moved to: 21,3 AI can now recalculate paths
+[16:24:53.872] DEBUG: AI turn processor - Next step: 21,11, AP: 3
+[16:24:53.872] DEBUG: AI moved from 21,12 to 21,11 (AP: 1)
+[16:24:54.038] DEBUG: Player moved to: 21,4 AI can now recalculate paths
+[16:24:54.038] DEBUG: AI turn processor - Next step: 21,10, AP: 1
+[16:24:54.038] DEBUG: AI waiting (AP: 0)
+[16:24:54.205] DEBUG: Player moved to: 21,5 AI can now recalculate paths
+[16:24:54.205] DEBUG: AI turn processor - Next step: 21,10, AP: 0
+[16:24:54.205] DEBUG: AI recovering 3 points (AP: 3)
+[16:24:54.337] DEBUG: Player moved to: 21,6 AI can now recalculate paths
+[16:24:54.338] DEBUG: AI turn processor - Next step: 21,10, AP: 3
+[16:24:54.338] DEBUG: AI moved from 21,11 to 21,10 (AP: 1)
+[16:24:54.490] DEBUG: Player moved to: 21,7 AI can now recalculate paths
+[16:24:54.490] DEBUG: AI turn processor - Next step: 21,9, AP: 1
+[16:24:54.490] DEBUG: AI waiting (AP: 0)
+[16:24:54.622] DEBUG: Player moved to: 21,8 AI can now recalculate paths
+[16:24:54.622] DEBUG: AI turn processor - Next step: 21,9, AP: 0
+[16:24:54.622] DEBUG: AI recovering 3 points (AP: 3)
+[16:24:54.803] DEBUG: Player moved to: 21,9 AI can now recalculate paths
+[16:24:54.803] DEBUG: AI attacked player (AP: 0)
+[16:24:55.769] DEBUG: Player moved to: 21,8 AI can now recalculate paths
+[16:24:55.935] DEBUG: Player moved to: 20,8 AI can now recalculate paths
+[16:24:56.207] DEBUG: Player moved to: 19,8 AI can now recalculate paths
+[16:24:56.325] DEBUG: Player moved to: 18,8 AI can now recalculate paths
+[16:24:56.436] DEBUG: Player moved to: 17,8 AI can now recalculate paths
+[16:24:56.554] DEBUG: Player moved to: 16,8 AI can now recalculate paths
+[16:24:56.672] DEBUG: Player moved to: 15,8 AI can now recalculate paths
+[16:24:56.791] DEBUG: Player moved to: 14,8 AI can now recalculate paths
+[16:24:57.054] DEBUG: Player moved to: 14,7 AI can now recalculate paths
+[16:24:57.271] DEBUG: Player moved to: 14,6 AI can now recalculate paths
+[16:24:57.409] DEBUG: Player moved to: 14,5 AI can now recalculate paths
+[16:24:57.555] DEBUG: Player moved to: 14,4 AI can now recalculate paths
+[16:24:57.722] DEBUG: Player moved to: 14,3 AI can now recalculate paths
+[16:24:57.972] DEBUG: Player moved to: 13,3 AI can now recalculate paths
+[16:24:58.237] DEBUG: Player moved to: 12,3 AI can now recalculate paths
+[16:24:58.354] DEBUG: Player moved to: 11,3 AI can now recalculate paths
+[16:24:58.354] DEBUG: AI turn processor - Next step: 4,3, AP: 6
+[16:24:58.354] DEBUG: AI moved from 3,3 to 4,3 (AP: 4)
+[16:24:58.472] DEBUG: Player moved to: 10,3 AI can now recalculate paths
+[16:24:58.472] DEBUG: AI turn processor - Next step: 5,3, AP: 4
+[16:24:58.472] DEBUG: AI moved from 4,3 to 5,3 (AP: 2)
+[16:24:58.591] DEBUG: Player moved to: 9,3 AI can now recalculate paths
+[16:24:58.591] DEBUG: AI turn processor - Next step: 6,3, AP: 2
+[16:24:58.591] DEBUG: AI moved from 5,3 to 6,3 (AP: 0)
+[16:24:58.704] DEBUG: Player moved to: 8,3 AI can now recalculate paths
+[16:24:58.704] DEBUG: AI turn processor - Next step: 7,3, AP: 0
+[16:24:58.704] DEBUG: AI recovering 3 points (AP: 3)
+[16:24:58.821] DEBUG: Player moved to: 7,3 AI can now recalculate paths
+[16:24:58.821] DEBUG: AI attacked player (AP: 0)
+[16:24:59.056] DEBUG: Player moved to: 6,3 AI can now recalculate paths
+[16:24:59.174] DEBUG: Player moved to: 5,3 AI can now recalculate paths
+[16:24:59.286] DEBUG: Player moved to: 4,3 AI can now recalculate paths
+[16:24:59.404] DEBUG: Player moved to: 3,3 AI can now recalculate paths
+[16:24:59.656] DEBUG: Player moved to: 3,2 AI can now recalculate paths
+[16:24:59.854] DEBUG: Player moved to: 3,1 AI can now recalculate paths
+[16:24:59.974] DEBUG: Player moved to: 2,1 AI can now recalculate paths
+[16:25:00.204] TRANSITION TRIGGERED: Player at (2,1) on tile type 4 pressed ENTER
+[16:25:00.205] =====================================
+[16:25:00.205] TRANSITION: STARTING MAP TRANSITION
+[16:25:00.205] =====================================
+[16:25:00.205] TRANSITION DEBUG: Current active map: ID=3 Type=dungeon Level=1
+[16:25:00.205] TRANSITION DEBUG: Player map context before transition: 3
+[16:25:00.205] TRANSITION START: From dungeon (Level 1, ID: 3)
+[16:25:00.206] TRANSITION TARGET: Going from dungeon to worldmap (ID: 2)
+[16:25:00.206] TRANSITION DEBUG: Target map details: ID=2 Type=worldmap Level=0
+[16:25:00.206] Transitioning to world map
+[16:25:00.206] TRANSITION: Positioning player at railway station (100,100) on world map
+[16:25:00.206] TRANSITION: Player target position on new map: 100,100
+[16:25:00.206] =============================================
+[16:25:00.206] TRANSITION STEP 1: Setting active map
+[16:25:00.206] SET ACTIVE MAP: Setting active map to worldmap (Level 0, ID: 2)
+[16:25:00.206] SET ACTIVE MAP: Propagated to MapSystem
+[16:25:00.206] TRANSITION DEBUG: Changed active map from 3 to 2
+[16:25:00.206] TRANSITION STEP 2: Updating player's map context
+[16:25:00.206] TRANSITION DEBUG: Updated player entity 9 map context from 3 to 2
+[16:25:00.206] TRANSITION STEP 3: Updating player position
+[16:25:00.206] TRANSITION DEBUG: Updated player position from (2,1) to (100,100)
+[16:25:00.206] TRANSITION STEP 4: Updating camera position
+[16:25:00.206] Camera position updated to (75,80) for map 2
+[16:25:00.206] TRANSITION COMPLETE: Player now on world map
+[16:25:00.206] TRANSITION: Reset AI pathfinding turn flag to prevent immediate AI turn
+[16:25:00.206] TRANSITION VERIFICATION:
+[16:25:00.206] - Player map context ID: 2
+[16:25:00.206]   OK: Player map context matches target map
+[16:25:00.206] - Active map ID: 2
+[16:25:00.206]   OK: Active map matches target map
+[16:25:00.206] - Player position: (100,100)
+[16:25:00.206]   OK: Player position matches target position
+[16:25:00.206] =====================================
+[16:25:00.206] TRANSITION: COMPLETED MAP TRANSITION
+[16:25:00.206] =====================================
+[16:25:00.207] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.207] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.207] DEBUG: Rendered 1 entities on world map
+[16:25:00.221] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.221] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.221] DEBUG: Rendered 1 entities on world map
+[16:25:00.238] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.239] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.239] DEBUG: Rendered 1 entities on world map
+[16:25:00.259] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.259] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.259] DEBUG: Rendered 1 entities on world map
+[16:25:00.275] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.275] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.275] DEBUG: Rendered 1 entities on world map
+[16:25:00.288] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.288] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.288] DEBUG: Rendered 1 entities on world map
+[16:25:00.308] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.308] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.308] DEBUG: Rendered 1 entities on world map
+[16:25:00.321] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.321] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.321] DEBUG: Rendered 1 entities on world map
+[16:25:00.343] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.343] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.343] DEBUG: Rendered 1 entities on world map
+[16:25:00.356] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.356] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.356] DEBUG: Rendered 1 entities on world map
+[16:25:00.371] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.371] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.371] DEBUG: Rendered 1 entities on world map
+[16:25:00.391] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.391] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.391] DEBUG: Rendered 1 entities on world map
+[16:25:00.405] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.405] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.405] DEBUG: Rendered 1 entities on world map
+[16:25:00.426] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.426] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.426] DEBUG: Rendered 1 entities on world map
+[16:25:00.440] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.440] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.440] DEBUG: Rendered 1 entities on world map
+[16:25:00.454] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.454] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.454] DEBUG: Rendered 1 entities on world map
+[16:25:00.474] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.474] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.474] DEBUG: Rendered 1 entities on world map
+[16:25:00.488] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.488] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.488] DEBUG: Rendered 1 entities on world map
+[16:25:00.509] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.509] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.509] DEBUG: Rendered 1 entities on world map
+[16:25:00.523] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.523] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.523] DEBUG: Rendered 1 entities on world map
+[16:25:00.537] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.537] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.537] DEBUG: Rendered 1 entities on world map
+[16:25:00.558] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.558] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.558] DEBUG: Rendered 1 entities on world map
+[16:25:00.572] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.572] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.572] DEBUG: Rendered 1 entities on world map
+[16:25:00.587] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.587] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.587] DEBUG: Rendered 1 entities on world map
+[16:25:00.606] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.606] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.606] DEBUG: Rendered 1 entities on world map
+[16:25:00.621] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.622] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.622] DEBUG: Rendered 1 entities on world map
+[16:25:00.641] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.641] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.641] DEBUG: Rendered 1 entities on world map
+[16:25:00.656] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.656] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.656] DEBUG: Rendered 1 entities on world map
+[16:25:00.670] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.670] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.670] DEBUG: Rendered 1 entities on world map
+[16:25:00.690] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.690] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.690] DEBUG: Rendered 1 entities on world map
+[16:25:00.704] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.704] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.704] DEBUG: Rendered 1 entities on world map
+[16:25:00.724] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.724] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.724] DEBUG: Rendered 1 entities on world map
+[16:25:00.741] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.741] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.741] DEBUG: Rendered 1 entities on world map
+[16:25:00.754] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.754] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.754] DEBUG: Rendered 1 entities on world map
+[16:25:00.775] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.775] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.775] DEBUG: Rendered 1 entities on world map
+[16:25:00.788] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.788] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.788] DEBUG: Rendered 1 entities on world map
+[16:25:00.809] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.809] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.809] DEBUG: Rendered 1 entities on world map
+[16:25:00.822] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.822] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.822] DEBUG: Rendered 1 entities on world map
+[16:25:00.837] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.837] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.837] DEBUG: Rendered 1 entities on world map
+[16:25:00.859] DEBUG: Player moved to: 99,100 AI can now recalculate paths
+[16:25:00.865] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.865] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.865] DEBUG: Rendered 1 entities on world map
+[16:25:00.873] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.873] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.873] DEBUG: Rendered 1 entities on world map
+[16:25:00.891] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.892] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.892] DEBUG: Rendered 1 entities on world map
+[16:25:00.906] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.906] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.906] DEBUG: Rendered 1 entities on world map
+[16:25:00.926] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.926] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.926] DEBUG: Rendered 1 entities on world map
+[16:25:00.940] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.940] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.940] DEBUG: Rendered 1 entities on world map
+[16:25:00.955] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.955] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.955] DEBUG: Rendered 1 entities on world map
+[16:25:00.982] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.982] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.982] DEBUG: Rendered 1 entities on world map
+[16:25:00.990] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.990] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:00.990] DEBUG: Rendered 1 entities on world map
+[16:25:01.004] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.004] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.004] DEBUG: Rendered 1 entities on world map
+[16:25:01.023] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.023] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.023] DEBUG: Rendered 1 entities on world map
+[16:25:01.038] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.038] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.038] DEBUG: Rendered 1 entities on world map
+[16:25:01.058] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.058] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.058] DEBUG: Rendered 1 entities on world map
+[16:25:01.074] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.074] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.074] DEBUG: Rendered 1 entities on world map
+[16:25:01.087] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.087] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.087] DEBUG: Rendered 1 entities on world map
+[16:25:01.107] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.107] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.107] DEBUG: Rendered 1 entities on world map
+[16:25:01.122] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.122] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.122] DEBUG: Rendered 1 entities on world map
+[16:25:01.142] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.142] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.142] DEBUG: Rendered 1 entities on world map
+[16:25:01.156] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.156] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.156] DEBUG: Rendered 1 entities on world map
+[16:25:01.170] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.170] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.170] DEBUG: Rendered 1 entities on world map
+[16:25:01.191] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.191] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.191] DEBUG: Rendered 1 entities on world map
+[16:25:01.205] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.205] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.205] DEBUG: Rendered 1 entities on world map
+[16:25:01.225] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.225] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.225] DEBUG: Rendered 1 entities on world map
+[16:25:01.239] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.239] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.239] DEBUG: Rendered 1 entities on world map
+[16:25:01.254] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.254] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.254] DEBUG: Rendered 1 entities on world map
+[16:25:01.275] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.275] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.275] DEBUG: Rendered 1 entities on world map
+[16:25:01.294] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.294] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.294] DEBUG: Rendered 1 entities on world map
+[16:25:01.304] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.304] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.304] DEBUG: Rendered 1 entities on world map
+[16:25:01.323] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.323] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.323] DEBUG: Rendered 1 entities on world map
+[16:25:01.337] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.337] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.337] DEBUG: Rendered 1 entities on world map
+[16:25:01.358] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.358] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.358] DEBUG: Rendered 1 entities on world map
+[16:25:01.372] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.372] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.372] DEBUG: Rendered 1 entities on world map
+[16:25:01.394] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.394] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.394] DEBUG: Rendered 1 entities on world map
+[16:25:01.406] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.406] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.406] DEBUG: Rendered 1 entities on world map
+[16:25:01.421] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.421] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.421] DEBUG: Rendered 1 entities on world map
+[16:25:01.441] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.441] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.441] DEBUG: Rendered 1 entities on world map
+[16:25:01.455] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.455] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.455] DEBUG: Rendered 1 entities on world map
+[16:25:01.476] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.476] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.476] DEBUG: Rendered 1 entities on world map
+[16:25:01.491] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.491] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.491] DEBUG: Rendered 1 entities on world map
+[16:25:01.504] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.504] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.504] DEBUG: Rendered 1 entities on world map
+[16:25:01.524] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.524] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.524] DEBUG: Rendered 1 entities on world map
+[16:25:01.538] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.538] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.538] DEBUG: Rendered 1 entities on world map
+[16:25:01.559] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.559] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.559] DEBUG: Rendered 1 entities on world map
+[16:25:01.574] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.574] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.574] DEBUG: Rendered 1 entities on world map
+[16:25:01.587] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.587] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.587] DEBUG: Rendered 1 entities on world map
+[16:25:01.607] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.607] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.607] DEBUG: Rendered 1 entities on world map
+[16:25:01.622] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.622] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.622] DEBUG: Rendered 1 entities on world map
+[16:25:01.642] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.642] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.642] DEBUG: Rendered 1 entities on world map
+[16:25:01.657] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.657] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.657] DEBUG: Rendered 1 entities on world map
+[16:25:01.671] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.671] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.671] DEBUG: Rendered 1 entities on world map
+[16:25:01.690] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.691] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.691] DEBUG: Rendered 1 entities on world map
+[16:25:01.704] DEBUG: Enemy 'Scavenger Beetle' (ID: 7) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.704] DEBUG: Enemy 'Scavenger Beetle' (ID: 6) not rendered - wrong map context: 3 vs active: 2
+[16:25:01.704] DEBUG: Rendered 1 entities on world map

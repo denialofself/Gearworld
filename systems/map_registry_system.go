@@ -29,16 +29,57 @@ func NewMapRegistrySystem() *MapRegistrySystem {
 
 // Initialize sets up the map registry system
 func (s *MapRegistrySystem) Initialize(world *ecs.World) {
-	s.world = world
-}
-
-// Update checks for map transitions and handles them
-func (s *MapRegistrySystem) Update(world *ecs.World, dt float64) {
 	// Store world reference
 	s.world = world
 
-	// Check for map transition events
-	s.handleMapTransitions(world)
+	// Subscribe to examine events
+	world.GetEventManager().Subscribe(EventExamine, func(event ecs.Event) {
+		examineEvent := event.(ExamineEvent)
+		s.HandleEvent(world, examineEvent)
+	})
+}
+
+// Update is called every frame but only processes transitions during player turns
+func (s *MapRegistrySystem) Update(world *ecs.World, dt float64) {
+	// No processing needed every frame in a turn-based game
+}
+
+// HandleEvent processes map transition events
+func (s *MapRegistrySystem) HandleEvent(world *ecs.World, event ecs.Event) {
+	switch e := event.(type) {
+	case ExamineEvent:
+		// Check if the examined entity is stairs
+		entity := s.world.GetEntity(e.TargetID)
+		if entity != nil && entity.HasTag("stairs") {
+			// Get player position
+			playerEntities := s.world.GetEntitiesWithTag("player")
+			if len(playerEntities) == 0 {
+				return
+			}
+			player := playerEntities[0]
+
+			playerPos, exists := s.world.GetComponent(player.ID, components.Position)
+			if !exists {
+				return
+			}
+			pos := playerPos.(*components.PositionComponent)
+
+			// Get stairs position
+			stairsPos, exists := s.world.GetComponent(entity.ID, components.Position)
+			if !exists {
+				return
+			}
+			stPos := stairsPos.(*components.PositionComponent)
+
+			// Check if player is on the stairs
+			if pos.X == stPos.X && pos.Y == stPos.Y {
+				GetDebugLog().Add(fmt.Sprintf("Player examining stairs at (%d,%d)", stPos.X, stPos.Y))
+				s.handleMapTransitions(world)
+			} else {
+				GetMessageLog().AddEnvironment("You need to be on the stairs to use them.")
+			}
+		}
+	}
 }
 
 // RegisterMap adds a map to the registry or replaces an existing one
