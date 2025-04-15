@@ -536,12 +536,13 @@ func (s *RenderSystem) drawStatsPanel(world *ecs.World, screen *ebiten.Image) {
 		filledWidth := int(float64(healthBarWidth) * healthPercentage)
 
 		// Draw the filled portion of the bar
+		tileID := NewTileID(12, 13)
 		for x := 0; x < filledWidth; x++ {
-			s.tileset.DrawTile(screen, '█', config.GameScreenWidth+2+x, 7, color.RGBA{200, 0, 0, 255})
+			s.tileset.DrawTileByID(screen, tileID, config.GameScreenWidth+2+x, 7, color.RGBA{200, 0, 0, 255})
 		}
-		// Draw the empty portion of the bar
+		// Draw the dark portion of the bar
 		for x := filledWidth; x < healthBarWidth; x++ {
-			s.tileset.DrawTile(screen, '░', config.GameScreenWidth+2+x, 7, color.RGBA{100, 0, 0, 255})
+			s.tileset.DrawTileByID(screen, tileID, config.GameScreenWidth+2+x, 7, color.RGBA{100, 0, 0, 255})
 		}
 
 		// Other stats
@@ -726,7 +727,8 @@ func (s *RenderSystem) drawInventoryListView(world *ecs.World, screen *ebiten.Im
 				// Highlight the selected item
 				itemColor = color.RGBA{255, 255, 100, 255}
 				// Draw a selection indicator
-				s.tileset.DrawTile(screen, '►', config.GameScreenWidth+1, 6+i, itemColor)
+				arrowTileID := NewTileID(0, 1)
+				s.tileset.DrawTileByID(screen, arrowTileID, config.GameScreenWidth+1, 6+i, itemColor)
 			}
 
 			s.tileset.DrawString(screen,
@@ -741,7 +743,7 @@ func (s *RenderSystem) drawInventoryListView(world *ecs.World, screen *ebiten.Im
 	}
 	s.tileset.DrawString(screen, "CONTROLS", config.GameScreenWidth+2, config.GameScreenHeight-5, color.RGBA{255, 230, 150, 255})
 	s.tileset.DrawString(screen, "I/ESC: Close inventory", config.GameScreenWidth+2, config.GameScreenHeight-4, color.RGBA{200, 200, 200, 255})
-	s.tileset.DrawString(screen, "↑/↓: Navigate items", config.GameScreenWidth+2, config.GameScreenHeight-3, color.RGBA{200, 200, 200, 255})
+	s.tileset.DrawString(screen, "Up/Down: Navigate items", config.GameScreenWidth+2, config.GameScreenHeight-3, color.RGBA{200, 200, 200, 255})
 	s.tileset.DrawString(screen, "Enter: View details", config.GameScreenWidth+2, config.GameScreenHeight-2, color.RGBA{200, 200, 200, 255})
 	s.tileset.DrawString(screen, "E: Equip item, U: Use item", config.GameScreenWidth+2, config.GameScreenHeight-1, color.RGBA{200, 200, 200, 255})
 }

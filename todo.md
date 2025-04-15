@@ -29,6 +29,8 @@ TILES
 [] look at a better index system for tile types
 
 SYSTEMS:
+[x] containers
+[] multi-level dungeons, track floor, save floor state
 [] player stamina costs and its effects
 [] player skills?
 [] ranged combat
@@ -40,7 +42,8 @@ SYSTEMS:
 [] standardize using RBGA or hex color codes
 
 UI:
-[] start screen
+[x] start screen
 [] death screen
-
+[x] basic bgm for start screen
+[] fix the icons for player health, status etc
 
