@@ -2,6 +2,11 @@ package ecs
 
 import "sync/atomic"
 
+// ResetEntityID resets the global entity ID counter
+func ResetEntityID() {
+	atomic.StoreUint64(&nextEntityID, 0)
+}
+
 // EntityID is a unique identifier for an entity
 type EntityID uint64
 

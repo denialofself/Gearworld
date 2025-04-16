@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 
 	"ebiten-rogue/components"
 	"ebiten-rogue/config"
@@ -210,6 +211,43 @@ func (g *Game) Update() error {
 				return ebiten.Termination
 			}
 		}
+	case *screens.GameScreen:
+		// Check for game over event
+		g.world.GetEventManager().Subscribe(systems.EventGameOver, func(event ecs.Event) {
+			// Pop the game screen and push the game over screen
+			g.screenStack.Pop()
+			g.screenStack.Push(screens.NewGameOverScreen())
+		})
+	case *screens.GameOverScreen:
+		// Return to start screen on Escape key
+		if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+			// Stop any background music
+			g.audioSystem.StopBGM()
+
+			// Log current state before cleanup
+			systems.GetDebugLog().Add("=== GAME OVER CLEANUP START ===")
+			activeMap := g.mapRegistrySystem.GetActiveMap()
+			if activeMap != nil {
+				systems.GetDebugLog().Add(fmt.Sprintf("Current active map ID: %d", activeMap.ID))
+			} else {
+				systems.GetDebugLog().Add("No active map")
+			}
+
+			// Clear the map registry
+			g.mapRegistrySystem.Clear()
+			systems.GetDebugLog().Add("Map registry cleared")
+
+			// Reinitialize the game
+			systems.GetDebugLog().Add("Reinitializing game...")
+			g.initialize()
+			systems.GetDebugLog().Add("Game reinitialized")
+
+			// Pop the game over screen and push the start screen
+			systems.GetDebugLog().Add("Popping game over screen and pushing start screen")
+			g.screenStack.Pop()
+			g.screenStack.Push(screens.NewStartScreen(g.audioSystem))
+			systems.GetDebugLog().Add("=== GAME OVER CLEANUP COMPLETE ===")
+		}
 	}
 
 	// Update the current screen
@@ -228,6 +266,21 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 // initialize sets up the initial game state
 func (g *Game) initialize() {
+	// Clear the world and map registry
+	systems.GetDebugLog().Add("Clearing world and map registry...")
+
+	// Reset the entity ID counter
+	ecs.ResetEntityID()
+
+	// Remove all entities from the world
+	entities := g.world.GetAllEntities()
+	for _, entity := range entities {
+		g.world.RemoveEntity(entity.ID)
+	}
+
+	g.mapRegistrySystem.Clear()
+	systems.GetDebugLog().Add("World and map registry cleared")
+
 	// Create the tile mapping entity
 	g.entitySpawner.CreateTileMapping()
 
@@ -249,7 +302,7 @@ func (g *Game) initialize() {
 		components.NewMapTypeComponent("worldmap", 0))
 
 	// Log the world map entity ID for debugging
-	systems.GetMessageLog().Add(fmt.Sprintf("DEBUG: Created world map with ID: %d", worldMapEntity.ID))
+	systems.GetDebugLog().Add(fmt.Sprintf("Created world map with ID: %d", worldMapEntity.ID))
 
 	// Register the world map with the map registry
 	g.mapRegistrySystem.RegisterMap(worldMapEntity)
@@ -268,9 +321,9 @@ func (g *Game) initialize() {
 	// Load dungeon themes from JSON files
 	err := dungeonThemer.LoadThemesFromDirectory("data/themes")
 	if err != nil {
-		systems.GetMessageLog().Add(fmt.Sprintf("WARNING: Failed to load dungeon themes: %v", err))
+		systems.GetDebugLog().Add(fmt.Sprintf("WARNING: Failed to load dungeon themes: %v", err))
 	} else {
-		systems.GetMessageLog().Add("Successfully loaded dungeon themes from data/themes")
+		systems.GetDebugLog().Add("Successfully loaded dungeon themes from data/themes")
 	}
 
 	// Configure the dungeon (level 1, abandoned theme, large size)
@@ -292,7 +345,7 @@ func (g *Game) initialize() {
 	}
 
 	// Log the dungeon entity ID for debugging
-	systems.GetMessageLog().Add(fmt.Sprintf("DEBUG: Created dungeon with ID: %d", startingStationEntity.ID))
+	systems.GetDebugLog().Add(fmt.Sprintf("Created dungeon with ID: %d", startingStationEntity.ID))
 
 	// Register the dungeon with the map registry
 	g.mapRegistrySystem.RegisterMap(startingStationEntity)
@@ -304,13 +357,14 @@ func (g *Game) initialize() {
 	}
 
 	if mapComp == nil {
-		systems.GetMessageLog().Add("Error: Failed to get map component")
+		systems.GetDebugLog().Add("Error: Failed to get map component")
 		return
 	}
 
 	// We'll start in the dungeon
 	// Set the active map in the map registry system
 	g.mapRegistrySystem.SetActiveMap(startingStationEntity)
+	systems.GetDebugLog().Add(fmt.Sprintf("Set active map to dungeon with ID: %d", startingStationEntity.ID))
 
 	// Find empty position for player
 	playerX, playerY := g.mapSystem.FindEmptyPosition(mapComp)

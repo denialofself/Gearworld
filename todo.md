@@ -9,6 +9,11 @@ CRAFTING:
 [] resources, skills, cost, durability?
 [] fixing the railways
 [] fixing the train
+[] skills?
+    [] alchemy
+    [] harvesting
+    [] tinkering
+    [] cybernetics?
 
 MAP GEN:
 [] fix the bsp wall smoothing
@@ -32,18 +37,34 @@ SYSTEMS:
 [x] containers
 [] multi-level dungeons, track floor, save floor state
 [] player stamina costs and its effects
+    [] action points and cost
+    [] speed, weapon speed
 [] player skills?
-[] ranged combat
+    [] combat skills
+    [] crafting skills
+    [] special abilities
+    [] classes? classless?
+    [] player stats expansion (str, agi, end, int, will)
+[] combat overhaul
+    [] missing
+    [] enemy abilities
+    [] combat ai versus movement ai    
+    [] ranged combat
+    [] reloading
+    [] enemy mutation system
 [] light sfx?
-[] using items
+[x] using items
 [] saving / loading
-[] handle player death
-[] handle monster death - loot tables?
+[x] handle player death
+[x] basic handle monster death 
+    [] loot tables?
+    [] blood splatter
+    [] corpses
 [] standardize using RBGA or hex color codes
 
 UI:
 [x] start screen
-[] death screen
+[x] death screen
 [x] basic bgm for start screen
-[] fix the icons for player health, status etc
+[x] fix the icons for player health, status etc
 

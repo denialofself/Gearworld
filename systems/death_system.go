@@ -40,9 +40,10 @@ func (s *DeathSystem) handleDeath(world *ecs.World, event DeathEvent) {
 	// Log the death
 	GetMessageLog().AddAlert(fmt.Sprintf("%s was killed by %s!", entityName, killerName))
 
-	// If the player died, log a special message
+	// If the player died, emit game over event
 	if isPlayer(world, event.EntityID) {
 		GetMessageLog().AddAlert("Game Over! You were defeated.")
+		world.GetEventManager().Emit(GameOverEvent{PlayerID: event.EntityID})
 	} else if isPlayer(world, event.KillerID) {
 		// Player killed something - check for XP gain
 		if monsterStatsComp, hasMonsterStats := world.GetComponent(event.EntityID, components.Stats); hasMonsterStats {

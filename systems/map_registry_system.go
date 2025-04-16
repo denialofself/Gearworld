@@ -717,3 +717,13 @@ func (s *MapRegistrySystem) updateCameraPosition(world *ecs.World, x, y int) {
 func (s *MapRegistrySystem) IsTransitionInProgress() bool {
 	return s.transitionInProgress
 }
+
+// Clear resets the map registry state
+func (s *MapRegistrySystem) Clear() {
+	// Create a new empty map to replace the old one
+	s.maps = make(map[string][]*ecs.Entity)
+	s.activeMapID = 0
+	s.lastMapID = 0
+	s.lastPosition = nil
+	s.transitionInProgress = false
+}

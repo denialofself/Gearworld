@@ -22,6 +22,7 @@ const (
 	EventCameraUpdate      ecs.EventType = "camera_update"
 	EventInventoryUI       ecs.EventType = "inventory_ui"
 	EventExamine           ecs.EventType = "examine"
+	EventGameOver          ecs.EventType = "game_over"
 )
 
 // Effect type constants
@@ -287,4 +288,14 @@ type ExamineEvent struct {
 // Type returns the event type
 func (e ExamineEvent) Type() ecs.EventType {
 	return EventExamine
+}
+
+// GameOverEvent is emitted when the player dies
+type GameOverEvent struct {
+	PlayerID ecs.EntityID // The player entity that died
+}
+
+// Type returns the event type
+func (e GameOverEvent) Type() ecs.EventType {
+	return EventGameOver
 }

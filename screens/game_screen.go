@@ -95,7 +95,7 @@ func (s *GameScreen) Update() error {
 
 	// Don't process input if a map transition is in progress
 	if s.mapRegistrySystem.IsTransitionInProgress() {
-		systems.GetDebugLog().Add("Update skipped: map transition in progress")
+		systems.GetMessageLog().Add("Update skipped: map transition in progress")
 		return nil
 	}
 
