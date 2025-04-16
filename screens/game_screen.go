@@ -28,6 +28,7 @@ type GameScreen struct {
 	fovSystem                 *systems.FOVSystem
 	containerSystem           *systems.ContainerSystem
 	audioSystem               *systems.AudioSystem
+	deathSystem               *systems.DeathSystem
 	cachedScreen              *ebiten.Image
 	needsRedraw               bool
 	screenStack               *ScreenStack
@@ -51,6 +52,7 @@ func NewGameScreen(
 	fovSystem *systems.FOVSystem,
 	containerSystem *systems.ContainerSystem,
 	audioSystem *systems.AudioSystem,
+	deathSystem *systems.DeathSystem,
 ) *GameScreen {
 	return &GameScreen{
 		BaseScreen:                NewBaseScreen(),
@@ -70,6 +72,7 @@ func NewGameScreen(
 		fovSystem:                 fovSystem,
 		containerSystem:           containerSystem,
 		audioSystem:               audioSystem,
+		deathSystem:               deathSystem,
 		needsRedraw:               true,
 		screenStack:               NewScreenStack(),
 	}

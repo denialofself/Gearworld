@@ -153,11 +153,6 @@ type StatsChangedEvent struct {
 	EntityID ecs.EntityID
 }
 
-// EntityDeathEvent is emitted when an entity dies
-type EntityDeathEvent struct {
-	EntityID ecs.EntityID
-}
-
 // PlayerMoveAttemptEvent is emitted when a player attempts to move
 type PlayerMoveAttemptEvent struct {
 	EntityID  ecs.EntityID

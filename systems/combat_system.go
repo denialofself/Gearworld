@@ -131,6 +131,12 @@ func (s *CombatSystem) ProcessCombat(world *ecs.World, attackerID, defenderID ec
 		if defenderStats.Health <= 0 {
 			GetMessageLog().AddAlert(fmt.Sprintf("%s was defeated!", defenderName))
 
+			// Emit death event before handling the entity
+			world.GetEventManager().Emit(DeathEvent{
+				EntityID: defenderID,
+				KillerID: attackerID,
+			})
+
 			// Handle player death
 			if isPlayer(world, defenderID) {
 				GetMessageLog().AddAlert("Game Over! You died.")
