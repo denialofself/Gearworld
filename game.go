@@ -332,23 +332,34 @@ func (g *Game) initialize() {
 	}
 
 	// Generate the themed dungeon with appropriate monsters
-	startingStationEntity := dungeonThemer.GenerateThemedDungeon(config)
-
-	// Add map type component if it doesn't exist
-	if !g.world.HasComponent(startingStationEntity.ID, components.MapType) {
-		g.world.AddComponent(startingStationEntity.ID, components.MapType,
-			components.NewMapTypeComponent("starting_station", 1))
+	dungeonFloors := dungeonThemer.GenerateThemedDungeon(config)
+	if len(dungeonFloors) == 0 {
+		systems.GetDebugLog().Add("Error: No dungeon floors were generated")
+		return
 	}
 
-	// Log the dungeon entity ID for debugging
-	systems.GetDebugLog().Add(fmt.Sprintf("Created dungeon with ID: %d", startingStationEntity.ID))
+	// Register all dungeon floors with the map registry
+	for i, floorEntity := range dungeonFloors {
+		floorLevel := i + 1 // Floor levels are 1-based
+		// Add map type component if it doesn't exist
+		if !g.world.HasComponent(floorEntity.ID, components.MapType) {
+			g.world.AddComponent(floorEntity.ID, components.MapType,
+				components.NewMapTypeComponent("dungeon", floorLevel))
+		}
 
-	// Register the dungeon with the map registry
-	g.mapRegistrySystem.RegisterMap(startingStationEntity)
+		// Log the dungeon entity ID for debugging
+		systems.GetDebugLog().Add(fmt.Sprintf("Created dungeon floor %d with ID: %d", floorLevel, floorEntity.ID))
+
+		// Register the dungeon floor with the map registry
+		g.mapRegistrySystem.RegisterMap(floorEntity)
+	}
+
+	// Get the first floor entity (where the player starts)
+	startingFloorEntity := dungeonFloors[0]
 
 	// Get the map component from the dungeon entity
 	var mapComp *components.MapComponent
-	if comp, exists := g.world.GetComponent(startingStationEntity.ID, components.MapComponentID); exists {
+	if comp, exists := g.world.GetComponent(startingFloorEntity.ID, components.MapComponentID); exists {
 		mapComp = comp.(*components.MapComponent)
 	}
 
@@ -359,8 +370,8 @@ func (g *Game) initialize() {
 
 	// We'll start in the dungeon
 	// Set the active map in the map registry system
-	g.mapRegistrySystem.SetActiveMap(startingStationEntity)
-	systems.GetDebugLog().Add(fmt.Sprintf("Set active map to dungeon with ID: %d", startingStationEntity.ID))
+	g.mapRegistrySystem.SetActiveMap(startingFloorEntity)
+	systems.GetDebugLog().Add(fmt.Sprintf("Set active map to dungeon floor 1 with ID: %d", startingFloorEntity.ID))
 
 	// Find empty position for player
 	playerX, playerY := g.mapSystem.FindEmptyPosition(mapComp)
@@ -370,11 +381,11 @@ func (g *Game) initialize() {
 
 	// Add map context component to the player
 	g.world.AddComponent(playerEntity.ID, components.MapContextID,
-		components.NewMapContextComponent(startingStationEntity.ID))
+		components.NewMapContextComponent(startingFloorEntity.ID))
 
 	// Create starter chest next to player
 	chestX, chestY := playerX+1, playerY
-	g.itemSpawner.SetSpawnMapID(startingStationEntity.ID)
+	g.itemSpawner.SetSpawnMapID(startingFloorEntity.ID)
 	g.itemSpawner.CreateContainer(chestX, chestY, "starter_chest")
 
 	// Create a camera entity for the player

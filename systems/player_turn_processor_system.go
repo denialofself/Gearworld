@@ -487,120 +487,81 @@ func (s *PlayerTurnProcessorSystem) processInventoryInput(world *ecs.World) {
 	}
 }
 
-// ProcessPlayerTurn processes a single player turn
-func (s *PlayerTurnProcessorSystem) ProcessPlayerTurn(world *ecs.World) bool {
+// ProcessTurn handles the player's turn
+func (s *PlayerTurnProcessorSystem) ProcessTurn(world *ecs.World) bool {
+	// Get player entity
 	playerEntities := world.GetEntitiesWithTag("player")
 	if len(playerEntities) == 0 {
 		return false
 	}
+	playerID := playerEntities[0].ID
 
-	playerEntity := playerEntities[0]
-
-	// If we're in the inventory mode, handle inventory interactions
-	if s.renderSystem != nil && s.renderSystem.IsInventoryOpen() {
-		// Handle basic inventory navigation
-		if inpututil.IsKeyJustPressed(ebiten.KeyEscape) || inpututil.IsKeyJustPressed(ebiten.KeyI) {
-			s.renderSystem.ToggleInventoryDisplay()
-			return false
-		}
-
-		// Handle item navigation with arrow keys
-		if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
-			s.renderSystem.SelectPreviousItem(world)
-			return false
-		}
-		if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) {
-			s.renderSystem.SelectNextItem(world)
-			return false
-		}
-
-		// Handle item inspection with Enter or L key
-		if inpututil.IsKeyJustPressed(ebiten.KeyEnter) || inpututil.IsKeyJustPressed(ebiten.KeyL) {
-			if s.renderSystem.IsItemViewMode() {
-				s.renderSystem.ExitItemView()
-			} else {
-				// Get the currently selected item
-				selectedIndex := s.renderSystem.GetSelectedItemIndex()
-				// Use the item details view
-				if playerEntity != nil && world.HasComponent(playerEntity.ID, components.Inventory) {
-					invComp, _ := world.GetComponent(playerEntity.ID, components.Inventory)
-					inventory := invComp.(*components.InventoryComponent)
-					if inventory.Size() > 0 && selectedIndex >= 0 && selectedIndex < inventory.Size() {
-						s.renderSystem.ViewItemDetails(selectedIndex)
-					}
-				}
-			}
-			return false
-		}
-
-		// Handle equipping with E key
-		if inpututil.IsKeyJustPressed(ebiten.KeyE) {
-			selectedIndex := s.renderSystem.GetSelectedItemIndex()
-			// Find the inventory system to use the item
-			for _, system := range world.GetSystems() {
-				if invSystem, ok := system.(*InventorySystem); ok {
-					if playerEntity != nil && world.HasComponent(playerEntity.ID, components.Inventory) {
-						invComp, _ := world.GetComponent(playerEntity.ID, components.Inventory)
-						inventory := invComp.(*components.InventoryComponent)
-						if inventory.Size() > 0 && selectedIndex >= 0 && selectedIndex < inventory.Size() {
-							invSystem.UseItem(world, playerEntity.ID, selectedIndex)
-						}
-					}
-					break
-				}
-			}
-			return false
-		}
-
-		// Handle using items with U key
-		if inpututil.IsKeyJustPressed(ebiten.KeyU) {
-			selectedIndex := s.renderSystem.GetSelectedItemIndex()
-			// Find the inventory system to use the item
-			for _, system := range world.GetSystems() {
-				if invSystem, ok := system.(*InventorySystem); ok {
-					if playerEntity != nil && world.HasComponent(playerEntity.ID, components.Inventory) {
-						invComp, _ := world.GetComponent(playerEntity.ID, components.Inventory)
-						inventory := invComp.(*components.InventoryComponent)
-						if inventory.Size() > 0 && selectedIndex >= 0 && selectedIndex < inventory.Size() {
-							// Use the specialized HandleUseKeyPress for consumable items
-							if invSystem.HandleUseKeyPress(world, playerEntity.ID, selectedIndex) {
-								// Mark the turn as complete if item was used
-								world.EmitEvent(TurnCompletedEvent{
-									EntityID: playerEntity.ID,
-								})
-							}
-						}
-					}
-					break
-				}
-			}
-			return false
-		}
-
-		// Use/equip selected item with a letter key (a-z)
-		for key := ebiten.KeyA; key <= ebiten.KeyZ; key++ {
-			if inpututil.IsKeyJustPressed(key) {
-				itemIndex := int(key - ebiten.KeyA)
-
-				// Set the selected item
-				s.renderSystem.SetSelectedItemIndex(itemIndex)
-
-				// Find the inventory system to use the item
-				for _, system := range world.GetSystems() {
-					if invSystem, ok := system.(*InventorySystem); ok {
-						invSystem.UseItem(world, playerEntity.ID, itemIndex)
-						break
-					}
-				}
-
-				// Close inventory view after using item
-				s.renderSystem.ExitItemView()
-				return false
-			}
-		}
-
-		// If we're handling inventory, don't process movement
+	// Get player position
+	posComp, exists := world.GetComponent(playerID, components.Position)
+	if !exists {
 		return false
+	}
+	playerPos := posComp.(*components.PositionComponent)
+
+	// Get active map
+	var activeMapID ecs.EntityID
+	var mapRegistry *MapRegistrySystem
+	for _, system := range world.GetSystems() {
+		if mapReg, ok := system.(*MapRegistrySystem); ok {
+			mapRegistry = mapReg
+			if activeMap := mapReg.GetActiveMap(); activeMap != nil {
+				activeMapID = activeMap.ID
+				break
+			}
+		}
+	}
+
+	if activeMapID == 0 {
+		return false
+	}
+
+	// Get map component
+	mapComp, exists := world.GetComponent(activeMapID, components.MapComponentID)
+	if !exists {
+		return false
+	}
+	currentMap := mapComp.(*components.MapComponent)
+
+	// Handle movement keys
+	var actionTaken bool
+	var newX, newY = playerPos.X, playerPos.Y
+
+	if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) {
+		newX--
+		actionTaken = true
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) {
+		newX++
+		actionTaken = true
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
+		newY--
+		actionTaken = true
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) {
+		newY++
+		actionTaken = true
+	}
+
+	// Check for map transition (stairs) action
+	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+		// Check if player is on stairs
+		if playerPos.X >= 0 && playerPos.X < currentMap.Width &&
+			playerPos.Y >= 0 && playerPos.Y < currentMap.Height {
+			tileUnderPlayer := currentMap.Tiles[playerPos.Y][playerPos.X]
+			if tileUnderPlayer == components.TileStairsUp || tileUnderPlayer == components.TileStairsDown {
+				// Let the map registry system handle the transition
+				if mapRegistry != nil {
+					GetDebugLog().Add(fmt.Sprintf("Player attempting to use stairs at (%d,%d)", playerPos.X, playerPos.Y))
+					mapRegistry.handleMapTransitions(world)
+					return true // Consume the turn
+				}
+			} else {
+				GetMessageLog().AddEnvironment("There are no stairs here.")
+			}
+		}
 	}
 
 	// Check for inventory toggle
@@ -610,33 +571,6 @@ func (s *PlayerTurnProcessorSystem) ProcessPlayerTurn(world *ecs.World) bool {
 			s.renderSystem.ToggleInventoryDisplay()
 		}
 		return false
-	}
-
-	// Get player's position component
-	posComp, exists := world.GetComponent(playerEntity.ID, components.Position)
-	if !exists {
-		return false
-	}
-	playerPos := posComp.(*components.PositionComponent)
-
-	// Default: no action taken
-	actionTaken := false
-
-	// Movement keys
-	// Arrow keys
-	newX, newY := playerPos.X, playerPos.Y
-	if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
-		newY--
-		actionTaken = true
-	} else if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) {
-		newY++
-		actionTaken = true
-	} else if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) {
-		newX--
-		actionTaken = true
-	} else if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) {
-		newX++
-		actionTaken = true
 	}
 
 	// If the player moved, check if they can actually move there
@@ -661,7 +595,7 @@ func (s *PlayerTurnProcessorSystem) ProcessPlayerTurn(world *ecs.World) bool {
 			if _, ok := system.(*MovementSystem); ok {
 				// Emit a move attempt event that the movement system will handle
 				world.EmitEvent(PlayerMoveAttemptEvent{
-					EntityID:  playerEntity.ID,
+					EntityID:  playerID,
 					FromX:     playerPos.X,
 					FromY:     playerPos.Y,
 					ToX:       newX,

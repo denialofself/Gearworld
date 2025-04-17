@@ -561,9 +561,30 @@ func (s *RenderSystem) drawStatsPanel(world *ecs.World, screen *ebiten.Image) {
 
 		// Display position information
 		s.tileset.DrawString(screen, "LOCATION", config.GameScreenWidth+2, 16, color.RGBA{255, 230, 150, 255})
+
+		// Get current map type and level
+		var mapType string = "Unknown"
+		var mapLevel int = -1
+		activeMap := s.getActiveMap(world)
+		if activeMap != nil {
+			if typeComp, exists := world.GetComponent(activeMap.ID, components.MapType); exists {
+				mapTypeComp := typeComp.(*components.MapTypeComponent)
+				mapType = mapTypeComp.MapType
+				mapLevel = mapTypeComp.Level
+			}
+		}
+
+		// Display map information
+		if mapType == "worldmap" {
+			s.tileset.DrawString(screen, "Surface", config.GameScreenWidth+2, 18, color.RGBA{200, 200, 255, 255})
+		} else {
+			s.tileset.DrawString(screen, fmt.Sprintf("Dungeon Level %d", mapLevel), config.GameScreenWidth+2, 18, color.RGBA{200, 200, 255, 255})
+		}
+
+		// Display coordinates
 		s.tileset.DrawString(screen,
 			"Pos: "+strconv.Itoa(position.X)+","+strconv.Itoa(position.Y),
-			config.GameScreenWidth+2, 18, color.RGBA{200, 200, 255, 255})
+			config.GameScreenWidth+2, 19, color.RGBA{200, 200, 255, 255})
 	}
 
 	// Draw equipped items section
@@ -1176,3 +1197,17 @@ func (s *RenderSystem) handleEquipmentChange(world *ecs.World, event interface{}
 
 // Equipment rendering is now done directly in the drawStatsPanel method
 // without any caching or intermediate updates
+
+// getActiveMap returns the currently active map entity
+func (s *RenderSystem) getActiveMap(world *ecs.World) *ecs.Entity {
+	// Find the MapRegistrySystem
+	for _, system := range world.GetSystems() {
+		if mapRegistry, ok := system.(interface{ GetActiveMap() *ecs.Entity }); ok {
+			// Check if this is the MapRegistrySystem by checking the type name
+			if fmt.Sprintf("%T", system) == "*systems.MapRegistrySystem" {
+				return mapRegistry.GetActiveMap()
+			}
+		}
+	}
+	return nil
+}

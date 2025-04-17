@@ -314,239 +314,65 @@ func (s *MapRegistrySystem) transitionBetweenMaps(world *ecs.World, tileType int
 		return
 	}
 
-	// Debug current state before transition
-	var activeMapType string
-	var activeMapLevel int
-	if typeComp, exists := world.GetComponent(activeMap.ID, components.MapType); exists {
-		mapTypeComp := typeComp.(*components.MapTypeComponent)
-		activeMapType = mapTypeComp.MapType
-		activeMapLevel = mapTypeComp.Level
+	// Get current map component
+	mapCompInterface, exists := world.GetComponent(activeMap.ID, components.MapComponentID)
+	if !exists {
+		fmt.Println("ERROR: Current map has no map component")
+		GetDebugLog().Add("ERROR: Current map has no map component")
+		s.transitionInProgress = false // Reset flag
+		return
 	}
-	fmt.Printf("TRANSITION DEBUG: Current active map: ID=%d Type=%s Level=%d\n",
-		activeMap.ID, activeMapType, activeMapLevel)
-	GetDebugLog().Add(fmt.Sprintf("TRANSITION DEBUG: Current active map: ID=%d Type=%s Level=%d",
-		activeMap.ID, activeMapType, activeMapLevel))
+	currentMap := mapCompInterface.(*components.MapComponent)
 
-	// Get player map context for debugging
+	// Get transition data for current position
+	transitionData, hasTransition := currentMap.GetTransition(playerPos.X, playerPos.Y)
+	if !hasTransition {
+		fmt.Println("ERROR: No transition data found at current position")
+		GetDebugLog().Add("ERROR: No transition data found at current position")
+		s.transitionInProgress = false // Reset flag
+		return
+	}
+
+	// Get target map
+	targetMap := world.GetEntity(transitionData.TargetMapID)
+	if targetMap == nil {
+		fmt.Println("ERROR: Target map entity not found")
+		GetDebugLog().Add("ERROR: Target map entity not found")
+		s.transitionInProgress = false // Reset flag
+		return
+	}
+
+	// Get target map type for logging
+	var targetMapType string
+	var targetMapLevel int
+	if typeComp, exists := world.GetComponent(targetMap.ID, components.MapType); exists {
+		mapTypeComp := typeComp.(*components.MapTypeComponent)
+		targetMapType = mapTypeComp.MapType
+		targetMapLevel = mapTypeComp.Level
+	}
+
+	// Log transition details
+	fmt.Printf("TRANSITION: From map %d to map %d (%s level %d)\n",
+		activeMap.ID, targetMap.ID, targetMapType, targetMapLevel)
+	GetDebugLog().Add(fmt.Sprintf("TRANSITION: From map %d to map %d (%s level %d)",
+		activeMap.ID, targetMap.ID, targetMapType, targetMapLevel))
+
+	// Get player entity
 	playerEntity := s.getPlayer()
 	if playerEntity == nil {
-		fmt.Println("ERROR: Player entity not found during transition debug")
-		GetDebugLog().Add("ERROR: Player entity not found during transition debug")
+		fmt.Println("ERROR: Player entity not found")
+		GetDebugLog().Add("ERROR: Player entity not found")
 		s.transitionInProgress = false
 		return
 	}
-
-	var playerMapID ecs.EntityID
-	if contextComp, exists := world.GetComponent(playerEntity.ID, components.MapContextID); exists {
-		mapContext := contextComp.(*components.MapContextComponent)
-		playerMapID = mapContext.MapID
-		fmt.Printf("TRANSITION DEBUG: Player map context before transition: %d\n", playerMapID)
-		GetDebugLog().Add(fmt.Sprintf("TRANSITION DEBUG: Player map context before transition: %d", playerMapID))
-	} else {
-		fmt.Println("ERROR: Player has no map context component before transition")
-		GetDebugLog().Add("ERROR: Player has no map context component before transition")
-	}
-
-	mapTypeCompInterface, exists := world.GetComponent(activeMap.ID, components.MapType)
-	if !exists {
-		fmt.Println("ERROR: Map type component not found during transition")
-		GetDebugLog().Add("ERROR: Map type component not found during transition")
-		s.transitionInProgress = false // Reset flag
-		return
-	}
-	currentMapType := mapTypeCompInterface.(*components.MapTypeComponent)
-
-	// Determine target map type based on current map and stair direction
-	var targetMapType *components.MapTypeComponent
-	var targetMap *ecs.Entity
-
-	// Log starting transition attempt
-	fmt.Printf("TRANSITION START: From %s (Level %d, ID: %d)\n",
-		currentMapType.MapType, currentMapType.Level, activeMap.ID)
-	GetDebugLog().Add(fmt.Sprintf("TRANSITION START: From %s (Level %d, ID: %d)",
-		currentMapType.MapType, currentMapType.Level, activeMap.ID))
-
-	if currentMapType.MapType == "worldmap" && tileType == components.TileStairsDown {
-		// Going down from world map to a dungeon
-		fmt.Println("TRANSITION: Going from worldmap to dungeon")
-		targetMapType = components.NewMapTypeComponent("dungeon", 1) // Level 1 dungeon
-		targetMap = s.GetMapByType("dungeon", 1)
-
-		// If no dungeon exists, this is an error since all maps should be created during init
-		if targetMap == nil {
-			fmt.Println("ERROR: Attempted to transition to non-existent dungeon")
-			GetDebugLog().Add("ERROR: Attempted to transition to non-existent dungeon")
-			s.transitionInProgress = false
-			return
-		}
-
-		fmt.Printf("TRANSITION TARGET: Going from worldmap to dungeon (ID: %d)\n", targetMap.ID)
-		GetDebugLog().Add(fmt.Sprintf("TRANSITION TARGET: Going from worldmap to dungeon (ID: %d)", targetMap.ID))
-	} else if currentMapType.MapType == "dungeon" && tileType == components.TileStairsUp {
-		// Going up from dungeon to world map
-		fmt.Println("TRANSITION: Going from dungeon to worldmap")
-		targetMapType = components.NewMapTypeComponent("worldmap", 0)
-		targetMap = s.GetMapByType("worldmap", 0)
-
-		// If no world map exists, this is an error since all maps should be created during init
-		if targetMap == nil {
-			fmt.Println("ERROR: Attempted to transition to non-existent world map")
-			GetDebugLog().Add("ERROR: Attempted to transition to non-existent world map")
-			s.transitionInProgress = false
-			return
-		}
-
-		fmt.Printf("TRANSITION TARGET: Going from dungeon to worldmap (ID: %d)\n", targetMap.ID)
-		GetDebugLog().Add(fmt.Sprintf("TRANSITION TARGET: Going from dungeon to worldmap (ID: %d)", targetMap.ID))
-	} else if currentMapType.MapType == "dungeon" && tileType == components.TileStairsDown {
-		// Going down to a deeper dungeon level
-		nextLevel := currentMapType.Level + 1
-		fmt.Printf("TRANSITION: Going from dungeon level %d to level %d\n", currentMapType.Level, nextLevel)
-		targetMapType = components.NewMapTypeComponent("dungeon", nextLevel)
-		targetMap = s.GetMapByType("dungeon", nextLevel)
-
-		// If no dungeon at this level exists, this is an error since all maps should be created during init
-		if targetMap == nil {
-			fmt.Printf("ERROR: Attempted to transition to non-existent dungeon level %d\n", nextLevel)
-			GetDebugLog().Add(fmt.Sprintf("ERROR: Attempted to transition to non-existent dungeon level %d", nextLevel))
-			s.transitionInProgress = false
-			return
-		}
-
-		fmt.Printf("TRANSITION TARGET: Going from dungeon level %d to level %d (ID: %d)\n",
-			currentMapType.Level, nextLevel, targetMap.ID)
-		GetDebugLog().Add(fmt.Sprintf("TRANSITION TARGET: Going from dungeon level %d to level %d (ID: %d)",
-			currentMapType.Level, nextLevel, targetMap.ID))
-	} else {
-		// Invalid transition
-		fmt.Printf("TRANSITION CANCELLED: Invalid transition (map type: %s, tile type: %d)\n",
-			currentMapType.MapType, tileType)
-		GetMessageLog().Add("You can't go that way.")
-		GetDebugLog().Add("TRANSITION CANCELLED: Invalid transition")
-		s.transitionInProgress = false // Reset flag
-		return
-	}
-
-	// Log target map type for debugging
-	if targetMap != nil {
-		var targetMapTypeStr string
-		var targetMapLevel int
-		if typeComp, exists := world.GetComponent(targetMap.ID, components.MapType); exists {
-			mapTypeComp := typeComp.(*components.MapTypeComponent)
-			targetMapTypeStr = mapTypeComp.MapType
-			targetMapLevel = mapTypeComp.Level
-			fmt.Printf("TRANSITION DEBUG: Target map details: ID=%d Type=%s Level=%d\n",
-				targetMap.ID, targetMapTypeStr, targetMapLevel)
-			GetDebugLog().Add(fmt.Sprintf("TRANSITION DEBUG: Target map details: ID=%d Type=%s Level=%d",
-				targetMap.ID, targetMapTypeStr, targetMapLevel))
-		} else {
-			fmt.Println("ERROR: Target map has no map type component")
-			GetDebugLog().Add("ERROR: Target map has no map type component")
-		}
-	} else {
-		fmt.Println("ERROR: Target map is nil after selection")
-		GetDebugLog().Add("ERROR: Target map is nil after selection")
-		s.transitionInProgress = false
-		return
-	}
-
-	// Check that we have a valid target map before proceeding
-	if targetMap == nil || targetMap.ID == 0 {
-		fmt.Println("ERROR: Target map is invalid")
-		GetDebugLog().Add("ERROR: Target map is invalid")
-		s.transitionInProgress = false
-		return
-	}
-
-	// Position the player appropriately on the new map
-	var targetX, targetY int
-	if tileType == components.TileStairsDown {
-		// Find stairs up on the target map
-		targetMapComp, exists := world.GetComponent(targetMap.ID, components.MapComponentID)
-		if !exists {
-			fmt.Println("ERROR: Target map has no map component")
-			GetDebugLog().Add("ERROR: Target map has no map component")
-			s.transitionInProgress = false // Reset flag
-			return
-		}
-
-		foundStairs := false
-		tmc := targetMapComp.(*components.MapComponent)
-		for y := 0; y < tmc.Height; y++ {
-			for x := 0; x < tmc.Width; x++ {
-				if tmc.Tiles[y][x] == components.TileStairsUp {
-					targetX, targetY = x, y
-					foundStairs = true
-					break
-				}
-			}
-			if foundStairs {
-				break
-			}
-		}
-
-		if !foundStairs {
-			// If no stairs found, place player at an empty spot
-			fmt.Println("Could not find stairs up on target map, finding empty position")
-			mapSystem := s.getMapSystem()
-			if mapSystem != nil {
-				targetX, targetY = mapSystem.FindEmptyPosition(tmc)
-			} else {
-				// Simple fallback
-				targetX, targetY = tmc.Width/2, tmc.Height/2
-			}
-		}
-	} else if tileType == components.TileStairsUp {
-		// Player is heading to the world map or previous level
-		if targetMapType.MapType == "worldmap" {
-			// For transitions to the world map
-			fmt.Println("Transitioning to world map")
-			GetDebugLog().Add("Transitioning to world map")
-
-			// For world map, always position at center (railway station) at 100,100
-			targetX, targetY = 100, 100
-			fmt.Printf("TRANSITION: Positioning player at railway station (100,100) on world map\n")
-			GetDebugLog().Add("TRANSITION: Positioning player at railway station (100,100) on world map")
-		} else {
-			// For dungeon-to-dungeon transitions (going back up a level)
-			// If we have a last position, use it
-			if s.lastPosition != nil && s.lastMapID == targetMap.ID {
-				targetX, targetY = s.lastPosition.X, s.lastPosition.Y
-			} else {
-				// If no last position, find an empty spot
-				fmt.Println("No last position for dungeon-to-dungeon transition, finding empty spot")
-				targetMapComp, exists := world.GetComponent(targetMap.ID, components.MapComponentID)
-				if !exists {
-					s.transitionInProgress = false // Reset flag
-					return
-				}
-
-				mapSystem := s.getMapSystem()
-				if mapSystem != nil {
-					targetX, targetY = mapSystem.FindEmptyPosition(targetMapComp.(*components.MapComponent))
-				} else {
-					// Simple fallback
-					tmc := targetMapComp.(*components.MapComponent)
-					targetX, targetY = tmc.Width/2, tmc.Height/2
-				}
-			}
-		}
-	}
-
-	fmt.Printf("TRANSITION: Player target position on new map: %d,%d\n", targetX, targetY)
-	GetDebugLog().Add(fmt.Sprintf("TRANSITION: Player target position on new map: %d,%d", targetX, targetY))
 
 	// CRITICAL ORDER OF OPERATIONS:
 	// 1. First UPDATE THE ACTIVE MAP
 	GetDebugLog().Add("=============================================")
 	GetDebugLog().Add("TRANSITION STEP 1: Setting active map")
-	// Get pre-update state for logging
 	var oldActiveMapID = s.activeMapID
 	s.SetActiveMap(targetMap)
 	GetDebugLog().Add(fmt.Sprintf("TRANSITION DEBUG: Changed active map from %d to %d", oldActiveMapID, s.activeMapID))
-	if s.activeMapID != targetMap.ID {
-		GetDebugLog().Add("ERROR: Active map was not updated correctly! This is a critical error.")
-	}
 
 	// 2. Then update player's map context to match the new active map
 	GetDebugLog().Add("TRANSITION STEP 2: Updating player's map context")
@@ -557,105 +383,44 @@ func (s *MapRegistrySystem) transitionBetweenMaps(world *ecs.World, tileType int
 		mapContextComp.(*components.MapContextComponent).MapID = targetMap.ID
 		GetDebugLog().Add(fmt.Sprintf("TRANSITION DEBUG: Updated player entity %d map context from %d to %d",
 			playerEntity.ID, oldPlayerMapContext, targetMap.ID))
-
-		// Verify the update
-		if mapContextComp.(*components.MapContextComponent).MapID != targetMap.ID {
-			GetDebugLog().Add("ERROR: Player map context was not updated correctly!")
-		}
 	} else {
 		world.AddComponent(playerEntity.ID, components.MapContextID, components.NewMapContextComponent(targetMap.ID))
 		GetDebugLog().Add(fmt.Sprintf("TRANSITION DEBUG: Added new map context to player: %d", targetMap.ID))
-
-		// Verify the component was added
-		if !world.HasComponent(playerEntity.ID, components.MapContextID) {
-			GetDebugLog().Add("ERROR: Failed to add map context to player!")
-		}
 	}
 
-	// 3. Update player position
+	// 3. Update player position using transition data
 	GetDebugLog().Add("TRANSITION STEP 3: Updating player position")
 	var oldX, oldY = playerPos.X, playerPos.Y
-	playerPos.X = targetX
-	playerPos.Y = targetY
+	playerPos.X = transitionData.TargetX
+	playerPos.Y = transitionData.TargetY
 	GetDebugLog().Add(fmt.Sprintf("TRANSITION DEBUG: Updated player position from (%d,%d) to (%d,%d)",
 		oldX, oldY, playerPos.X, playerPos.Y))
 
-	// Verify update
-	if playerPos.X != targetX || playerPos.Y != targetY {
-		GetDebugLog().Add("ERROR: Player position was not updated correctly!")
-	}
-
 	// 4. Force camera update after map change
 	GetDebugLog().Add("TRANSITION STEP 4: Updating camera position")
-	s.updateCameraPosition(world, targetX, targetY)
+	s.updateCameraPosition(world, playerPos.X, playerPos.Y)
 
 	// Log the transition completion
-	if targetMapType.MapType == "worldmap" {
+	if targetMapType == "worldmap" {
 		fmt.Println("TRANSITION COMPLETE: Player now on world map")
 		GetMessageLog().Add("You climb the stairs and emerge onto the surface.")
 		GetDebugLog().Add("TRANSITION COMPLETE: Player now on world map")
 	} else {
-		if currentMapType.MapType == "worldmap" {
-			fmt.Println("TRANSITION COMPLETE: Player now in dungeon")
-			GetMessageLog().Add("You descend into the darkness below.")
-			GetDebugLog().Add("TRANSITION COMPLETE: Player now in dungeon")
-		} else if currentMapType.Level < targetMapType.Level {
-			fmt.Printf("TRANSITION COMPLETE: Player now in dungeon level %d\n", targetMapType.Level)
-			GetMessageLog().Add("You descend deeper into the dungeon.")
-			GetDebugLog().Add(fmt.Sprintf("TRANSITION COMPLETE: Player now in dungeon level %d", targetMapType.Level))
-		} else {
-			fmt.Printf("TRANSITION COMPLETE: Player now in dungeon level %d\n", targetMapType.Level)
-			GetMessageLog().Add("You climb back to the previous level.")
-			GetDebugLog().Add(fmt.Sprintf("TRANSITION COMPLETE: Player now in dungeon level %d", targetMapType.Level))
-		}
+		fmt.Printf("TRANSITION COMPLETE: Player now in dungeon level %d\n", targetMapLevel)
+		GetMessageLog().Add(fmt.Sprintf("You %s to level %d.",
+			map[bool]string{true: "descend", false: "climb"}[tileType == components.TileStairsDown],
+			targetMapLevel))
+		GetDebugLog().Add(fmt.Sprintf("TRANSITION COMPLETE: Player now in dungeon level %d", targetMapLevel))
 	}
 
-	// Reset the AI pathfinding system's turn processed flag to avoid AI processing in the new map
+	// Reset the AI pathfinding system's turn processed flag
 	for _, system := range world.GetSystems() {
 		if aiPathfinding, ok := system.(*AIPathfindingSystem); ok {
 			aiPathfinding.ResetTurn()
-			GetDebugLog().Add("TRANSITION: Reset AI pathfinding turn flag to prevent immediate AI turn")
+			GetDebugLog().Add("TRANSITION: Reset AI pathfinding turn flag")
 			break
 		}
 	}
-
-	// Verify the transition completed correctly
-	GetDebugLog().Add("TRANSITION VERIFICATION:")
-
-	// Check player map context
-	if world.HasComponent(playerEntity.ID, components.MapContextID) {
-		mapContextComp, _ := world.GetComponent(playerEntity.ID, components.MapContextID)
-		playerMapID := mapContextComp.(*components.MapContextComponent).MapID
-		GetDebugLog().Add(fmt.Sprintf("- Player map context ID: %d", playerMapID))
-
-		if playerMapID != targetMap.ID {
-			GetDebugLog().Add("  ERROR: Player map context doesn't match target map!")
-		} else {
-			GetDebugLog().Add("  OK: Player map context matches target map")
-		}
-	} else {
-		GetDebugLog().Add("  ERROR: Player has no map context component after transition!")
-	}
-
-	// Check active map
-	GetDebugLog().Add(fmt.Sprintf("- Active map ID: %d", s.activeMapID))
-	if s.activeMapID != targetMap.ID {
-		GetDebugLog().Add("  ERROR: Active map doesn't match target map!")
-	} else {
-		GetDebugLog().Add("  OK: Active map matches target map")
-	}
-
-	// Check player position
-	GetDebugLog().Add(fmt.Sprintf("- Player position: (%d,%d)", playerPos.X, playerPos.Y))
-	if playerPos.X != targetX || playerPos.Y != targetY {
-		GetDebugLog().Add("  ERROR: Player position doesn't match target position!")
-	} else {
-		GetDebugLog().Add("  OK: Player position matches target position")
-	}
-
-	GetDebugLog().Add("=====================================")
-	GetDebugLog().Add("TRANSITION: COMPLETED MAP TRANSITION")
-	GetDebugLog().Add("=====================================")
 
 	// Reset the transition flag now that we're done
 	s.transitionInProgress = false

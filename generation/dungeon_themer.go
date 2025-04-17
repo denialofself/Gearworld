@@ -92,7 +92,7 @@ func (t *DungeonThemer) LoadThemesFromDirectory(directory string) error {
 }
 
 // GenerateThemedDungeon creates a new dungeon entity with the specified configuration
-func (t *DungeonThemer) GenerateThemedDungeon(config DungeonConfiguration) *ecs.Entity {
+func (t *DungeonThemer) GenerateThemedDungeon(config DungeonConfiguration) []*ecs.Entity {
 	// Get theme definition if using JSON theme
 	var themeDef *DungeonThemeDefinition
 	if config.ThemeID != "" {
@@ -133,11 +133,8 @@ func (t *DungeonThemer) GenerateThemedDungeon(config DungeonConfiguration) *ecs.
 		}
 	}
 
-	// Return the first floor entity
-	if len(floorEntities) > 0 {
-		return floorEntities[0]
-	}
-	return nil
+	// Return all floor entities
+	return floorEntities
 }
 
 // generateFloor generates a single floor of the dungeon
@@ -195,8 +192,22 @@ func (t *DungeonThemer) generateFloor(config DungeonConfiguration, themeDef *Dun
 		// Add stairs up to world map on first floor
 		x, y := t.findEmptyPosition(mapComp)
 		mapComp.SetTile(x, y, components.TileStairsUp)
-		// Store transition data
-		mapComp.AddTransition(x, y, 0, 0, 0, true) // Target map ID will be set when connecting to world map
+		// Store transition data - connect to world map
+		worldMapEntities := t.world.GetEntitiesWithTag("worldmap")
+		if len(worldMapEntities) > 0 {
+			// Get the world map's map component to find the central station
+			worldMapComp, exists := t.world.GetComponent(worldMapEntities[0].ID, components.MapComponentID)
+			if exists {
+				worldMap := worldMapComp.(*components.MapComponent)
+				// Find the central station tile (usually in the middle of the world map)
+				centerX, centerY := worldMap.Width/2, worldMap.Height/2
+				mapComp.AddTransition(x, y, worldMapEntities[0].ID, centerX, centerY, true)
+			} else {
+				t.logMessage("Warning: Could not find world map component")
+			}
+		} else {
+			t.logMessage("Warning: Could not find world map to connect stairs")
+		}
 	}
 
 	// Create floor entity
