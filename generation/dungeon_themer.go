@@ -29,6 +29,8 @@ type DungeonConfiguration struct {
 	EvenHigherLevelChance float64       // Chance of spawning even higher level monsters (0.0-1.0)
 	AddStairsUp           bool          // Whether to add stairs up near the player's spawn point
 	ThemeID               string        // Optional ID of a JSON theme definition to use instead of Theme enum
+	TotalFloors           int           // Total number of floors to generate (default: 1)
+	CurrentFloor          int           // Current floor being generated (1-based)
 }
 
 // DungeonSize defines the size category of a dungeon
@@ -68,7 +70,7 @@ func NewDungeonThemer(world *ecs.World, templateManager *data.EntityTemplateMana
 	return &DungeonThemer{
 		world:           world,
 		dungeonGen:      dungeonGen,
-		populator:       NewDungeonPopulator(world, entitySpawner, templateManager),
+		populator:       NewDungeonPopulator(world, entitySpawner, templateManager, logFunc),
 		templateManager: templateManager,
 		entitySpawner:   entitySpawner,
 		themeManager:    NewDungeonThemeManager(),
@@ -89,48 +91,67 @@ func (t *DungeonThemer) LoadThemesFromDirectory(directory string) error {
 	return t.themeManager.LoadThemesFromDirectory(directory)
 }
 
-// GenerateThemedDungeon generates a complete dungeon with a theme and appropriate monsters
+// GenerateThemedDungeon creates a new dungeon entity with the specified configuration
 func (t *DungeonThemer) GenerateThemedDungeon(config DungeonConfiguration) *ecs.Entity {
-	// Create map entity
-	mapEntity := t.world.CreateEntity()
-	mapEntity.AddTag("map")
-	t.world.TagEntity(mapEntity.ID, "map")
+	// Get theme definition if using JSON theme
+	var themeDef *DungeonThemeDefinition
+	if config.ThemeID != "" {
+		themeDef = t.themeManager.GetTheme(config.ThemeID)
+		if themeDef == nil {
+			t.logMessage(fmt.Sprintf("Warning: Theme ID '%s' not found, using default theme", config.ThemeID))
+		}
+	}
 
-	// Generate the appropriate dungeon type based on size
+	// Determine number of floors
+	totalFloors := 1
+	if themeDef != nil && themeDef.Floors > 0 {
+		totalFloors = themeDef.Floors
+	}
+	if config.TotalFloors > 0 {
+		totalFloors = config.TotalFloors
+	}
+
+	// Create dungeon entity
+	dungeonEntity := t.world.CreateEntity()
+	t.world.TagEntity(dungeonEntity.ID, "dungeon")
+
+	// Generate each floor
+	var floorEntities []*ecs.Entity
+	for floor := 1; floor <= totalFloors; floor++ {
+		// Create floor configuration
+		floorConfig := config
+		floorConfig.CurrentFloor = floor
+		floorConfig.TotalFloors = totalFloors
+
+		// Generate the floor
+		floorEntity := t.generateFloor(floorConfig, themeDef)
+		floorEntities = append(floorEntities, floorEntity)
+
+		// If this isn't the first floor, connect it to the previous floor
+		if floor > 1 {
+			t.connectFloors(floorEntities[floor-2], floorEntity)
+		}
+	}
+
+	// Return the first floor entity
+	if len(floorEntities) > 0 {
+		return floorEntities[0]
+	}
+	return nil
+}
+
+// generateFloor generates a single floor of the dungeon
+func (t *DungeonThemer) generateFloor(config DungeonConfiguration, themeDef *DungeonThemeDefinition) *ecs.Entity {
+	// Get dimensions based on size
 	width, height := t.getDungeonDimensions(config.Size)
 
 	// Create map component
 	mapComp := components.NewMapComponent(width, height)
-	t.world.AddComponent(mapEntity.ID, components.MapComponentID, mapComp)
 
-	// Add map type component
-	t.world.AddComponent(mapEntity.ID, components.MapType, components.NewMapTypeComponent("dungeon", config.Level))
-
-	// Generate dungeon based on generator type and size
-	var generatorName string
+	// Generate the layout
 	var rooms [][4]int
-
 	switch config.Generator {
-	case GeneratorCellular:
-		generatorName = "Cellular Automata"
-		switch config.Size {
-		case SizeSmall:
-			t.dungeonGen.GenerateSmallCellularDungeon(mapComp)
-		case SizeLarge:
-			t.dungeonGen.GenerateLargeCellularDungeon(mapComp)
-		case SizeHuge:
-			t.dungeonGen.GenerateGiantCellularDungeon(mapComp)
-		default: // SizeNormal
-			t.dungeonGen.GenerateSmallCellularDungeon(mapComp)
-		}
-		// For cellular automata, find the rooms
-		rooms = t.dungeonGen.findAllOpenAreas(mapComp)
-	case GeneratorRandom:
-		generatorName = "Random Rooms"
-		// Use the existing simple rooms and corridors generator
-		rooms = t.generateRandomRoomsAndCorridors(mapComp, config.Size)
-	default: // GeneratorBSP
-		generatorName = "BSP"
+	case GeneratorBSP:
 		switch config.Size {
 		case SizeSmall:
 			t.dungeonGen.GenerateSmallBSPDungeon(mapComp)
@@ -139,226 +160,133 @@ func (t *DungeonThemer) GenerateThemedDungeon(config DungeonConfiguration) *ecs.
 		case SizeHuge:
 			t.dungeonGen.GenerateGiantBSPDungeon(mapComp)
 		default: // SizeNormal
-			t.dungeonGen.GenerateSmallBSPDungeon(mapComp)
+			t.dungeonGen.GenerateBSPDungeon(mapComp)
 		}
-		// For BSP dungeons, find the rooms
-		rooms = t.findRoomsInBSPDungeon(mapComp)
+		rooms = t.dungeonGen.FindFirstRoomInMap(mapComp)
+	case GeneratorCellular:
+		rooms = t.dungeonGen.Generate(mapComp, config.Size)
+	case GeneratorRandom:
+		rooms = t.generateRandomRoomsAndCorridors(mapComp, config.Size)
 	}
 
-	// Log the map generation
-	if t.logMessage != nil {
-		var themeName string
-		if config.ThemeID != "" {
-			if theme := t.themeManager.GetTheme(config.ThemeID); theme != nil {
-				themeName = theme.Name
-			} else {
-				themeName = string(config.Theme) // Fallback to enum theme
-			}
-		} else {
-			themeName = string(config.Theme)
-		}
-		t.logMessage(fmt.Sprintf("Generated a %s dungeon using %s generator", themeName, generatorName))
-	}
-
-	// If configured, add stairs up near player spawn
-	if config.AddStairsUp {
-		t.addStairsUpNearPlayerSpawn(mapComp)
-	}
-
-	// Apply theme to the dungeon
-	var usingJsonTheme bool = false
-	if config.ThemeID != "" {
-		// Use JSON theme definition if available
-		if theme := t.themeManager.GetTheme(config.ThemeID); theme != nil {
-			t.applyThemeDefinition(mapComp, theme, rooms)
-			usingJsonTheme = true
-		} else {
-			// Fallback to legacy theme enum
-			t.applyMapTheming(mapComp, config.Theme)
-		}
+	// Apply theme
+	if themeDef != nil {
+		t.applyThemeDefinition(mapComp, themeDef, rooms)
 	} else {
-		// Use legacy theme enum
 		t.applyMapTheming(mapComp, config.Theme)
 	}
 
-	// Add dungeon features (stairs, water pools, etc.) ONLY if not using JSON theme
-	if !usingJsonTheme {
-		t.dungeonGen.AddFeatures(mapComp, rooms)
+	// Add stairs if needed
+	if config.CurrentFloor < config.TotalFloors {
+		// Add stairs down to next floor
+		x, y := t.findEmptyPosition(mapComp)
+		mapComp.SetTile(x, y, components.TileStairsDown)
+		// Store transition data
+		mapComp.AddTransition(x, y, 0, 0, 0, true) // Target map ID will be set when next floor is created
+	}
+
+	if config.CurrentFloor > 1 {
+		// Add stairs up to previous floor
+		x, y := t.findEmptyPosition(mapComp)
+		mapComp.SetTile(x, y, components.TileStairsUp)
+		// Store transition data
+		mapComp.AddTransition(x, y, 0, 0, 0, true) // Target map ID will be set when connecting floors
+	} else if config.AddStairsUp {
+		// Add stairs up to world map on first floor
+		x, y := t.findEmptyPosition(mapComp)
+		mapComp.SetTile(x, y, components.TileStairsUp)
+		// Store transition data
+		mapComp.AddTransition(x, y, 0, 0, 0, true) // Target map ID will be set when connecting to world map
+	}
+
+	// Create floor entity
+	floorEntity := t.world.CreateEntity()
+	t.world.AddComponent(floorEntity.ID, components.MapComponentID, mapComp)
+
+	// Add map type component
+	mapType := components.NewMapTypeComponent("dungeon", config.CurrentFloor)
+	t.world.AddComponent(floorEntity.ID, components.MapType, mapType)
+
+	// Populate the dungeon with monsters and items
+	options := PopulationOptions{
+		DungeonLevel:          config.Level,
+		Theme:                 config.Theme,
+		DensityFactor:         config.DensityFactor,
+		HigherLevelChance:     config.HigherLevelChance,
+		EvenHigherLevelChance: config.EvenHigherLevelChance,
+	}
+
+	// If using a JSON theme, use its tags
+	if themeDef != nil {
+		options.PreferredTags = themeDef.Tags
+		options.ExcludeTags = themeDef.ExcludeTags
+		options.DensityFactor = themeDef.DensityFactor
+		options.HigherLevelChance = themeDef.HigherLevelChance
+		options.EvenHigherLevelChance = themeDef.EvenHigherLevelChance
 	} else {
-		// If using JSON theme, still add stairs down if not already added in applyThemeDefinition
-		// but skip other features (vegetation, pools) as those are controlled by the theme
-		if mapComp != nil {
-			// Check if stairs down already exist
-			var hasStairsDown bool = false
-			for y := 0; y < mapComp.Height; y++ {
-				for x := 0; x < mapComp.Width; x++ {
-					if mapComp.Tiles[y][x] == components.TileStairsDown {
-						hasStairsDown = true
-						if t.logMessage != nil {
-							t.logMessage(fmt.Sprintf("Found existing stairs down at (%d,%d)", x, y))
-						}
+		options.PreferredTags = t.getThemeTags(config.Theme)
+	}
 
-						// Place the stairs and create a stairs entity
-						mapComp.SetTile(x, y, components.TileStairsDown)
+	t.populator.PopulateDungeon(mapComp, floorEntity.ID, options)
 
-						// Create a stairs entity
-						stairsEntity := t.world.CreateEntity()
-						stairsEntity.AddTag("stairs")
-						t.world.TagEntity(stairsEntity.ID, "stairs")
+	return floorEntity
+}
 
-						// Add position component
-						t.world.AddComponent(stairsEntity.ID, components.Position, &components.PositionComponent{
-							X: x,
-							Y: y,
-						})
+// connectFloors connects two adjacent floors with stairs
+func (t *DungeonThemer) connectFloors(floor1Entity, floor2Entity *ecs.Entity) {
+	// Get the map components
+	map1Comp, exists1 := t.world.GetComponent(floor1Entity.ID, components.MapComponentID)
+	map2Comp, exists2 := t.world.GetComponent(floor2Entity.ID, components.MapComponentID)
 
-						// Add map context component
-						t.world.AddComponent(stairsEntity.ID, components.MapContext, components.NewMapContextComponent(mapEntity.ID))
+	if !exists1 || !exists2 {
+		t.logMessage("Error: Could not find map components for floor entities")
+		return
+	}
 
-						if t.logMessage != nil {
-							t.logMessage(fmt.Sprintf("Added stairs down at (%d,%d)", x, y))
-						}
+	floor1Map := map1Comp.(*components.MapComponent)
+	floor2Map := map2Comp.(*components.MapComponent)
 
-						break
-					}
-				}
-				if hasStairsDown {
-					break
-				}
+	// Find stairs down in floor1 and stairs up in floor2
+	var stairsDownX, stairsDownY int
+	var stairsUpX, stairsUpY int
+	var foundDown, foundUp bool
+
+	// Find stairs down in floor1
+	for y := 0; y < floor1Map.Height; y++ {
+		for x := 0; x < floor1Map.Width; x++ {
+			if floor1Map.Tiles[y][x] == components.TileStairsDown {
+				stairsDownX, stairsDownY = x, y
+				foundDown = true
+				break
 			}
-
-			// If no stairs down, add them in the last room
-			if !hasStairsDown {
-				// Find the last room (typically the goal/boss room)
-				var lastRoom [4]int
-				if len(rooms) > 0 {
-					lastRoom = rooms[len(rooms)-1]
-				}
-
-				var stairsX, stairsY int
-				stairsPlaced := false
-
-				// Try to find a good spot for stairs
-				for attempts := 0; attempts < 20 && !stairsPlaced; attempts++ {
-					testX := lastRoom[0] + t.rng.Intn(lastRoom[2])
-					testY := lastRoom[1] + t.rng.Intn(lastRoom[3])
-
-					if mapComp.Tiles[testY][testX] == components.TileFloor {
-						stairsX, stairsY = testX, testY
-						stairsPlaced = true
-					}
-				}
-
-				// If we still can't find a good spot, use the room center
-				if !stairsPlaced {
-					stairsX = lastRoom[0] + lastRoom[2]/2
-					stairsY = lastRoom[1] + lastRoom[3]/2
-
-					// If it's a wall, find the nearest floor tile
-					if mapComp.IsWall(stairsX, stairsY) {
-						for radius := 1; radius < 5 && !stairsPlaced; radius++ {
-							for dy := -radius; dy <= radius && !stairsPlaced; dy++ {
-								for dx := -radius; dx <= radius && !stairsPlaced; dx++ {
-									nx, ny := stairsX+dx, stairsY+dy
-									if nx >= 0 && nx < mapComp.Width && ny >= 0 && ny < mapComp.Height &&
-										mapComp.Tiles[ny][nx] == components.TileFloor {
-										stairsX, stairsY = nx, ny
-										stairsPlaced = true
-									}
-								}
-							}
-						}
-					} else {
-						stairsPlaced = true
-					}
-				}
-
-				// Place the stairs if we found a good spot
-				if stairsPlaced {
-					mapComp.SetTile(stairsX, stairsY, components.TileStairsDown)
-					if t.logMessage != nil {
-						t.logMessage(fmt.Sprintf("Added backup stairs down at (%d,%d)", stairsX, stairsY))
-					}
-
-					// Create a stairs entity at this position and tag it
-					stairsEntity := t.world.CreateEntity()
-					stairsEntity.AddTag("stairs")
-					t.world.TagEntity(stairsEntity.ID, "stairs")
-
-					// Add position component
-					t.world.AddComponent(stairsEntity.ID, components.Position, &components.PositionComponent{
-						X: stairsX,
-						Y: stairsY,
-					})
-
-					// Add map context component
-					t.world.AddComponent(stairsEntity.ID, components.MapContext, components.NewMapContextComponent(mapEntity.ID))
-				} else if t.logMessage != nil {
-					t.logMessage("WARNING: Could not find a suitable location for stairs down")
-				}
-			}
+		}
+		if foundDown {
+			break
 		}
 	}
 
-	// Important: Set the map's ID in the entity spawner before populating with monsters
-	// This ensures all monsters get the correct MapContext
-	if t.logMessage != nil {
-		t.logMessage(fmt.Sprintf("Setting spawn map ID to %d for monster creation", mapEntity.ID))
-	}
-	t.entitySpawner.SetSpawnMapID(mapEntity.ID)
-
-	// Populate the dungeon with monsters
-	var options PopulationOptions
-
-	if config.ThemeID != "" {
-		// Use JSON theme definition if available
-		if theme := t.themeManager.GetTheme(config.ThemeID); theme != nil {
-			options = PopulationOptions{
-				DungeonLevel:          config.Level,
-				Theme:                 config.Theme, // Keep legacy theme for compatibility
-				DensityFactor:         theme.DensityFactor,
-				HigherLevelChance:     theme.HigherLevelChance,
-				EvenHigherLevelChance: theme.EvenHigherLevelChance,
-				PreferredTags:         theme.Tags,
-				ExcludeTags:           theme.ExcludeTags,
-			}
-		} else {
-			// Fallback to configuration values
-			options = PopulationOptions{
-				DungeonLevel:          config.Level,
-				Theme:                 config.Theme,
-				DensityFactor:         config.DensityFactor,
-				HigherLevelChance:     config.HigherLevelChance,
-				EvenHigherLevelChance: config.EvenHigherLevelChance,
-				PreferredTags:         t.getThemeTags(config.Theme),
-				ExcludeTags:           nil,
+	// Find stairs up in floor2
+	for y := 0; y < floor2Map.Height; y++ {
+		for x := 0; x < floor2Map.Width; x++ {
+			if floor2Map.Tiles[y][x] == components.TileStairsUp {
+				stairsUpX, stairsUpY = x, y
+				foundUp = true
+				break
 			}
 		}
-	} else {
-		// Use configuration values
-		options = PopulationOptions{
-			DungeonLevel:          config.Level,
-			Theme:                 config.Theme,
-			DensityFactor:         config.DensityFactor,
-			HigherLevelChance:     config.HigherLevelChance,
-			EvenHigherLevelChance: config.EvenHigherLevelChance,
-			PreferredTags:         t.getThemeTags(config.Theme),
-			ExcludeTags:           nil,
+		if foundUp {
+			break
 		}
 	}
 
-	// If we have a boss chance from a JSON theme, potentially add a boss
-	if config.ThemeID != "" {
-		if theme := t.themeManager.GetTheme(config.ThemeID); theme != nil && theme.BossChance > 0 {
-			if t.rng.Float64() < theme.BossChance && len(theme.BossTypes) > 0 {
-				t.addBossMonster(mapComp, theme.BossTypes)
-			}
-		}
+	if !foundDown || !foundUp {
+		t.logMessage("Error: Could not find connecting stairs between floors")
+		return
 	}
 
-	t.populator.PopulateDungeon(mapComp, options)
-
-	return mapEntity
+	// Update transition data
+	floor1Map.AddTransition(stairsDownX, stairsDownY, floor2Entity.ID, stairsUpX, stairsUpY, true)
+	floor2Map.AddTransition(stairsUpX, stairsUpY, floor1Entity.ID, stairsDownX, stairsDownY, true)
 }
 
 // getDungeonDimensions returns the width and height for a dungeon of the given size
@@ -566,7 +494,7 @@ func GetDungeonThemeFromLevel(level int, rng *rand.Rand) DungeonTheme {
 }
 
 // applyThemeDefinition applies visual changes based on a theme definition
-func (t *DungeonThemer) applyThemeDefinition(mapComp *components.MapComponent, theme *DungeonThemeDefinition, rooms [][4]int) {
+func (t *DungeonThemer) applyThemeDefinition(mapComp *components.MapComponent, themeDef *DungeonThemeDefinition, rooms [][4]int) {
 	// Check if stairs down already exist
 	stairsDownExists := false
 	for y := 0; y < mapComp.Height; y++ {
@@ -641,23 +569,23 @@ func (t *DungeonThemer) applyThemeDefinition(mapComp *components.MapComponent, t
 	// Place features using our generic function
 
 	// Water pools
-	if theme.WaterChance > 0 {
-		t.placeFeaturePools(mapComp, components.TileWater, theme.WaterChance)
+	if themeDef.WaterChance > 0 {
+		t.placeFeaturePools(mapComp, components.TileWater, themeDef.WaterChance)
 	}
 
 	// Lava pools
-	if theme.LavaChance > 0 {
-		t.placeFeaturePools(mapComp, components.TileLava, theme.LavaChance)
+	if themeDef.LavaChance > 0 {
+		t.placeFeaturePools(mapComp, components.TileLava, themeDef.LavaChance)
 	}
 
 	// Grass patches
-	if theme.GrassChance > 0 {
-		t.placeFeature(mapComp, components.TileGrass, theme.GrassChance, []int{components.TileFloor})
+	if themeDef.GrassChance > 0 {
+		t.placeFeature(mapComp, components.TileGrass, themeDef.GrassChance, []int{components.TileFloor})
 	}
 
 	// Trees
-	if theme.TreeChance > 0 {
-		t.placeFeature(mapComp, components.TileTree, theme.TreeChance, []int{components.TileFloor, components.TileGrass})
+	if themeDef.TreeChance > 0 {
+		t.placeFeature(mapComp, components.TileTree, themeDef.TreeChance, []int{components.TileFloor, components.TileGrass})
 	}
 
 	// TODO: Add support for special tiles when more tile types are available

@@ -2,6 +2,7 @@ package generation
 
 import (
 	"ebiten-rogue/components"
+	"fmt"
 )
 
 // BSPNode represents a node in the binary space partitioning tree
@@ -30,6 +31,8 @@ func (node *BSPNode) CorridorEnd() []int {
 
 // GenerateBSPDungeon creates a dungeon using binary space partitioning
 func (g *DungeonGenerator) GenerateBSPDungeon(mapComp *components.MapComponent) {
+	fmt.Printf("DEBUG: Starting BSP dungeon generation for map %dx%d\n", mapComp.Width, mapComp.Height)
+
 	// Fill the map with walls initially
 	for y := 0; y < mapComp.Height; y++ {
 		for x := 0; x < mapComp.Width; x++ {
@@ -51,11 +54,41 @@ func (g *DungeonGenerator) GenerateBSPDungeon(mapComp *components.MapComponent) 
 	// Generate rooms within the leaf nodes
 	g.createRoomsInLeaves(root)
 
+	// Count rooms for debugging
+	var roomCount int
+	var countRooms func(*BSPNode)
+	countRooms = func(node *BSPNode) {
+		if node.Room != nil {
+			roomCount++
+			fmt.Printf("DEBUG: Found room at (%d,%d) size %dx%d\n",
+				node.Room.X, node.Room.Y, node.Room.Width, node.Room.Height)
+		}
+		if node.Left != nil {
+			countRooms(node.Left)
+		}
+		if node.Right != nil {
+			countRooms(node.Right)
+		}
+	}
+	countRooms(root)
+	fmt.Printf("DEBUG: Created %d rooms\n", roomCount)
+
 	// Connect rooms together
 	g.connectRooms(root)
 
 	// Draw the rooms and corridors on the map
 	g.drawBSPDungeon(root, mapComp)
+
+	// Count floor tiles for debugging
+	floorTiles := 0
+	for y := 0; y < mapComp.Height; y++ {
+		for x := 0; x < mapComp.Width; x++ {
+			if mapComp.Tiles[y][x] == components.TileFloor {
+				floorTiles++
+			}
+		}
+	}
+	fmt.Printf("DEBUG: Map has %d floor tiles\n", floorTiles)
 
 	// Verify room connectivity and fix orphaned rooms
 	g.ensureRoomConnectivity(root, mapComp)

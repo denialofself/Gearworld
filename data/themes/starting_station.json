@@ -3,6 +3,7 @@
     "name": "Starting Station",
     "description": "A small research outpost that serves as a safe haven in the wilderness",
     "difficulty": 1,
+    "floors": 5,
     "tags": ["insect"],
     "exclude_tags": ["undead", "demon", "dragon", "goblinoid", "humanoid"],
     
@@ -15,7 +16,7 @@
         {"tile_type": "terminal", "chance": 0.05}
     ],
     
-    "density_factor": 0.08,
+    "density_factor": 0.5,
     "higher_level_chance": 0.0,
     "even_higher_level_chance": 0.0,
     "boss_chance": 0.0,

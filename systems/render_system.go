@@ -375,26 +375,15 @@ func (s *RenderSystem) drawEntities(world *ecs.World, screen *ebiten.Image, came
 		}
 
 		// Check if entity has a map context component
-		if world.HasComponent(entity.ID, components.MapContextID) {
-			mapContextComp, _ := world.GetComponent(entity.ID, components.MapContextID)
-			mapContext := mapContextComp.(*components.MapContextComponent)
+		if !world.HasComponent(entity.ID, components.MapContextID) {
+			continue
+		}
 
-			// Skip entities that don't belong to the active map
-			if mapContext.MapID != activeMapID {
-				// Debug logging for enemies on the wrong map context
-				if entity.HasTag("enemy") && world.HasComponent(entity.ID, components.Name) {
-					nameComp, _ := world.GetComponent(entity.ID, components.Name)
-					name := nameComp.(*components.NameComponent)
-					GetDebugLog().Add(fmt.Sprintf("DEBUG: Enemy '%s' (ID: %d) not rendered - wrong map context: %d vs active: %d",
-						name.Name, entity.ID, mapContext.MapID, activeMapID))
-				}
-				continue
-			}
-		} else {
-			// Debug log if entity doesn't have map context
-			if entity.HasTag("ai") || entity.HasTag("enemy") {
-				GetDebugLog().Add(fmt.Sprintf("Entity %d has no MapContext", entity.ID))
-			}
+		mapContextComp, _ := world.GetComponent(entity.ID, components.MapContextID)
+		mapContext := mapContextComp.(*components.MapContextComponent)
+
+		// Skip entities that don't belong to the active map
+		if mapContext.MapID != activeMapID {
 			continue
 		}
 

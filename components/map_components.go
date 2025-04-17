@@ -1,17 +1,27 @@
 package components
 
 import (
+	"ebiten-rogue/ecs"
 	"fmt"
 	"image/color"
 )
 
+// TransitionData stores information about a transition tile
+type TransitionData struct {
+	TargetMapID     ecs.EntityID // ID of the map this transition leads to
+	TargetX         int          // X position where player appears in target map
+	TargetY         int          // Y position where player appears in target map
+	IsBidirectional bool         // Whether the transition works both ways
+}
+
 // MapComponent stores the game map data
 type MapComponent struct {
-	Width    int
-	Height   int
-	Tiles    [][]int
-	Visible  [][]bool // Track currently visible tiles
-	Explored [][]bool // Track tiles that have been seen at least once
+	Width       int
+	Height      int
+	Tiles       [][]int
+	Visible     [][]bool                       // Track currently visible tiles
+	Explored    [][]bool                       // Track tiles that have been seen at least once
+	Transitions map[int]map[int]TransitionData // Maps (x,y) coordinates to transition data
 }
 
 // Tile types
@@ -141,7 +151,7 @@ func NewTileMappingComponent() *TileMappingComponent {
 	mapping.Definitions[TileRuinedRailway] = NewTileDefinitionByPos(13, 3, color.RGBA{100, 100, 110, 255}) // Railway: rusty tracks
 	mapping.Definitions[TileSubstation] = NewTileDefinitionByPos(15, 0, color.RGBA{200, 200, 0, 255})      // Substation: industrial yellow
 	// New railway tile definitions
-	railwayColor := color.RGBA{184, 49, 42, 255}                                            // Same rusty color as ruined railway
+	railwayColor := color.RGBA{184, 49, 42, 255}                                              // Same rusty color as ruined railway
 	mapping.Definitions[TileRailwayHorizontal] = NewTileDefinitionByPos(4, 12, railwayColor)  // Box drawing horizontal
 	mapping.Definitions[TileRailwayVertical] = NewTileDefinitionByPos(3, 11, railwayColor)    // Box drawing vertical
 	mapping.Definitions[TileRailwayTopLeft] = NewTileDefinitionByPos(10, 13, railwayColor)    // Box drawing top left corner
@@ -170,29 +180,22 @@ func (t *TileMappingComponent) GetTileDefinition(tileType int) TileDefinition {
 	}
 }
 
-// NewMapComponent creates a new map with the given dimensions
+// NewMapComponent creates a new map component with the specified dimensions
 func NewMapComponent(width, height int) *MapComponent {
 	m := &MapComponent{
-		Width:    width,
-		Height:   height,
-		Tiles:    make([][]int, height),
-		Visible:  make([][]bool, height),
-		Explored: make([][]bool, height),
+		Width:       width,
+		Height:      height,
+		Tiles:       make([][]int, height),
+		Visible:     make([][]bool, height),
+		Explored:    make([][]bool, height),
+		Transitions: make(map[int]map[int]TransitionData),
 	}
 
-	// Initialize the tiles
+	// Initialize the 2D arrays
 	for y := 0; y < height; y++ {
 		m.Tiles[y] = make([]int, width)
 		m.Visible[y] = make([]bool, width)
 		m.Explored[y] = make([]bool, width)
-
-		for x := 0; x < width; x++ {
-			// Start with walls everywhere
-			m.Tiles[y][x] = TileWall
-			// Initially nothing is visible or explored
-			m.Visible[y][x] = false
-			m.Explored[y][x] = false
-		}
 	}
 
 	return m
@@ -289,4 +292,41 @@ func DebugWallDetection() {
 	testWallType("TileWallTeeTop", TileWallTeeTop)
 	testWallType("TileWallTeeBottom", TileWallTeeBottom)
 	testWallType("TileWallCross", TileWallCross)
+}
+
+// AddTransition adds a transition at the specified coordinates
+func (m *MapComponent) AddTransition(x, y int, targetMapID ecs.EntityID, targetX, targetY int, isBidirectional bool) {
+	// Initialize the x map if it doesn't exist
+	if _, exists := m.Transitions[x]; !exists {
+		m.Transitions[x] = make(map[int]TransitionData)
+	}
+
+	// Add the transition data
+	m.Transitions[x][y] = TransitionData{
+		TargetMapID:     targetMapID,
+		TargetX:         targetX,
+		TargetY:         targetY,
+		IsBidirectional: isBidirectional,
+	}
+}
+
+// GetTransition returns the transition data at the specified coordinates
+func (m *MapComponent) GetTransition(x, y int) (TransitionData, bool) {
+	if xMap, exists := m.Transitions[x]; exists {
+		if data, exists := xMap[y]; exists {
+			return data, true
+		}
+	}
+	return TransitionData{}, false
+}
+
+// RemoveTransition removes the transition at the specified coordinates
+func (m *MapComponent) RemoveTransition(x, y int) {
+	if xMap, exists := m.Transitions[x]; exists {
+		delete(xMap, y)
+		// Clean up empty x maps
+		if len(xMap) == 0 {
+			delete(m.Transitions, x)
+		}
+	}
 }

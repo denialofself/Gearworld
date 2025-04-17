@@ -13,6 +13,7 @@ type DungeonThemeDefinition struct {
 	Name        string   `json:"name"`         // Display name for the theme
 	Description string   `json:"description"`  // Description of the theme
 	Difficulty  int      `json:"difficulty"`   // Base difficulty level (1-10)
+	Floors      int      `json:"floors"`       // Number of floors in this dungeon (default: 1)
 	Tags        []string `json:"tags"`         // Tags for monsters that fit this theme
 	ExcludeTags []string `json:"exclude_tags"` // Tags for monsters that don't fit this theme
 

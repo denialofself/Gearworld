@@ -312,27 +312,23 @@ func (g *Game) initialize() {
 		g.world,
 		g.templateManager,
 		g.entitySpawner,
-		systems.GetMessageLog().Add, // Pass the logging function
+		systems.GetMessageLog().Add,
 	)
 
-	// Set a random seed for dungeon generation
-	dungeonThemer.SetSeed(time.Now().UnixNano())
-
-	// Load dungeon themes from JSON files
+	// Load themes from the data/themes directory
 	err := dungeonThemer.LoadThemesFromDirectory("data/themes")
 	if err != nil {
-		systems.GetDebugLog().Add(fmt.Sprintf("WARNING: Failed to load dungeon themes: %v", err))
-	} else {
-		systems.GetDebugLog().Add("Successfully loaded dungeon themes from data/themes")
+		systems.GetMessageLog().Add(fmt.Sprintf("Error loading dungeon themes: %v", err))
 	}
 
 	// Configure the dungeon (level 1, abandoned theme, large size)
 	config := generation.DungeonConfiguration{
-		Level:       1,
-		Size:        generation.SizeSmall,
-		Generator:   generation.GeneratorBSP,
-		AddStairsUp: true,               // Add stairs up to return to the world map
-		ThemeID:     "starting_station", // Use the JSON theme if available
+		Level:         1,
+		Size:          generation.SizeSmall,
+		Generator:     generation.GeneratorBSP,
+		AddStairsUp:   true,               // Add stairs up to return to the world map
+		ThemeID:       "starting_station", // Use the JSON theme if available
+		DensityFactor: 1.0,                // Standard monster density
 	}
 
 	// Generate the themed dungeon with appropriate monsters

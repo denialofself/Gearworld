@@ -103,102 +103,135 @@ func (g *DungeonGenerator) FindEmptyPosition(mapComp *components.MapComponent) (
 	}
 }
 
-// FindFirstRoomInMap attempts to identify the first room in a dungeon map
-// Returns a room as [x, y, width, height] or an empty slice if no room could be identified
-func (g *DungeonGenerator) FindFirstRoomInMap(mapComp *components.MapComponent) []int {
-	// Strategy: scan the top-left quarter of the map looking for a room
-	// A room is defined as a contiguous area of floor tiles surrounded by walls
-	searchWidth := mapComp.Width / 2
-	searchHeight := mapComp.Height / 2
+// FindFirstRoomInMap returns the coordinates of the first room found in the map
+func (g *DungeonGenerator) FindFirstRoomInMap(mapComp *components.MapComponent) [][4]int {
+	// Create a visited array to track which tiles we've checked
+	visited := make([][]bool, mapComp.Height)
+	for i := range visited {
+		visited[i] = make([]bool, mapComp.Width)
+	}
 
-	// First, find a floor tile (potential room center)
-	var startX, startY int
-	foundStart := false
-
-	for y := 5; y < searchHeight-5 && !foundStart; y++ {
-		for x := 5; x < searchWidth-5 && !foundStart; x++ {
-			if mapComp.Tiles[y][x] == components.TileFloor {
-				// Check if this might be room center (surrounded by floor tiles)
-				floorCount := 0
-				for dy := -2; dy <= 2; dy++ {
-					for dx := -2; dx <= 2; dx++ {
-						nx, ny := x+dx, y+dy
-						if nx >= 0 && nx < mapComp.Width && ny >= 0 && ny < mapComp.Height &&
-							mapComp.Tiles[ny][nx] == components.TileFloor {
-							floorCount++
-						}
-					}
-				}
-
-				// If we found enough floor tiles around, this is likely a room center
-				if floorCount >= 20 { // At least 20 out of 25 tiles are floor
-					startX, startY = x, y
-					foundStart = true
-					break
-				}
+	// Scan the map for floor tiles
+	for y := 0; y < mapComp.Height; y++ {
+		for x := 0; x < mapComp.Width; x++ {
+			if !visited[y][x] && mapComp.Tiles[y][x] == components.TileFloor {
+				// Found a floor tile, flood fill to find room boundaries
+				minX, minY := x, y
+				maxX, maxY := x, y
+				g.floodFillRoom(mapComp, visited, x, y, &minX, &minY, &maxX, &maxY)
+				return [][4]int{{minX, minY, maxX, maxY}}
 			}
 		}
 	}
+	return nil
+}
 
-	if !foundStart {
-		return []int{} // No suitable room found
+// floodFillRoom performs a flood fill to find room boundaries
+func (g *DungeonGenerator) floodFillRoom(mapComp *components.MapComponent, visited [][]bool, x, y int, minX, minY, maxX, maxY *int) {
+	if x < 0 || x >= mapComp.Width || y < 0 || y >= mapComp.Height || visited[y][x] || mapComp.Tiles[y][x] != components.TileFloor {
+		return
 	}
 
-	// Now find the room boundaries by expanding from the center
-	minX, minY := startX, startY
-	maxX, maxY := startX, startY
-
-	// Find left boundary
-	for x := startX; x >= 0; x-- {
-		if mapComp.IsWall(x, startY) {
-			minX = x + 1
-			break
-		}
-		if x == 0 {
-			minX = 0
-		}
+	visited[y][x] = true
+	if x < *minX {
+		*minX = x
+	}
+	if x > *maxX {
+		*maxX = x
+	}
+	if y < *minY {
+		*minY = y
+	}
+	if y > *maxY {
+		*maxY = y
 	}
 
-	// Find right boundary
-	for x := startX; x < mapComp.Width; x++ {
-		if mapComp.IsWall(x, startY) {
-			maxX = x - 1
-			break
-		}
-		if x == mapComp.Width-1 {
-			maxX = mapComp.Width - 1
-		}
-	}
+	// Recursively flood fill in all directions
+	g.floodFillRoom(mapComp, visited, x+1, y, minX, minY, maxX, maxY)
+	g.floodFillRoom(mapComp, visited, x-1, y, minX, minY, maxX, maxY)
+	g.floodFillRoom(mapComp, visited, x, y+1, minX, minY, maxX, maxY)
+	g.floodFillRoom(mapComp, visited, x, y-1, minX, minY, maxX, maxY)
+}
 
-	// Find top boundary
-	for y := startY; y >= 0; y-- {
-		if mapComp.IsWall(startX, y) {
-			minY = y + 1
-			break
-		}
-		if y == 0 {
-			minY = 0
+// Generate creates a new dungeon layout in the provided map component
+func (g *DungeonGenerator) Generate(mapComp *components.MapComponent, size DungeonSize) [][4]int {
+	// Fill the map with walls initially
+	for y := 0; y < mapComp.Height; y++ {
+		for x := 0; x < mapComp.Width; x++ {
+			mapComp.SetTile(x, y, components.TileWall)
 		}
 	}
 
-	// Find bottom boundary
-	for y := startY; y < mapComp.Height; y++ {
-		if mapComp.IsWall(startX, y) {
-			maxY = y - 1
-			break
-		}
-		if y == mapComp.Height-1 {
-			maxY = mapComp.Height - 1
-		}
+	// Generate the layout based on size
+	var rooms [][4]int
+	switch size {
+	case SizeSmall:
+		rooms = g.generateSmallBSP(mapComp)
+	case SizeLarge:
+		rooms = g.generateLargeBSP(mapComp)
+	case SizeHuge:
+		rooms = g.generateHugeBSP(mapComp)
+	default: // SizeNormal
+		rooms = g.generateNormalBSP(mapComp)
 	}
 
-	width := maxX - minX + 1
-	height := maxY - minY + 1
+	// Add features like water, lava, stairs, etc.
+	g.AddFeatures(mapComp, rooms)
 
-	// Validate the room (must be reasonable size)
-	if width < 4 || height < 4 || width > mapComp.Width/2 || height > mapComp.Height/2 {
-		return []int{} // Not a valid room
+	return rooms
+}
+
+// generateSmallBSP generates a small BSP dungeon
+func (g *DungeonGenerator) generateSmallBSP(mapComp *components.MapComponent) [][4]int {
+	// TODO: Implement BSP generation for small dungeons
+	// For now, fall back to random rooms
+	g.GenerateRoomsAndCorridors(mapComp)
+	return g.FindFirstRoomInMap(mapComp)
+}
+
+// generateLargeBSP generates a large BSP dungeon
+func (g *DungeonGenerator) generateLargeBSP(mapComp *components.MapComponent) [][4]int {
+	// TODO: Implement BSP generation for large dungeons
+	// For now, fall back to random rooms
+	g.GenerateRoomsAndCorridors(mapComp)
+	return g.FindFirstRoomInMap(mapComp)
+}
+
+// generateHugeBSP generates a huge BSP dungeon
+func (g *DungeonGenerator) generateHugeBSP(mapComp *components.MapComponent) [][4]int {
+	// TODO: Implement BSP generation for huge dungeons
+	// For now, fall back to random rooms
+	g.GenerateRoomsAndCorridors(mapComp)
+	return g.FindFirstRoomInMap(mapComp)
+}
+
+// generateNormalBSP generates a normal-sized BSP dungeon
+func (g *DungeonGenerator) generateNormalBSP(mapComp *components.MapComponent) [][4]int {
+	// TODO: Implement BSP generation for normal dungeons
+	// For now, fall back to random rooms
+	g.GenerateRoomsAndCorridors(mapComp)
+	return g.FindFirstRoomInMap(mapComp)
+}
+
+// findRooms finds all rooms in the generated dungeon
+func (d *DungeonGenerator) findRooms(mapComp *components.MapComponent) [][4]int {
+	var rooms [][4]int
+	visited := make([][]bool, mapComp.Height)
+	for i := range visited {
+		visited[i] = make([]bool, mapComp.Width)
 	}
 
-	return []int{minX, minY, width, height}
+	// Find rooms by flood filling floor tiles
+	for y := 0; y < mapComp.Height; y++ {
+		for x := 0; x < mapComp.Width; x++ {
+			if !visited[y][x] && mapComp.Tiles[y][x] == components.TileFloor {
+				// Found a new room, flood fill to find its bounds
+				minX, minY := x, y
+				maxX, maxY := x, y
+				d.floodFillRoom(mapComp, visited, x, y, &minX, &minY, &maxX, &maxY)
+				rooms = append(rooms, [4]int{minX, minY, maxX, maxY})
+			}
+		}
+	}
+	return rooms
 }

@@ -51,6 +51,15 @@ func (s *CombatSystem) handleCollision(world *ecs.World, event CollisionEvent) {
 	isPlayerInvolved := isPlayer(world, entityID1) || isPlayer(world, entityID2)
 
 	if isPlayerInvolved {
+		// Check if both entities are on the same map
+		mapID1 := getEntityMapID(world, entityID1)
+		mapID2 := getEntityMapID(world, entityID2)
+
+		if mapID1 != mapID2 {
+			GetDebugLog().Add(fmt.Sprintf("DEBUG: Collision combat prevented - entities on different maps (%d vs %d)", mapID1, mapID2))
+			return
+		}
+
 		// Determine attacker and defender
 		var attackerID, defenderID ecs.EntityID
 		if isPlayer(world, entityID1) {
@@ -72,8 +81,27 @@ func (s *CombatSystem) handleEnemyAttack(world *ecs.World, event EnemyAttackEven
 	attackerID := event.AttackerID
 	defenderID := event.TargetID
 
+	// Check if both entities are on the same map
+	attackerMapID := getEntityMapID(world, attackerID)
+	defenderMapID := getEntityMapID(world, defenderID)
+
+	if attackerMapID != defenderMapID {
+		GetDebugLog().Add(fmt.Sprintf("DEBUG: Combat prevented - entities on different maps (attacker: %d, defender: %d)", attackerMapID, defenderMapID))
+		return
+	}
+
 	// Process the combat with the enemy as the attacker
 	s.ProcessCombat(world, attackerID, defenderID)
+}
+
+// getEntityMapID returns the map ID an entity is on, or 0 if not on a map
+func getEntityMapID(world *ecs.World, entityID ecs.EntityID) ecs.EntityID {
+	if world.HasComponent(entityID, components.MapContextID) {
+		mapContextComp, _ := world.GetComponent(entityID, components.MapContextID)
+		mapContext := mapContextComp.(*components.MapContextComponent)
+		return mapContext.MapID
+	}
+	return 0
 }
 
 // Update registers with event system if not already initialized

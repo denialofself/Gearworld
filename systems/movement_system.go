@@ -101,19 +101,41 @@ func (s *MovementSystem) isValidMoveStandard(world *ecs.World, mapID ecs.EntityI
 		return false
 	}
 
-	// Check for entity collision
-	targetID := s.getEntityAtPosition(world, x, y)
-	if targetID != 0 && targetID != entityID {
-		// If there's an entity and it's not the moving entity
-		if _, hasCollision := world.GetComponent(targetID, components.Collision); hasCollision {
-			// Emit a collision event
-			world.EmitEvent(CollisionEvent{
-				EntityID1: entityID,
-				EntityID2: targetID,
-				X:         x,
-				Y:         y,
-			})
-			return false
+	// Check for entity collision, only on the same map
+	for _, entity := range world.GetAllEntities() {
+		// Skip entities not on the same map
+		if world.HasComponent(entity.ID, components.MapContextID) {
+			mapContextComp, _ := world.GetComponent(entity.ID, components.MapContextID)
+			mapContext := mapContextComp.(*components.MapContextComponent)
+			if mapContext.MapID != mapID {
+				continue
+			}
+		} else {
+			// Skip entities without a map context
+			continue
+		}
+
+		posComp, hasPos := world.GetComponent(entity.ID, components.Position)
+		if !hasPos {
+			continue
+		}
+
+		pos := posComp.(*components.PositionComponent)
+		if pos.X == x && pos.Y == y {
+			// Position is occupied by an entity, check if it blocks
+			if collComp, hasCol := world.GetComponent(entity.ID, components.Collision); hasCol {
+				collision := collComp.(*components.CollisionComponent)
+				if collision.Blocks {
+					// Emit a collision event
+					world.EmitEvent(CollisionEvent{
+						EntityID1: entityID,
+						EntityID2: entity.ID,
+						X:         x,
+						Y:         y,
+					})
+					return false
+				}
+			}
 		}
 	}
 
