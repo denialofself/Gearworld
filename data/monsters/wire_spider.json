@@ -1,0 +1,21 @@
+{
+    "id": "wire_spider",
+    "name": "Wire Spider",
+    "description": "A copper-colored spider with a metallic sheen. It's known to weave intricate webs and is quite territorial.",
+    "tileX": 3,
+    "tileY": 7,
+    "color": "#d94338",
+    "health": 15,
+    "attack": 3,
+    "defense": 3,
+    "actionPoints": 6,
+    "maxActionPoints": 6,
+    "recovery": 3,
+    "healingfactor": 0,
+    "level": 1,
+    "xp": 20,
+    "aiType": "aggressive",
+    "tags": ["enemy", "insect", "ai"],
+    "blocksPath": true,
+    "spawnWeight": 8
+  }

@@ -21,14 +21,13 @@ const (
 // DungeonConfiguration defines a complete configuration for a dungeon
 type DungeonConfiguration struct {
 	Level                 int           // Dungeon depth/level
-	Theme                 DungeonTheme  // Theme of the dungeon (legacy enum approach)
 	Size                  DungeonSize   // Size of the dungeon
 	Generator             GeneratorType // Type of dungeon generator to use
 	DensityFactor         float64       // Monster density (1.0 = standard)
 	HigherLevelChance     float64       // Chance of spawning higher level monsters (0.0-1.0)
 	EvenHigherLevelChance float64       // Chance of spawning even higher level monsters (0.0-1.0)
 	AddStairsUp           bool          // Whether to add stairs up near the player's spawn point
-	ThemeID               string        // Optional ID of a JSON theme definition to use instead of Theme enum
+	ThemeID               string        // ID of the JSON theme definition to use
 	TotalFloors           int           // Total number of floors to generate (default: 1)
 	CurrentFloor          int           // Current floor being generated (1-based)
 }
@@ -170,16 +169,36 @@ func (t *DungeonThemer) generateFloor(config DungeonConfiguration, themeDef *Dun
 	if themeDef != nil {
 		t.applyThemeDefinition(mapComp, themeDef, rooms)
 	} else {
-		t.applyMapTheming(mapComp, config.Theme)
+		t.logMessage("Warning: No theme definition provided")
 	}
 
 	// Add stairs if needed
 	if config.CurrentFloor < config.TotalFloors {
-		// Add stairs down to next floor
-		x, y := t.findEmptyPosition(mapComp)
-		mapComp.SetTile(x, y, components.TileStairsDown)
-		// Store transition data
-		mapComp.AddTransition(x, y, 0, 0, 0, true) // Target map ID will be set when next floor is created
+		// Check if stairs down already exist
+		stairsDownExists := false
+		for y := 0; y < mapComp.Height; y++ {
+			for x := 0; x < mapComp.Width; x++ {
+				if mapComp.Tiles[y][x] == components.TileStairsDown {
+					stairsDownExists = true
+					if t.logMessage != nil {
+						t.logMessage(fmt.Sprintf("Found existing stairs down at (%d,%d)", x, y))
+					}
+					break
+				}
+			}
+			if stairsDownExists {
+				break
+			}
+		}
+
+		// Only add stairs down if they don't already exist
+		if !stairsDownExists {
+			// Add stairs down to next floor
+			x, y := t.findEmptyPosition(mapComp)
+			mapComp.SetTile(x, y, components.TileStairsDown)
+			// Store transition data
+			mapComp.AddTransition(x, y, 0, 0, 0, true) // Target map ID will be set when next floor is created
+		}
 	}
 
 	if config.CurrentFloor > 1 {
@@ -221,7 +240,6 @@ func (t *DungeonThemer) generateFloor(config DungeonConfiguration, themeDef *Dun
 	// Populate the dungeon with monsters and items
 	options := PopulationOptions{
 		DungeonLevel:          config.Level,
-		Theme:                 config.Theme,
 		DensityFactor:         config.DensityFactor,
 		HigherLevelChance:     config.HigherLevelChance,
 		EvenHigherLevelChance: config.EvenHigherLevelChance,
@@ -234,8 +252,6 @@ func (t *DungeonThemer) generateFloor(config DungeonConfiguration, themeDef *Dun
 		options.DensityFactor = themeDef.DensityFactor
 		options.HigherLevelChance = themeDef.HigherLevelChance
 		options.EvenHigherLevelChance = themeDef.EvenHigherLevelChance
-	} else {
-		options.PreferredTags = t.getThemeTags(config.Theme)
 	}
 
 	t.populator.PopulateDungeon(mapComp, floorEntity.ID, options)
@@ -314,89 +330,6 @@ func (t *DungeonThemer) getDungeonDimensions(size DungeonSize) (width, height in
 	}
 }
 
-// getThemeTags returns tags that should be preferred for a given theme
-func (t *DungeonThemer) getThemeTags(theme DungeonTheme) []string {
-	switch theme {
-	case ThemeUndead:
-		return []string{"undead", "ghost", "skeleton", "zombie"}
-	case ThemeGoblinoid:
-		return []string{"goblinoid", "humanoid", "orc", "goblin"}
-	case ThemeInsects:
-		return []string{"insect", "vermin", "spider", "bug"}
-	case ThemeDemonic:
-		return []string{"demon", "devil", "fiend", "hellspawn"}
-	default:
-		return []string{} // No specific tags for standard
-	}
-}
-
-// applyMapTheming applies visual changes to the map based on theme
-func (t *DungeonThemer) applyMapTheming(mapComp *components.MapComponent, theme DungeonTheme) {
-	// Apply theme-specific visual changes to the map
-	switch theme {
-	case ThemeUndead:
-		// Add tombstones, bones, etc.
-		t.addTombstones(mapComp)
-	case ThemeDemonic:
-		// Add lava pools, ritual circles
-		t.addLavaPools(mapComp)
-	case ThemeInsects:
-		// Add webs, egg sacs
-		t.addWebs(mapComp)
-	case ThemeGoblinoid:
-		// Add crude furniture, campfires
-		t.addCampfires(mapComp)
-	}
-}
-
-// Theme-specific map decorations (placeholder implementations)
-func (t *DungeonThemer) addTombstones(mapComp *components.MapComponent) {
-	// Replace some floor tiles with tombstone-like features
-	// This would be implemented with actual tile types when available
-	// For now, just a placeholder that does nothing
-}
-
-func (t *DungeonThemer) addLavaPools(mapComp *components.MapComponent) {
-	// Add some lava pools to the map
-	poolCount := mapComp.Width * mapComp.Height / 400 // Roughly one pool per 400 tiles
-
-	for i := 0; i < poolCount; i++ {
-		// Find a suitable location
-		for attempts := 0; attempts < 50; attempts++ {
-			x := t.rng.Intn(mapComp.Width-4) + 2
-			y := t.rng.Intn(mapComp.Height-4) + 2
-
-			// Only place on floor tiles
-			if mapComp.Tiles[y][x] == components.TileFloor {
-				// Create a small lava pool
-				poolSize := 2 + t.rng.Intn(3) // 2-4 tiles across
-				for py := y - poolSize/2; py <= y+poolSize/2; py++ {
-					for px := x - poolSize/2; px <= x+poolSize/2; px++ {
-						// Check bounds
-						if px >= 0 && px < mapComp.Width && py >= 0 && py < mapComp.Height {
-							// Only convert floor tiles and make pool irregular
-							if mapComp.Tiles[py][px] == components.TileFloor && t.rng.Intn(100) < 70 {
-								mapComp.SetTile(px, py, components.TileLava)
-							}
-						}
-					}
-				}
-				break
-			}
-		}
-	}
-}
-
-func (t *DungeonThemer) addWebs(mapComp *components.MapComponent) {
-	// This would add web decorations when we have web tiles
-	// For now, just a placeholder that does nothing
-}
-
-func (t *DungeonThemer) addCampfires(mapComp *components.MapComponent) {
-	// This would add campfire decorations when we have campfire tiles
-	// For now, just a placeholder that does nothing
-}
-
 // findPlayerSpawnLocation finds a suitable location for player spawning
 func (t *DungeonThemer) findPlayerSpawnLocation(mapComp *components.MapComponent) (int, int) {
 	// Return a random empty position in the map
@@ -461,47 +394,6 @@ func (t *DungeonThemer) findEmptyPosition(mapComp *components.MapComponent) (int
 
 	// Last resort: return the center of the map
 	return mapComp.Width / 2, mapComp.Height / 2
-}
-
-// GetDungeonThemeFromLevel returns a recommended theme for a dungeon level
-func GetDungeonThemeFromLevel(level int, rng *rand.Rand) DungeonTheme {
-	// Define some themes based on level ranges
-	// This could be expanded or loaded from config
-	switch {
-	case level <= 3:
-		// Beginner levels more likely to have goblinoids
-		if rng.Float64() < 0.6 {
-			return ThemeGoblinoid
-		}
-		return ThemeStandard
-
-	case level <= 6:
-		// Mid levels more likely to have undead
-		roll := rng.Float64()
-		if roll < 0.4 {
-			return ThemeUndead
-		} else if roll < 0.7 {
-			return ThemeInsects
-		}
-		return ThemeStandard
-
-	case level <= 10:
-		// Higher levels more likely to have demons
-		roll := rng.Float64()
-		if roll < 0.5 {
-			return ThemeDemonic
-		} else if roll < 0.8 {
-			return ThemeUndead
-		}
-		return ThemeStandard
-
-	default:
-		// Deep levels heavily demonic or mixed
-		if rng.Float64() < 0.7 {
-			return ThemeDemonic
-		}
-		return ThemeStandard
-	}
 }
 
 // applyThemeDefinition applies visual changes based on a theme definition
@@ -644,8 +536,17 @@ func (t *DungeonThemer) placeFeature(mapComp *components.MapComponent, featureTy
 // placeFeaturePools places pool-type features (water, lava) that should appear in clusters
 func (t *DungeonThemer) placeFeaturePools(mapComp *components.MapComponent, featureType int, chance float64) {
 	// Calculate how many pools to place based on map size and chance
-	// Pools need a lower divisor since each pool consists of multiple tiles
-	poolCount := int(float64(mapComp.Width*mapComp.Height) * chance / 400.0)
+	// Use a smaller divisor for small maps to ensure features appear
+	divisor := 400.0
+	if mapComp.Width <= 40 && mapComp.Height <= 30 {
+		divisor = 100.0 // More pools in small maps
+	}
+	poolCount := int(float64(mapComp.Width*mapComp.Height) * chance / divisor)
+
+	// Ensure at least one pool if chance is high enough
+	if chance >= 0.1 && poolCount == 0 {
+		poolCount = 1
+	}
 
 	for i := 0; i < poolCount; i++ {
 		// Find an empty spot for the pool

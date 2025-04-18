@@ -35,13 +35,12 @@ type DungeonPopulator struct {
 
 // PopulationOptions defines options for populating a dungeon
 type PopulationOptions struct {
-	DungeonLevel          int          // Dungeon depth/level (affects monster difficulty)
-	Theme                 DungeonTheme // Theme of the dungeon
-	DensityFactor         float64      // How many monsters per room (1.0 = standard)
-	HigherLevelChance     float64      // Chance of spawning monsters from next level (0.0-1.0)
-	EvenHigherLevelChance float64      // Chance of spawning monsters from two levels higher (0.0-1.0)
-	PreferredTags         []string     // Tags to prefer when choosing monsters
-	ExcludeTags           []string     // Tags to avoid when choosing monsters
+	DungeonLevel          int      // Dungeon depth/level (affects monster difficulty)
+	DensityFactor         float64  // How many monsters per room (1.0 = standard)
+	HigherLevelChance     float64  // Chance of spawning monsters from next level (0.0-1.0)
+	EvenHigherLevelChance float64  // Chance of spawning monsters from two levels higher (0.0-1.0)
+	PreferredTags         []string // Tags to prefer when choosing monsters
+	ExcludeTags           []string // Tags to avoid when choosing monsters
 }
 
 // NewDungeonPopulator creates a new dungeon populator
@@ -328,35 +327,8 @@ func (p *DungeonPopulator) getEligibleMonsters(options PopulationOptions) []mons
 
 // matchesTheme checks if a monster matches the dungeon theme
 func (p *DungeonPopulator) matchesTheme(template *data.EntityTemplate, options PopulationOptions) bool {
-	// If we have preferred tags from JSON theme, use those as the primary filter
-	if len(options.PreferredTags) > 0 {
-		// Monster must match at least one of the preferred tags
-		return p.hasPreferredTags(template, options.PreferredTags)
-	}
-
-	// Standard theme accepts all monsters
-	if options.Theme == ThemeStandard {
-		return true
-	}
-
-	// For legacy enum themes, check for specific theme matches
-	switch options.Theme {
-	case ThemeUndead:
-		return p.hasTag(template, "undead")
-	case ThemeGoblinoid:
-		return p.hasTag(template, "goblinoid") || p.hasTag(template, "humanoid")
-	case ThemeInsects:
-		return p.hasTag(template, "insect") || p.hasTag(template, "vermin")
-	case ThemeDemonic:
-		return p.hasTag(template, "demon") || p.hasTag(template, "devil")
-	case ThemeAbandoned:
-		// Abandoned theme uses a mix of monsters but primarily vermin
-		return p.hasTag(template, "vermin") || p.hasTag(template, "insect") ||
-			p.hasTag(template, "undead")
-	}
-
-	// Default to allowing the monster if theme handling is not implemented
-	return true
+	// Monster must match at least one of the preferred tags
+	return p.hasPreferredTags(template, options.PreferredTags)
 }
 
 // hasTag checks if a template has a specific tag

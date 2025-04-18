@@ -327,7 +327,7 @@ func (g *Game) initialize() {
 		Size:          generation.SizeSmall,
 		Generator:     generation.GeneratorBSP,
 		AddStairsUp:   true,               // Add stairs up to return to the world map
-		ThemeID:       "starting_station", // Use the JSON theme if available
+		ThemeID:       "starting_station", // Use the JSON theme
 		DensityFactor: 1.0,                // Standard monster density
 	}
 

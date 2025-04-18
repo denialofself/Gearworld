@@ -149,7 +149,7 @@ func (s *AIPathfindingSystem) Update(world *ecs.World, dt float64) {
 
 		// Process AI based on type
 		switch ai.Type {
-		case "slow_chase", "slow_wander":
+		case "slow_chase", "slow_wander", "aggressive":
 			s.processPathfinding(world, entity.ID, ai, pos, playerPos, gameMap)
 			// Add other AI types here as needed
 		}

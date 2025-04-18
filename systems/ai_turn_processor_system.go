@@ -156,6 +156,17 @@ func (s *AITurnProcessorSystem) processTurn(world *ecs.World, entityID uint64, a
 			stats.ActionPoints -= AttackCost
 			GetMessageLog().Add(fmt.Sprintf("DEBUG: AI attacked player (AP: %d)", stats.ActionPoints))
 			return
+		case "aggressive":
+			// Aggressive AI always attacks when adjacent
+			world.GetEventManager().Emit(EnemyAttackEvent{
+				AttackerID: ecs.EntityID(entityID),
+				TargetID:   playerID,
+				X:          pos.X,
+				Y:          pos.Y,
+			})
+			stats.ActionPoints -= AttackCost
+			GetMessageLog().Add(fmt.Sprintf("DEBUG: Aggressive AI attacked player (AP: %d)", stats.ActionPoints))
+			return
 		}
 	}
 
@@ -177,6 +188,9 @@ func (s *AITurnProcessorSystem) processTurn(world *ecs.World, entityID uint64, a
 					stats.ActionPoints -= WaitCost
 					return
 				}
+			case "aggressive":
+				// Aggressive AI never skips movement
+				// Always moves toward the player
 			}
 
 			// Move to the next step

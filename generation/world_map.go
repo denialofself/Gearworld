@@ -492,24 +492,58 @@ func (g *WorldMapGenerator) CreateWorldMapEntity(world *ecs.World, width, height
 	centerX := mapComp.Width / 2
 	centerY := mapComp.Height / 2
 
-	// Place additional substations first (excluding center)
-	substations := make([]struct{ x, y int }, 0, 4) // 3 additional + 1 center
-	attempts := 0
-	maxAttempts := 30 // Limit attempts to avoid infinite loop
+	// Place the center substation
+	mapComp.SetTile(centerX, centerY, components.TileSubstation)
+	fmt.Printf("Placed center substation at: (%d, %d)\n", centerX, centerY)
 
-	for len(substations) < 3 && attempts < maxAttempts {
+	// Place the alpha station near the center
+	alphaStation := struct{ x, y int }{}
+	attempts := 0
+	maxAttempts := 20
+	minDistance := 5  // Minimum distance from center
+	maxDistance := 15 // Maximum distance from center
+
+	for attempts < maxAttempts {
+		// Generate a random angle
+		angle := g.rng.Float64() * 2 * math.Pi
+		// Generate a random distance between min and max
+		distance := minDistance + g.rng.Intn(maxDistance-minDistance)
+
+		// Calculate position
+		alphaX := centerX + int(float64(distance)*math.Cos(angle))
+		alphaY := centerY + int(float64(distance)*math.Sin(angle))
+
+		// Check bounds and if the tile is walkable
+		if alphaX >= 0 && alphaX < mapComp.Width &&
+			alphaY >= 0 && alphaY < mapComp.Height &&
+			mapComp.Tiles[alphaY][alphaX] != components.TileMountains {
+			alphaStation.x = alphaX
+			alphaStation.y = alphaY
+			mapComp.SetTile(alphaX, alphaY, components.TileSubstation)
+			fmt.Printf("Placed alpha station at: (%d, %d)\n", alphaX, alphaY)
+			break
+		}
+		attempts++
+	}
+
+	// Place additional stations (8 total)
+	additionalStations := make([]struct{ x, y int }, 0, 8)
+	attempts = 0
+	maxAttempts = 100 // Increased attempts for more stations
+
+	for len(additionalStations) < 8 && attempts < maxAttempts {
 		attempts++
 		x := g.rng.Intn(mapComp.Width)
 		y := g.rng.Intn(mapComp.Height)
 
-		// Skip if this is the center or a mountain tile
-		if (x == centerX && y == centerY) || mapComp.Tiles[y][x] == components.TileMountains {
+		// Skip if this is a mountain tile
+		if mapComp.Tiles[y][x] == components.TileMountains {
 			continue
 		}
 
-		// Check minimum distance from other substations
+		// Check minimum distance from other stations
 		tooClose := false
-		for _, s := range substations {
+		for _, s := range additionalStations {
 			dx := x - s.x
 			dy := y - s.y
 			distance := dx*dx + dy*dy
@@ -519,112 +553,48 @@ func (g *WorldMapGenerator) CreateWorldMapEntity(world *ecs.World, width, height
 			}
 		}
 
+		// Also check distance from center and alpha
+		dx := x - centerX
+		dy := y - centerY
+		if dx*dx+dy*dy < 400 {
+			tooClose = true
+		}
+		dx = x - alphaStation.x
+		dy = y - alphaStation.y
+		if dx*dx+dy*dy < 400 {
+			tooClose = true
+		}
+
 		if tooClose {
 			continue
 		}
 
-		// Place the substation
+		// Place the station
 		mapComp.SetTile(x, y, components.TileSubstation)
-		substations = append(substations, struct{ x, y int }{x, y})
-		fmt.Printf("Placed additional substation at: (%d, %d)\n", x, y)
+		additionalStations = append(additionalStations, struct{ x, y int }{x, y})
+		fmt.Printf("Placed additional station at: (%d, %d)\n", x, y)
 	}
 
-	// Finally, place the center substation
-	mapComp.SetTile(centerX, centerY, components.TileSubstation)
-	fmt.Printf("Placed center substation at: (%d, %d)\n", centerX, centerY)
-
-	// Group stations by primary direction from center
-	northStations := make([]struct{ x, y int }, 0)
-	southStations := make([]struct{ x, y int }, 0)
-	eastStations := make([]struct{ x, y int }, 0)
-	westStations := make([]struct{ x, y int }, 0)
-
-	for _, s := range substations {
-		dx := s.x - centerX
-		dy := s.y - centerY
-
-		// Determine primary direction based on larger delta and angle
-		if math.Abs(float64(dx)) > math.Abs(float64(dy)) {
-			if dx > 0 {
-				eastStations = append(eastStations, s)
-			} else {
-				westStations = append(westStations, s)
+	// Connect center to alpha station with broken railway
+	path := g.findPath(mapComp, centerX, centerY, alphaStation.x, alphaStation.y)
+	if path != nil {
+		// Randomly remove two tiles from the path
+		if len(path) > 2 {
+			removeIndices := make(map[int]bool)
+			for len(removeIndices) < 2 {
+				idx := g.rng.Intn(len(path)-2) + 1 // Don't remove first or last tile
+				removeIndices[idx] = true
 			}
-		} else {
-			if dy > 0 {
-				southStations = append(southStations, s)
-			} else {
-				northStations = append(northStations, s)
+
+			// Draw the railway with gaps
+			for i := 0; i < len(path)-1; i++ {
+				if !removeIndices[i] {
+					current := path[i]
+					next := path[i+1]
+					g.drawRailwayLine(mapComp, current.x, current.y, next.x, next.y)
+				}
 			}
 		}
-	}
-
-	// Create trunk lines in each direction where we have stations
-	if len(northStations) > 0 {
-		// Find furthest north station
-		maxY := centerY
-		for _, s := range northStations {
-			if s.y < maxY {
-				maxY = s.y
-			}
-		}
-		// Draw north trunk
-		g.drawRailwayLine(mapComp, centerX, centerY-1, centerX, maxY)
-	}
-
-	if len(southStations) > 0 {
-		// Find furthest south station
-		maxY := centerY
-		for _, s := range southStations {
-			if s.y > maxY {
-				maxY = s.y
-			}
-		}
-		// Draw south trunk
-		g.drawRailwayLine(mapComp, centerX, centerY+1, centerX, maxY)
-	}
-
-	if len(eastStations) > 0 {
-		// Find furthest east station
-		maxX := centerX
-		for _, s := range eastStations {
-			if s.x > maxX {
-				maxX = s.x
-			}
-		}
-		// Draw east trunk
-		g.drawRailwayLine(mapComp, centerX+1, centerY, maxX, centerY)
-	}
-
-	if len(westStations) > 0 {
-		// Find furthest west station
-		maxX := centerX
-		for _, s := range westStations {
-			if s.x < maxX {
-				maxX = s.x
-			}
-		}
-		// Draw west trunk
-		g.drawRailwayLine(mapComp, centerX-1, centerY, maxX, centerY)
-	}
-
-	// Connect stations to their nearest trunk line
-	connectToTrunk := func(s struct{ x, y int }, trunkX, trunkY int) {
-		g.drawRailwayLine(mapComp, trunkX, trunkY, s.x, s.y)
-	}
-
-	// Connect each station to its trunk
-	for _, s := range northStations {
-		connectToTrunk(s, centerX, s.y)
-	}
-	for _, s := range southStations {
-		connectToTrunk(s, centerX, s.y)
-	}
-	for _, s := range eastStations {
-		connectToTrunk(s, s.x, centerY)
-	}
-	for _, s := range westStations {
-		connectToTrunk(s, s.x, centerY)
 	}
 
 	return mapEntity
