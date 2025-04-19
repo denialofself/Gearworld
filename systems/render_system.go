@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"image/color"
 	"strconv"
-	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
 
@@ -15,16 +14,18 @@ import (
 
 // RenderSystem handles drawing entities to the screen
 type RenderSystem struct {
-	tileset           *Tileset
-	cameraX           int          // Camera X position
-	cameraY           int          // Camera Y position
-	cameraTargetID    ecs.EntityID // Entity the camera is following
-	debugWindowActive bool         // Whether the debug window is currently displayed
-	debugScrollOffset int          // Current scroll position in the debug log
-	showInventory     bool         // Whether to show inventory instead of stats panel
-	itemViewMode      bool         // Whether we're viewing a specific item's details
-	selectedItemIndex int          // Index of the currently selected item
-	initialized       bool         // Whether the system has been initialized
+	tileset             *Tileset
+	cameraX             int          // Camera X position
+	cameraY             int          // Camera Y position
+	cameraTargetID      ecs.EntityID // Entity the camera is following
+	debugWindowActive   bool         // Whether the debug window is currently displayed
+	debugScrollOffset   int          // Current scroll position in the debug log
+	showInventory       bool         // Whether to show inventory instead of stats panel
+	itemViewMode        bool         // Whether we're viewing a specific item's details
+	selectedItemIndex   int          // Index of the currently selected item
+	initialized         bool         // Whether the system has been initialized
+	world               *ecs.World
+	messageScrollOffset int // New field for message scrolling
 }
 
 // NewRenderSystem creates a new rendering system
@@ -79,6 +80,7 @@ func (s *RenderSystem) Initialize(world *ecs.World) {
 	world.RegisterEventListener(s.handleEquipmentChange)
 
 	s.initialized = true
+	s.world = world
 }
 
 // Update performs any rendering-related updates
@@ -255,6 +257,7 @@ func (s *RenderSystem) drawStandardMap(world *ecs.World, screen *ebiten.Image, m
 	for y := 0; y < screenHeight; y++ {
 		for x := 0; x < screenWidth; x++ {
 			// Convert screen position to world position
+			// The camera position is already centered by the camera system
 			worldX := x + cameraX
 			worldY := y + cameraY
 
@@ -601,55 +604,19 @@ func (s *RenderSystem) drawStatsPanel(world *ecs.World, screen *ebiten.Image) {
 		s.tileset.DrawTile(screen, '-', x, 22, color.RGBA{180, 180, 180, 255})
 	}
 
-	// Get player position
-	var position *components.PositionComponent
-	if comp, exists := world.GetComponent(playerID, components.Position); exists {
-		position = comp.(*components.PositionComponent)
-
-		// Display position information
-		s.tileset.DrawString(screen, "LOCATION", config.GameScreenWidth+2, 24, color.RGBA{255, 230, 150, 255})
-
-		// Get current map type and level
-		var mapType string = "Unknown"
-		var mapLevel int = -1
-		activeMap := s.getActiveMap(world)
-		if activeMap != nil {
-			if typeComp, exists := world.GetComponent(activeMap.ID, components.MapType); exists {
-				mapTypeComp := typeComp.(*components.MapTypeComponent)
-				mapType = mapTypeComp.MapType
-				mapLevel = mapTypeComp.Level
-			}
-		}
-
-		// Display map information
-		if mapType == "worldmap" {
-			s.tileset.DrawString(screen, "Surface", config.GameScreenWidth+2, 26, color.RGBA{200, 200, 255, 255})
-		} else {
-			s.tileset.DrawString(screen, fmt.Sprintf("Dungeon Level %d", mapLevel), config.GameScreenWidth+2, 26, color.RGBA{200, 200, 255, 255})
-		}
-
-		// Display coordinates
-		s.tileset.DrawString(screen,
-			"Pos: "+strconv.Itoa(position.X)+","+strconv.Itoa(position.Y),
-			config.GameScreenWidth+2, 27, color.RGBA{200, 200, 255, 255})
-	}
-
 	// Draw equipped items section
 	if world.HasComponent(playerID, components.Equipment) {
-		// Draw a separator
-		for x := config.GameScreenWidth + 1; x < config.ScreenWidth-1; x++ {
-			s.tileset.DrawTile(screen, '-', x, 20, color.RGBA{180, 180, 180, 255})
-		} // Display equipment title
-		s.tileset.DrawString(screen, "EQUIPMENT", config.GameScreenWidth+2, 22, color.RGBA{255, 230, 150, 255})
+		// Display equipment title
+		s.tileset.DrawString(screen, "EQUIPMENT", config.GameScreenWidth+2, 24, color.RGBA{255, 230, 150, 255})
 
 		// Fixed display positions for each equipment slot
 		fixedPositions := map[components.EquipmentSlot]int{
-			components.SlotHead:      24,
-			components.SlotBody:      25,
-			components.SlotMainHand:  26,
-			components.SlotOffHand:   27,
-			components.SlotFeet:      28,
-			components.SlotAccessory: 29,
+			components.SlotHead:      26,
+			components.SlotBody:      27,
+			components.SlotMainHand:  28,
+			components.SlotOffHand:   29,
+			components.SlotFeet:      30,
+			components.SlotAccessory: 31,
 		}
 
 		slotNames := map[components.EquipmentSlot]string{
@@ -687,15 +654,58 @@ func (s *RenderSystem) drawStatsPanel(world *ecs.World, screen *ebiten.Image) {
 				s.tileset.DrawString(screen, slotText, config.GameScreenWidth+2, fixedPositions[slot], itemColor)
 			}
 		}
+
+		// Draw a separator after equipment section
+		for x := config.GameScreenWidth + 1; x < config.ScreenWidth-1; x++ {
+			s.tileset.DrawTile(screen, '-', x, 33, color.RGBA{180, 180, 180, 255})
+		}
+	}
+
+	// Draw location section below equipment
+	s.tileset.DrawString(screen, "LOCATION", config.GameScreenWidth+2, 35, color.RGBA{255, 230, 150, 255})
+
+	// Get current map type and level
+	var mapType string = "Unknown"
+	var mapLevel int = -1
+	activeMap := s.getActiveMap(world)
+	if activeMap != nil {
+		if typeComp, exists := world.GetComponent(activeMap.ID, components.MapType); exists {
+			mapTypeComp := typeComp.(*components.MapTypeComponent)
+			mapType = mapTypeComp.MapType
+			mapLevel = mapTypeComp.Level
+		}
+	}
+
+	// Display map information
+	if mapType == "worldmap" {
+		s.tileset.DrawString(screen, "Surface", config.GameScreenWidth+2, 37, color.RGBA{200, 200, 255, 255})
+	} else {
+		s.tileset.DrawString(screen, fmt.Sprintf("Dungeon Level %d", mapLevel), config.GameScreenWidth+2, 37, color.RGBA{200, 200, 255, 255})
+	}
+
+	// Get player position
+	var position *components.PositionComponent
+	if comp, exists := world.GetComponent(playerID, components.Position); exists {
+		position = comp.(*components.PositionComponent)
+	}
+
+	// Display coordinates if we have position
+	if position != nil {
+		s.tileset.DrawString(screen,
+			"Pos: "+strconv.Itoa(position.X)+","+strconv.Itoa(position.Y),
+			config.GameScreenWidth+2, 38, color.RGBA{200, 200, 255, 255})
+	}
+
+	// Draw a separator before controls section
+	for x := config.GameScreenWidth + 1; x < config.ScreenWidth-1; x++ {
+		s.tileset.DrawTile(screen, '-', x, 40, color.RGBA{180, 180, 180, 255})
 	}
 
 	// Draw game controls reminder at the bottom of the stats panel
-	for x := config.GameScreenWidth + 1; x < config.ScreenWidth-1; x++ {
-		s.tileset.DrawTile(screen, '-', x, config.GameScreenHeight-5, color.RGBA{180, 180, 180, 255})
-	}
-	s.tileset.DrawString(screen, "CONTROLS", config.GameScreenWidth+2, config.GameScreenHeight-4, color.RGBA{255, 230, 150, 255})
-	s.tileset.DrawString(screen, "Arrow Keys: Move", config.GameScreenWidth+2, config.GameScreenHeight-3, color.RGBA{200, 200, 200, 255})
-	s.tileset.DrawString(screen, "I: Inventory", config.GameScreenWidth+2, config.GameScreenHeight-2, color.RGBA{200, 200, 200, 255})
+	s.tileset.DrawString(screen, "CONTROLS", config.GameScreenWidth+2, 42, color.RGBA{255, 230, 150, 255})
+	s.tileset.DrawString(screen, "Arrow Keys: Move", config.GameScreenWidth+2, 43, color.RGBA{200, 200, 200, 255})
+	s.tileset.DrawString(screen, "I: Inventory", config.GameScreenWidth+2, 44, color.RGBA{200, 200, 200, 255})
+	s.tileset.DrawString(screen, "PgUp/PgDn: Scroll Log", config.GameScreenWidth+2, 45, color.RGBA{200, 200, 200, 255})
 }
 
 // drawInventoryPanel draws the player inventory panel
@@ -960,35 +970,67 @@ func (s *RenderSystem) formatGameEffect(effect components.GameEffect) string {
 func (s *RenderSystem) drawMessagesPanel(screen *ebiten.Image) {
 	// Draw messages panel border
 	for x := 0; x < config.ScreenWidth; x++ {
-		s.tileset.DrawTile(screen, '-', x, config.GameScreenHeight, color.RGBA{200, 200, 200, 255})
+		s.tileset.DrawTile(screen, '-', x, config.MessageWindowStartY, color.RGBA{200, 200, 200, 255})
 	}
 
 	// Get message log
 	messageLog := GetMessageLog()
 
-	// Calculate how many messages can fit
-	messagesAreaHeight := config.ScreenHeight - config.GameScreenHeight - 1
+	// Calculate how many messages can fit in the reduced space
+	messagesAreaHeight := config.MessageWindowHeight - 1 // Leave room for title
 	maxMessages := messagesAreaHeight
 
 	// Draw title for the message area
-	s.tileset.DrawString(screen, "MESSAGE LOG", 1, config.GameScreenHeight+1, color.RGBA{255, 230, 150, 255})
-	// Draw messages from the log (starting at line 2 to leave room for the title)
-	messages := messageLog.RecentMessages(maxMessages)
-	for i, msg := range messages {
-		// Get the appropriate color for this message based on its type
-		msgColor := msg.GetColor()
+	s.tileset.DrawString(screen, "MESSAGE LOG", 1, config.MessageWindowStartY+1, color.RGBA{255, 230, 150, 255})
 
-		// Override with red for errors/warnings based on text content (optional fallback)
-		if len(msg.Text) > 6 && (strings.HasPrefix(msg.Text, "ERROR") || strings.HasPrefix(msg.Text, "WARNING")) {
-			msgColor = color.RGBA{255, 100, 100, 255} // Red for errors/warnings
+	// Get visible messages based on scroll position
+	messages := messageLog.RecentMessages(100) // Get all messages
+	startIdx := s.messageScrollOffset
+	if startIdx > len(messages)-maxMessages {
+		startIdx = len(messages) - maxMessages
+		if startIdx < 0 {
+			startIdx = 0
 		}
+	}
 
-		s.tileset.DrawString(screen, msg.Text, 1, config.GameScreenHeight+2+i, msgColor)
+	// Draw visible messages
+	for i := 0; i < maxMessages && startIdx+i < len(messages); i++ {
+		msg := messages[startIdx+i]
+		msgColor := msg.GetColor()
+		s.tileset.DrawString(screen, msg.Text, 1, config.MessageWindowStartY+2+i, msgColor)
+	}
+
+	// Draw scroll indicators if needed
+	if len(messages) > maxMessages {
+		if s.messageScrollOffset > 0 {
+			s.tileset.DrawTile(screen, '▲', config.ScreenWidth-2, config.MessageWindowStartY+2, color.RGBA{200, 200, 200, 255})
+		}
+		if s.messageScrollOffset < len(messages)-maxMessages {
+			s.tileset.DrawTile(screen, '▼', config.ScreenWidth-2, config.MessageWindowStartY+maxMessages, color.RGBA{200, 200, 200, 255})
+		}
 	}
 
 	// Draw debug window if active
 	if s.debugWindowActive {
 		s.drawDebugWindow(screen)
+	}
+}
+
+// ScrollMessagesUp scrolls the message window up one line
+func (s *RenderSystem) ScrollMessagesUp() {
+	if s.messageScrollOffset > 0 {
+		s.messageScrollOffset--
+	}
+}
+
+// ScrollMessagesDown scrolls the message window down one line
+func (s *RenderSystem) ScrollMessagesDown() {
+	messageLog := GetMessageLog()
+	messages := messageLog.RecentMessages(100)
+	maxVisible := config.MessageWindowHeight - 2 // Account for title and border
+
+	if s.messageScrollOffset < len(messages)-maxVisible {
+		s.messageScrollOffset++
 	}
 }
 

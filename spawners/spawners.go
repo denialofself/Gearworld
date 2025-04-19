@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"ebiten-rogue/components"
-	"ebiten-rogue/config"
 	"ebiten-rogue/data"
 	"ebiten-rogue/ecs"
 )
@@ -96,9 +95,14 @@ func (s *EntitySpawner) CreateCamera(targetEntityID uint64, x, y int) *ecs.Entit
 	// Create camera component
 	cameraComp := components.NewCameraComponent(targetEntityID)
 
-	// Set initial camera position
-	cameraComp.X = x - config.GameScreenWidth/2
-	cameraComp.Y = y - config.GameScreenHeight/2
+	// Calculate the offset needed to center the player at (24, 19) in the map panel
+	// The map panel is 50x40 tiles, so center is at (24, 19)
+	desiredPlayerX := 24
+	desiredPlayerY := 19
+
+	// Set camera position to place the player at the desired position
+	cameraComp.X = x - desiredPlayerX
+	cameraComp.Y = y - desiredPlayerY
 
 	// Add the camera component
 	s.world.AddComponent(cameraEntity.ID, components.Camera, cameraComp)

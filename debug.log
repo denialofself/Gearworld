@@ -1,1200 +1,399 @@
-===== DEBUG LOG STARTED AT 2025-04-19 01:35:45 =====
-[01:35:46.147] Clearing world and map registry...
-[01:35:46.147] World and map registry cleared
-[01:35:46.208] Created world map with ID: 2
-[01:35:46.208] REGISTRY: Registered worldmap (Level 0) with ID: 2
-[01:35:46.209] Populating dungeon with map ID 4
-[01:35:46.209] Map has 598 floor tiles
-[01:35:46.209] Found area with 419 floor tiles at (32,1), counting as 4 rooms
-[01:35:46.210] Found area with 179 floor tiles at (1,2), counting as 1 rooms
-[01:35:46.210] Total floor tiles: 598, Found 5 rooms
-[01:35:46.210] Found 5 rooms in dungeon
-[01:35:46.210] Placing 2 monsters (rooms: 5 * density: 0.50)
-[01:35:46.210] Found 2 eligible monster templates
-[01:35:46.210] - scav_beetle (level 1, tags: [enemy insect ai])
-[01:35:46.210] - wire_spider (level 1, tags: [enemy insect ai])
-[01:35:46.210] Found 2 eligible monster templates
-[01:35:46.210] - Eligible monster: scav_beetle (level 1, tags: [enemy insect ai])
-[01:35:46.210] - Eligible monster: wire_spider (level 1, tags: [enemy insect ai])
-[01:35:46.210] DEBUG: Creating enemy with MapContext ID: 4
-[01:35:46.210] Created monster scav_beetle at 23,2 (1/2)
-[01:35:46.210] DEBUG: Creating enemy with MapContext ID: 4
-[01:35:46.210] Created monster wire_spider at 11,4 (2/2)
-[01:35:46.210] Finished populating dungeon. Placed 2/2 monsters
-[01:35:46.212] Populating dungeon with map ID 7
-[01:35:46.212] Map has 665 floor tiles
-[01:35:46.212] Found area with 664 floor tiles at (1,1), counting as 6 rooms
-[01:35:46.212] Total floor tiles: 665, Found 6 rooms
-[01:35:46.212] Found 6 rooms in dungeon
-[01:35:46.212] Placing 3 monsters (rooms: 6 * density: 0.50)
-[01:35:46.212] Found 2 eligible monster templates
-[01:35:46.212] - scav_beetle (level 1, tags: [enemy insect ai])
-[01:35:46.212] - wire_spider (level 1, tags: [enemy insect ai])
-[01:35:46.212] Found 2 eligible monster templates
-[01:35:46.212] - Eligible monster: scav_beetle (level 1, tags: [enemy insect ai])
-[01:35:46.212] - Eligible monster: wire_spider (level 1, tags: [enemy insect ai])
-[01:35:46.212] DEBUG: Creating enemy with MapContext ID: 7
-[01:35:46.212] Created monster wire_spider at 18,23 (1/3)
-[01:35:46.212] DEBUG: Creating enemy with MapContext ID: 7
-[01:35:46.212] Created monster scav_beetle at 25,7 (2/3)
-[01:35:46.212] DEBUG: Creating enemy with MapContext ID: 7
-[01:35:46.212] Created monster scav_beetle at 21,14 (3/3)
-[01:35:46.212] Finished populating dungeon. Placed 3/3 monsters
-[01:35:46.213] Populating dungeon with map ID 11
-[01:35:46.213] Map has 618 floor tiles
-[01:35:46.213] Found area with 618 floor tiles at (27,1), counting as 6 rooms
-[01:35:46.213] Total floor tiles: 618, Found 6 rooms
-[01:35:46.213] Found 6 rooms in dungeon
-[01:35:46.213] Placing 3 monsters (rooms: 6 * density: 0.50)
-[01:35:46.213] Found 2 eligible monster templates
-[01:35:46.213] - scav_beetle (level 1, tags: [enemy insect ai])
-[01:35:46.213] - wire_spider (level 1, tags: [enemy insect ai])
-[01:35:46.213] Found 2 eligible monster templates
-[01:35:46.213] - Eligible monster: scav_beetle (level 1, tags: [enemy insect ai])
-[01:35:46.213] - Eligible monster: wire_spider (level 1, tags: [enemy insect ai])
-[01:35:46.213] DEBUG: Creating enemy with MapContext ID: 11
-[01:35:46.213] Created monster wire_spider at 22,21 (1/3)
-[01:35:46.213] DEBUG: Creating enemy with MapContext ID: 11
-[01:35:46.213] Created monster scav_beetle at 18,15 (2/3)
-[01:35:46.213] DEBUG: Creating enemy with MapContext ID: 11
-[01:35:46.213] Created monster wire_spider at 20,15 (3/3)
-[01:35:46.213] Finished populating dungeon. Placed 3/3 monsters
-[01:35:46.213] Populating dungeon with map ID 15
-[01:35:46.213] Map has 556 floor tiles
-[01:35:46.213] Found area with 282 floor tiles at (30,1), counting as 2 rooms
-[01:35:46.213] Found area with 274 floor tiles at (2,3), counting as 2 rooms
-[01:35:46.213] Total floor tiles: 556, Found 4 rooms
-[01:35:46.213] Found 4 rooms in dungeon
-[01:35:46.214] Placing 2 monsters (rooms: 4 * density: 0.50)
-[01:35:46.214] Found 2 eligible monster templates
-[01:35:46.214] - wire_spider (level 1, tags: [enemy insect ai])
-[01:35:46.214] - scav_beetle (level 1, tags: [enemy insect ai])
-[01:35:46.214] Found 2 eligible monster templates
-[01:35:46.214] - Eligible monster: wire_spider (level 1, tags: [enemy insect ai])
-[01:35:46.214] - Eligible monster: scav_beetle (level 1, tags: [enemy insect ai])
-[01:35:46.214] DEBUG: Creating enemy with MapContext ID: 15
-[01:35:46.214] Created monster scav_beetle at 7,9 (1/2)
-[01:35:46.214] DEBUG: Creating enemy with MapContext ID: 15
-[01:35:46.214] Created monster wire_spider at 8,4 (2/2)
-[01:35:46.214] Finished populating dungeon. Placed 2/2 monsters
-[01:35:46.215] Populating dungeon with map ID 18
-[01:35:46.215] Map has 568 floor tiles
-[01:35:46.215] Found area with 567 floor tiles at (1,2), counting as 5 rooms
-[01:35:46.215] Total floor tiles: 568, Found 5 rooms
-[01:35:46.215] Found 5 rooms in dungeon
-[01:35:46.215] Placing 2 monsters (rooms: 5 * density: 0.50)
-[01:35:46.215] Found 2 eligible monster templates
-[01:35:46.215] - scav_beetle (level 1, tags: [enemy insect ai])
-[01:35:46.215] - wire_spider (level 1, tags: [enemy insect ai])
-[01:35:46.215] Found 2 eligible monster templates
-[01:35:46.215] - Eligible monster: scav_beetle (level 1, tags: [enemy insect ai])
-[01:35:46.215] - Eligible monster: wire_spider (level 1, tags: [enemy insect ai])
-[01:35:46.215] DEBUG: Creating enemy with MapContext ID: 18
-[01:35:46.215] Created monster scav_beetle at 5,9 (1/2)
-[01:35:46.215] DEBUG: Creating enemy with MapContext ID: 18
-[01:35:46.215] Created monster wire_spider at 2,23 (2/2)
-[01:35:46.215] Finished populating dungeon. Placed 2/2 monsters
-[01:35:46.215] Created dungeon floor 1 with ID: 4
-[01:35:46.215] REGISTRY: Registered dungeon (Level 1) with ID: 4
-[01:35:46.215] Created dungeon floor 2 with ID: 7
-[01:35:46.215] REGISTRY: Registered dungeon (Level 2) with ID: 7
-[01:35:46.215] Created dungeon floor 3 with ID: 11
-[01:35:46.215] REGISTRY: Registered dungeon (Level 3) with ID: 11
-[01:35:46.215] Created dungeon floor 4 with ID: 15
-[01:35:46.215] REGISTRY: Registered dungeon (Level 4) with ID: 15
-[01:35:46.215] Created dungeon floor 5 with ID: 18
-[01:35:46.215] REGISTRY: Registered dungeon (Level 5) with ID: 18
-[01:35:46.215] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 4)
-[01:35:46.215] SET ACTIVE MAP: Propagated to MapSystem
-[01:35:46.215] Set active map to dungeon floor 1 with ID: 4
-[01:35:46.215] Processing initial item entry: template_id=bandage, count=3
-[01:35:46.215] Successfully added item bandage (ID: 23) to container
-[01:35:46.215] Successfully added item bandage (ID: 24) to container
-[01:35:46.215] Successfully added item bandage (ID: 25) to container
-[01:35:46.215] Processing initial item entry: template_id=miners_headlamp, count=1
-[01:35:46.215] Successfully added item miners_headlamp (ID: 26) to container
-[01:35:46.215] Processing initial item entry: template_id=rusty_spanner, count=1
-[01:35:46.215] Successfully added item rusty_spanner (ID: 27) to container
-[01:35:46.215] Processing initial item entry: template_id=tattered_jumpsuit, count=1
-[01:35:46.215] Successfully added item tattered_jumpsuit (ID: 28) to container
-[01:35:46.215] Created container with 6 items total
-[01:35:46.215] --- MAP SUMMARY ---
-[01:35:46.215] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[01:35:46.215] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[01:35:46.215] Active map ID: 4
-[01:35:46.215] DEBUG: AI turn processor - Next step: 22,2, AP: 6
-[01:35:46.215] DEBUG: AI moved from 23,2 to 22,2 (AP: 4)
-[01:35:47.544] DEBUG: Player moved to: 20,5 AI can now recalculate paths
-[01:35:47.544] DEBUG: AI turn processor - Next step: 21,2, AP: 4
-[01:35:47.544] DEBUG: AI moved from 22,2 to 21,2 (AP: 2)
-[01:35:48.107] Examining container at (21,6)
-[01:35:48.107] Starting item pickup from container
-[01:35:48.107] Container has 6 items before pickup
-[01:35:48.107] Attempting to pick up Bandage (type: first aid, ID: 23)
-[01:35:48.107] Successfully picked up Bandage
-[01:35:48.107] Attempting to pick up Bandage (type: first aid, ID: 24)
-[01:35:48.107] Successfully picked up Bandage
-[01:35:48.107] Attempting to pick up Bandage (type: first aid, ID: 25)
-[01:35:48.107] Successfully picked up Bandage
-[01:35:48.107] Attempting to pick up Miner's Headlamp (type: headgear, ID: 26)
-[01:35:48.107] Successfully picked up Miner's Headlamp
-[01:35:48.107] Attempting to pick up Rusty Spanner (type: weapon, ID: 27)
-[01:35:48.107] Successfully picked up Rusty Spanner
-[01:35:48.107] Attempting to pick up Tattered Jumpsuit (type: armor, ID: 28)
-[01:35:48.107] Successfully picked up Tattered Jumpsuit
-[01:35:48.107] Container has 0 items after pickup
-[01:35:48.107] Emitted examine event for container at (21,6)
-[01:35:48.759] DEBUG: Player moved to: 21,5 AI can now recalculate paths
-[01:35:48.759] DEBUG: AI turn processor - Next step: 21,3, AP: 2
-[01:35:48.759] DEBUG: AI moved from 21,2 to 21,3 (AP: 0)
-[01:35:49.379] DEBUG: Player moved to: 21,4 AI can now recalculate paths
-[01:35:49.379] DEBUG: AI turn processor - Next step: 21,4, AP: 0
-[01:35:49.379] DEBUG: AI recovering 3 points (AP: 3)
-[01:35:49.643] MonsterAbilitySystem: Received combat attack event - Player attacking Scavenger Beetle
-[01:35:49.643] MonsterAbilitySystem: Player has no abilities
-[01:35:50.025] MonsterAbilitySystem: Received combat attack event - Player attacking Scavenger Beetle
-[01:35:50.025] MonsterAbilitySystem: Player has no abilities
-[01:35:52.491] Equipping item 26 in slot head
-[01:35:52.491] Item has 4 effects:
-[01:35:52.491]   - Effect: equipment add 3 on FOV.Range
-[01:35:52.491]   - Effect: equipment set 1 on FOV.LightSource
-[01:35:52.491]   - Effect: equipment set 5 on FOV.LightRange
-[01:35:52.491]   - Effect: equipment add 1 on Stats.Defense
-[01:35:52.491] Current stats before equip:
-[01:35:52.491]   - Health: 100/100
-[01:35:52.491]   - Attack: 5
-[01:35:52.491]   - Defense: 1
-[01:35:52.491] Current stats before equip:
-[01:35:52.491]   - Health: 100/100
-[01:35:52.491]   - Attack: 5
-[01:35:52.491]   - Defense: 1
-[01:35:52.491] Stats after equip:
-[01:35:52.491]   - Health: 100/100
-[01:35:52.491]   - Attack: 5
-[01:35:52.491]   - Defense: 2
-[01:35:52.491] Current stats before equip:
-[01:35:52.491]   - Health: 100/100
-[01:35:52.491]   - Attack: 5
-[01:35:52.491]   - Defense: 2
-[01:35:52.491] Stats after equip:
-[01:35:52.491]   - Health: 100/100
-[01:35:52.491]   - Attack: 5
-[01:35:52.491]   - Defense: 2
-[01:35:52.491] Equipment change detected: Equipped item 26 in slot head
-[01:35:52.491] Stats after equip:
-[01:35:52.491]   - Health: 100/100
-[01:35:52.491]   - Attack: 5
-[01:35:52.491]   - Defense: 2
-[01:35:52.930] Equipping item 27 in slot mainhand
-[01:35:52.930] Item has 1 effects:
-[01:35:52.930]   - Effect: equipment add 1 on Stats.Attack
-[01:35:52.930] Current stats before equip:
-[01:35:52.930]   - Health: 100/100
-[01:35:52.930]   - Attack: 5
-[01:35:52.930]   - Defense: 2
-[01:35:52.930] Current stats before equip:
-[01:35:52.930]   - Health: 100/100
-[01:35:52.930]   - Attack: 5
-[01:35:52.930]   - Defense: 2
-[01:35:52.930] Stats after equip:
-[01:35:52.930]   - Health: 100/100
-[01:35:52.930]   - Attack: 6
-[01:35:52.930]   - Defense: 2
-[01:35:52.930] Current stats before equip:
-[01:35:52.930]   - Health: 100/100
-[01:35:52.930]   - Attack: 6
-[01:35:52.930]   - Defense: 2
-[01:35:52.930] Stats after equip:
-[01:35:52.930]   - Health: 100/100
-[01:35:52.930]   - Attack: 6
-[01:35:52.930]   - Defense: 2
-[01:35:52.930] Equipment change detected: Equipped item 27 in slot mainhand
-[01:35:52.930] Stats after equip:
-[01:35:52.930]   - Health: 100/100
-[01:35:52.930]   - Attack: 6
-[01:35:52.930]   - Defense: 2
-[01:35:53.381] Equipping item 28 in slot body
-[01:35:53.381] Item has 1 effects:
-[01:35:53.381]   - Effect: equipment add 1 on Stats.Defense
-[01:35:53.381] Current stats before equip:
-[01:35:53.381]   - Health: 100/100
-[01:35:53.381]   - Attack: 6
-[01:35:53.381]   - Defense: 2
-[01:35:53.381] Current stats before equip:
-[01:35:53.381]   - Health: 100/100
-[01:35:53.381]   - Attack: 6
-[01:35:53.381]   - Defense: 2
-[01:35:53.381] Stats after equip:
-[01:35:53.381]   - Health: 100/100
-[01:35:53.381]   - Attack: 6
-[01:35:53.381]   - Defense: 3
-[01:35:53.381] Current stats before equip:
-[01:35:53.381]   - Health: 100/100
-[01:35:53.381]   - Attack: 6
-[01:35:53.381]   - Defense: 3
-[01:35:53.381] Stats after equip:
-[01:35:53.381]   - Health: 100/100
-[01:35:53.381]   - Attack: 6
-[01:35:53.381]   - Defense: 3
-[01:35:53.381] Equipment change detected: Equipped item 28 in slot body
-[01:35:53.381] Stats after equip:
-[01:35:53.381]   - Health: 100/100
-[01:35:53.381]   - Attack: 6
-[01:35:53.381]   - Defense: 3
-[01:35:54.812] DEBUG: Player moved to: 22,4 AI can now recalculate paths
-[01:35:54.993] DEBUG: Player moved to: 23,4 AI can now recalculate paths
-[01:35:55.159] DEBUG: Player moved to: 24,4 AI can now recalculate paths
-[01:35:55.326] DEBUG: Player moved to: 25,4 AI can now recalculate paths
-[01:35:55.493] DEBUG: Player moved to: 26,4 AI can now recalculate paths
-[01:35:55.778] DEBUG: Player moved to: 25,4 AI can now recalculate paths
-[01:35:56.043] DEBUG: Player moved to: 24,4 AI can now recalculate paths
-[01:35:56.160] DEBUG: Player moved to: 23,4 AI can now recalculate paths
-[01:35:56.279] DEBUG: Player moved to: 22,4 AI can now recalculate paths
-[01:35:56.397] DEBUG: Player moved to: 21,4 AI can now recalculate paths
-[01:35:56.508] DEBUG: Player moved to: 20,4 AI can now recalculate paths
-[01:35:56.626] DEBUG: Player moved to: 19,4 AI can now recalculate paths
-[01:35:56.945] DEBUG: Player moved to: 19,3 AI can now recalculate paths
-[01:35:57.161] TRANSITION TRIGGERED: Player at (19,3) on tile type 3 pressed ENTER
-[01:35:57.162] =====================================
-[01:35:57.162] TRANSITION: STARTING MAP TRANSITION
-[01:35:57.162] =====================================
-[01:35:57.162] TRANSITION: From map 4 to map 7 (dungeon level 2)
-[01:35:57.162] =============================================
-[01:35:57.162] TRANSITION STEP 1: Setting active map
-[01:35:57.162] SET ACTIVE MAP: Setting active map to dungeon (Level 2, ID: 7)
-[01:35:57.162] SET ACTIVE MAP: Propagated to MapSystem
-[01:35:57.162] TRANSITION DEBUG: Changed active map from 4 to 7
-[01:35:57.162] TRANSITION STEP 2: Updating player's map context
-[01:35:57.162] TRANSITION DEBUG: Updated player entity 21 map context from 4 to 7
-[01:35:57.162] TRANSITION STEP 3: Updating player position
-[01:35:57.162] TRANSITION DEBUG: Updated player position from (19,3) to (32,20)
-[01:35:57.162] TRANSITION STEP 4: Updating camera position
-[01:35:57.162] Camera position updated to (-10,-10) for map 7
-[01:35:57.162] TRANSITION COMPLETE: Player now in dungeon level 2
-[01:35:57.162] TRANSITION: Reset AI pathfinding turn flag
-[01:35:57.745] DEBUG: Player moved to: 32,21 AI can now recalculate paths
-[01:35:57.913] DEBUG: Player moved to: 32,22 AI can now recalculate paths
-[01:35:58.058] DEBUG: Player moved to: 32,23 AI can now recalculate paths
-[01:35:58.196] DEBUG: Player moved to: 32,24 AI can now recalculate paths
-[01:35:58.342] DEBUG: Player moved to: 32,25 AI can now recalculate paths
-[01:35:58.510] DEBUG: Player moved to: 31,25 AI can now recalculate paths
-[01:35:58.779] DEBUG: Player moved to: 30,25 AI can now recalculate paths
-[01:35:58.891] DEBUG: Player moved to: 29,25 AI can now recalculate paths
-[01:35:59.009] DEBUG: Player moved to: 28,25 AI can now recalculate paths
-[01:35:59.127] DEBUG: Player moved to: 27,25 AI can now recalculate paths
-[01:35:59.245] DEBUG: Player moved to: 26,25 AI can now recalculate paths
-[01:35:59.363] DEBUG: Player moved to: 26,24 AI can now recalculate paths
-[01:35:59.544] DEBUG: Player moved to: 26,23 AI can now recalculate paths
-[01:35:59.544] DEBUG: AI turn processor - Next step: 19,23, AP: 6
-[01:35:59.544] DEBUG: AI moved from 18,23 to 19,23 (AP: 4)
-[01:35:59.697] DEBUG: Player moved to: 25,23 AI can now recalculate paths
-[01:35:59.697] DEBUG: AI turn processor - Next step: 20,23, AP: 4
-[01:35:59.697] DEBUG: AI moved from 19,23 to 20,23 (AP: 2)
-[01:35:59.961] DEBUG: Player moved to: 24,23 AI can now recalculate paths
-[01:35:59.961] DEBUG: AI turn processor - Next step: 21,23, AP: 2
-[01:35:59.961] DEBUG: AI moved from 20,23 to 21,23 (AP: 0)
-[01:36:00.079] DEBUG: Player moved to: 23,23 AI can now recalculate paths
-[01:36:00.079] DEBUG: AI turn processor - Next step: 22,23, AP: 0
-[01:36:00.079] DEBUG: AI recovering 3 points (AP: 3)
-[01:36:00.496] DEBUG: Player moved to: 22,23 AI can now recalculate paths
-[01:36:00.496] MonsterAbilitySystem: Received combat attack event - Wire Spider attacking Player
-[01:36:00.496] MonsterAbilitySystem: Wire Spider has 1 abilities
-[01:36:00.496] MonsterAbilitySystem: Wire Spider has 3 action points
-[01:36:00.496] MonsterAbilitySystem: Checking ability 'Bleeding Bite' (trigger: on_attack, cooldown: 0/3, cost: 2)
-[01:36:00.496] MonsterAbilitySystem: Triggering 'Bleeding Bite' ability
-[01:36:00.496] Applying 1 effects to entity 21:
-[01:36:00.496]   - Effect: periodic subtract 1d10 on Stats.Health
-[01:36:00.496] Current stats before effects:
-[01:36:00.496]   - Health: 84/100
-[01:36:00.496]   - Attack: 6
-[01:36:00.496]   - Defense: 3
-[01:36:00.496]   - Added new effect
-[01:36:00.496] Stats after effects:
-[01:36:00.496]   - Health: 84/100
-[01:36:00.496]   - Attack: 6
-[01:36:00.496]   - Defense: 3
-[01:36:00.496] MonsterAbilitySystem: Applied effect - type: periodic, operation: subtract, value: 1d10, duration: 4
-[01:36:00.496] MonsterAbilitySystem: Deducted 2 action points from Wire Spider
-[01:36:00.496] MonsterAbilitySystem: Set 'Bleeding Bite' cooldown to 3
-[01:36:00.496] DEBUG: Aggressive AI attacked player (AP: -2)
-[01:36:00.961] DEBUG: Player moved to: 23,23 AI can now recalculate paths
-[01:36:00.961] Processing periodic effect on entity 21 - Duration: 4
-[01:36:00.961] Keeping periodic effect, new duration: 3
-[01:36:00.961] Processing periodic effect on entity 21 - Duration: 3
-[01:36:00.961] Keeping periodic effect, new duration: 2
-[01:36:00.961] DEBUG: AI turn processor - Next step: 22,23, AP: -2
-[01:36:00.961] DEBUG: AI recovering 3 points (AP: 1)
-[01:36:01.198] DEBUG: Player moved to: 24,23 AI can now recalculate paths
-[01:36:01.198] Processing periodic effect on entity 21 - Duration: 2
-[01:36:01.198] Keeping periodic effect, new duration: 1
-[01:36:01.198] Processing periodic effect on entity 21 - Duration: 1
-[01:36:01.198] Keeping periodic effect, new duration: 0
-[01:36:01.198] DEBUG: AI turn processor - Next step: 22,23, AP: 1
-[01:36:01.198] DEBUG: AI waiting (AP: 0)
-[01:36:01.393] DEBUG: Player moved to: 25,23 AI can now recalculate paths
-[01:36:01.393] Processing periodic effect on entity 21 - Duration: 0
-[01:36:01.393] Removing periodic effect - duration expired
-[01:36:01.393] DEBUG: AI turn processor - Next step: 22,23, AP: 0
-[01:36:01.393] DEBUG: AI recovering 3 points (AP: 3)
-[01:36:01.545] DEBUG: Player moved to: 26,23 AI can now recalculate paths
-[01:36:01.545] DEBUG: AI turn processor - Next step: 22,23, AP: 3
-[01:36:01.545] DEBUG: AI moved from 21,23 to 22,23 (AP: 1)
-[01:36:02.178] DEBUG: Player moved to: 25,23 AI can now recalculate paths
-[01:36:02.178] DEBUG: AI turn processor - Next step: 23,23, AP: 1
-[01:36:02.178] DEBUG: AI waiting (AP: 0)
-[01:36:02.358] DEBUG: Player moved to: 24,23 AI can now recalculate paths
-[01:36:02.358] DEBUG: AI turn processor - Next step: 23,23, AP: 0
-[01:36:02.358] DEBUG: AI recovering 3 points (AP: 3)
-[01:36:02.525] DEBUG: Player moved to: 23,23 AI can now recalculate paths
-[01:36:02.525] MonsterAbilitySystem: Received combat attack event - Wire Spider attacking Player
-[01:36:02.525] MonsterAbilitySystem: Wire Spider has 1 abilities
-[01:36:02.525] MonsterAbilitySystem: Wire Spider has 3 action points
-[01:36:02.525] MonsterAbilitySystem: Checking ability 'Bleeding Bite' (trigger: on_attack, cooldown: 0/3, cost: 2)
-[01:36:02.525] MonsterAbilitySystem: Triggering 'Bleeding Bite' ability
-[01:36:02.525] Applying 1 effects to entity 21:
-[01:36:02.525]   - Effect: periodic subtract 1d10 on Stats.Health
-[01:36:02.525] Current stats before effects:
-[01:36:02.525]   - Health: 48/100
-[01:36:02.525]   - Attack: 6
-[01:36:02.525]   - Defense: 3
-[01:36:02.525]   - Added new effect
-[01:36:02.525] Stats after effects:
-[01:36:02.525]   - Health: 48/100
-[01:36:02.525]   - Attack: 6
-[01:36:02.525]   - Defense: 3
-[01:36:02.525] MonsterAbilitySystem: Applied effect - type: periodic, operation: subtract, value: 1d10, duration: 4
-[01:36:02.525] MonsterAbilitySystem: Deducted 2 action points from Wire Spider
-[01:36:02.525] MonsterAbilitySystem: Set 'Bleeding Bite' cooldown to 3
-[01:36:02.525] DEBUG: Aggressive AI attacked player (AP: -2)
-[01:36:02.834] MonsterAbilitySystem: Received combat attack event - Player attacking Wire Spider
-[01:36:02.835] MonsterAbilitySystem: Player has no abilities
-[01:36:02.835] Processing periodic effect on entity 21 - Duration: 4
-[01:36:02.835] Keeping periodic effect, new duration: 3
-[01:36:02.835] Processing periodic effect on entity 21 - Duration: 3
-[01:36:02.835] Keeping periodic effect, new duration: 2
-[01:36:03.248] MonsterAbilitySystem: Received combat attack event - Player attacking Wire Spider
-[01:36:03.248] MonsterAbilitySystem: Player has no abilities
-[01:36:03.248] Processing periodic effect on entity 21 - Duration: 2
-[01:36:03.248] Keeping periodic effect, new duration: 1
-[01:36:03.248] Processing periodic effect on entity 21 - Duration: 1
-[01:36:03.248] Keeping periodic effect, new duration: 0
-[01:36:03.678] DEBUG: Player moved to: 22,23 AI can now recalculate paths
-[01:36:03.678] Processing periodic effect on entity 21 - Duration: 0
-[01:36:03.678] Removing periodic effect - duration expired
-[01:36:04.313] DEBUG: Player moved to: 23,23 AI can now recalculate paths
-[01:36:04.658] DEBUG: Player moved to: 24,23 AI can now recalculate paths
-[01:36:04.860] DEBUG: Player moved to: 25,23 AI can now recalculate paths
-[01:36:05.228] DEBUG: Player moved to: 26,23 AI can now recalculate paths
-[01:36:05.562] DEBUG: Player moved to: 27,23 AI can now recalculate paths
-[01:36:10.030] Applying 1 effects to entity 21:
-[01:36:10.030]   - Effect: instant add 20 on Stats.Health
-[01:36:10.030] Current stats before effects:
-[01:36:10.030]   - Health: 24/100
-[01:36:10.030]   - Attack: 6
-[01:36:10.030]   - Defense: 3
-[01:36:10.030]   - Added new effect
-[01:36:10.030] Stats after effects:
-[01:36:10.030]   - Health: 44/100
-[01:36:10.030]   - Attack: 6
-[01:36:10.030]   - Defense: 3
-[01:36:10.030] Applying 1 effects to entity 21:
-[01:36:10.030]   - Effect: instant add 20 on Stats.Health
-[01:36:10.030] Current stats before effects:
-[01:36:10.030]   - Health: 44/100
-[01:36:10.030]   - Attack: 6
-[01:36:10.030]   - Defense: 3
-[01:36:10.030]   - Updated existing effect
-[01:36:10.030] Stats after effects:
-[01:36:10.030]   - Health: 64/100
-[01:36:10.030]   - Attack: 6
-[01:36:10.030]   - Defense: 3
-===== DEBUG LOG STARTED AT 2025-04-19 01:37:50 =====
-[01:37:51.367] Clearing world and map registry...
-[01:37:51.367] World and map registry cleared
-[01:37:51.417] Created world map with ID: 2
-[01:37:51.417] REGISTRY: Registered worldmap (Level 0) with ID: 2
-[01:37:51.419] Populating dungeon with map ID 4
-[01:37:51.419] Map has 703 floor tiles
-[01:37:51.419] Found area with 703 floor tiles at (3,1), counting as 7 rooms
-[01:37:51.419] Total floor tiles: 703, Found 7 rooms
-[01:37:51.419] Found 7 rooms in dungeon
-[01:37:51.419] Placing 3 monsters (rooms: 7 * density: 0.50)
-[01:37:51.419] Found 2 eligible monster templates
-[01:37:51.419] - scav_beetle (level 1, tags: [enemy insect ai])
-[01:37:51.419] - wire_spider (level 1, tags: [enemy insect ai])
-[01:37:51.419] Found 2 eligible monster templates
-[01:37:51.419] - Eligible monster: scav_beetle (level 1, tags: [enemy insect ai])
-[01:37:51.419] - Eligible monster: wire_spider (level 1, tags: [enemy insect ai])
-[01:37:51.419] DEBUG: Creating enemy with MapContext ID: 4
-[01:37:51.419] Created monster scav_beetle at 31,20 (1/3)
-[01:37:51.419] DEBUG: Creating enemy with MapContext ID: 4
-[01:37:51.419] Created monster scav_beetle at 4,7 (2/3)
-[01:37:51.419] DEBUG: Creating enemy with MapContext ID: 4
-[01:37:51.419] Created monster wire_spider at 12,7 (3/3)
-[01:37:51.419] Finished populating dungeon. Placed 3/3 monsters
-[01:37:51.420] Populating dungeon with map ID 8
-[01:37:51.420] Map has 625 floor tiles
-[01:37:51.420] Found area with 625 floor tiles at (3,1), counting as 6 rooms
-[01:37:51.420] Total floor tiles: 625, Found 6 rooms
-[01:37:51.420] Found 6 rooms in dungeon
-[01:37:51.420] Placing 3 monsters (rooms: 6 * density: 0.50)
-[01:37:51.420] Found 2 eligible monster templates
-[01:37:51.420] - scav_beetle (level 1, tags: [enemy insect ai])
-[01:37:51.420] - wire_spider (level 1, tags: [enemy insect ai])
-[01:37:51.420] Found 2 eligible monster templates
-[01:37:51.420] - Eligible monster: scav_beetle (level 1, tags: [enemy insect ai])
-[01:37:51.420] - Eligible monster: wire_spider (level 1, tags: [enemy insect ai])
-[01:37:51.420] DEBUG: Creating enemy with MapContext ID: 8
-[01:37:51.420] Created monster scav_beetle at 6,26 (1/3)
-[01:37:51.420] DEBUG: Creating enemy with MapContext ID: 8
-[01:37:51.420] Created monster scav_beetle at 31,5 (2/3)
-[01:37:51.420] DEBUG: Creating enemy with MapContext ID: 8
-[01:37:51.420] Created monster wire_spider at 9,20 (3/3)
-[01:37:51.420] Finished populating dungeon. Placed 3/3 monsters
-[01:37:51.421] Populating dungeon with map ID 12
-[01:37:51.421] Map has 663 floor tiles
-[01:37:51.421] Found area with 663 floor tiles at (2,1), counting as 6 rooms
-[01:37:51.421] Total floor tiles: 663, Found 6 rooms
-[01:37:51.421] Found 6 rooms in dungeon
-[01:37:51.421] Placing 3 monsters (rooms: 6 * density: 0.50)
-[01:37:51.421] Found 2 eligible monster templates
-[01:37:51.421] - scav_beetle (level 1, tags: [enemy insect ai])
-[01:37:51.421] - wire_spider (level 1, tags: [enemy insect ai])
-[01:37:51.421] Found 2 eligible monster templates
-[01:37:51.421] - Eligible monster: scav_beetle (level 1, tags: [enemy insect ai])
-[01:37:51.421] - Eligible monster: wire_spider (level 1, tags: [enemy insect ai])
-[01:37:51.421] DEBUG: Creating enemy with MapContext ID: 12
-[01:37:51.421] Created monster scav_beetle at 6,8 (1/3)
-[01:37:51.421] DEBUG: Creating enemy with MapContext ID: 12
-[01:37:51.421] Created monster wire_spider at 23,11 (2/3)
-[01:37:51.421] DEBUG: Creating enemy with MapContext ID: 12
-[01:37:51.421] Created monster scav_beetle at 34,14 (3/3)
-[01:37:51.421] Finished populating dungeon. Placed 3/3 monsters
-[01:37:51.422] Populating dungeon with map ID 16
-[01:37:51.422] Map has 618 floor tiles
-[01:37:51.422] Found area with 259 floor tiles at (2,1), counting as 2 rooms
-[01:37:51.422] Found area with 152 floor tiles at (31,1), counting as 1 rooms
-[01:37:51.422] Found area with 205 floor tiles at (19,13), counting as 2 rooms
-[01:37:51.422] Total floor tiles: 618, Found 5 rooms
-[01:37:51.422] Found 5 rooms in dungeon
-[01:37:51.422] Placing 2 monsters (rooms: 5 * density: 0.50)
-[01:37:51.422] Found 2 eligible monster templates
-[01:37:51.422] - scav_beetle (level 1, tags: [enemy insect ai])
-[01:37:51.422] - wire_spider (level 1, tags: [enemy insect ai])
-[01:37:51.422] Found 2 eligible monster templates
-[01:37:51.422] - Eligible monster: scav_beetle (level 1, tags: [enemy insect ai])
-[01:37:51.422] - Eligible monster: wire_spider (level 1, tags: [enemy insect ai])
-[01:37:51.422] DEBUG: Creating enemy with MapContext ID: 16
-[01:37:51.422] Created monster wire_spider at 5,16 (1/2)
-[01:37:51.422] DEBUG: Creating enemy with MapContext ID: 16
-[01:37:51.422] Created monster wire_spider at 9,11 (2/2)
-[01:37:51.422] Finished populating dungeon. Placed 2/2 monsters
-[01:37:51.424] Populating dungeon with map ID 19
-[01:37:51.424] Map has 545 floor tiles
-[01:37:51.424] Found area with 545 floor tiles at (16,1), counting as 5 rooms
-[01:37:51.424] Total floor tiles: 545, Found 5 rooms
-[01:37:51.424] Found 5 rooms in dungeon
-[01:37:51.424] Placing 2 monsters (rooms: 5 * density: 0.50)
-[01:37:51.424] Found 2 eligible monster templates
-[01:37:51.424] - scav_beetle (level 1, tags: [enemy insect ai])
-[01:37:51.424] - wire_spider (level 1, tags: [enemy insect ai])
-[01:37:51.424] Found 2 eligible monster templates
-[01:37:51.424] - Eligible monster: scav_beetle (level 1, tags: [enemy insect ai])
-[01:37:51.424] - Eligible monster: wire_spider (level 1, tags: [enemy insect ai])
-[01:37:51.424] DEBUG: Creating enemy with MapContext ID: 19
-[01:37:51.424] Created monster scav_beetle at 17,8 (1/2)
-[01:37:51.424] DEBUG: Creating enemy with MapContext ID: 19
-[01:37:51.424] Created monster wire_spider at 18,10 (2/2)
-[01:37:51.424] Finished populating dungeon. Placed 2/2 monsters
-[01:37:51.424] Created dungeon floor 1 with ID: 4
-[01:37:51.424] REGISTRY: Registered dungeon (Level 1) with ID: 4
-[01:37:51.424] Created dungeon floor 2 with ID: 8
-[01:37:51.424] REGISTRY: Registered dungeon (Level 2) with ID: 8
-[01:37:51.424] Created dungeon floor 3 with ID: 12
-[01:37:51.424] REGISTRY: Registered dungeon (Level 3) with ID: 12
-[01:37:51.424] Created dungeon floor 4 with ID: 16
-[01:37:51.424] REGISTRY: Registered dungeon (Level 4) with ID: 16
-[01:37:51.424] Created dungeon floor 5 with ID: 19
-[01:37:51.424] REGISTRY: Registered dungeon (Level 5) with ID: 19
-[01:37:51.424] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 4)
-[01:37:51.424] SET ACTIVE MAP: Propagated to MapSystem
-[01:37:51.424] Set active map to dungeon floor 1 with ID: 4
-[01:37:51.424] Processing initial item entry: template_id=bandage, count=3
-[01:37:51.424] Successfully added item bandage (ID: 24) to container
-[01:37:51.424] Successfully added item bandage (ID: 25) to container
-[01:37:51.424] Successfully added item bandage (ID: 26) to container
-[01:37:51.424] Processing initial item entry: template_id=miners_headlamp, count=1
-[01:37:51.424] Successfully added item miners_headlamp (ID: 27) to container
-[01:37:51.424] Processing initial item entry: template_id=rusty_spanner, count=1
-[01:37:51.424] Successfully added item rusty_spanner (ID: 28) to container
-[01:37:51.424] Processing initial item entry: template_id=tattered_jumpsuit, count=1
-[01:37:51.424] Successfully added item tattered_jumpsuit (ID: 29) to container
-[01:37:51.424] Created container with 6 items total
-[01:37:51.424] --- MAP SUMMARY ---
-[01:37:51.424] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[01:37:51.424] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[01:37:51.424] Active map ID: 4
-[01:37:51.424] DEBUG: AI turn processor - Next step: 31,21, AP: 6
-[01:37:51.424] DEBUG: AI moved from 31,20 to 31,21 (AP: 4)
-[01:37:52.632] Examining container at (32,23)
-[01:37:52.632] Starting item pickup from container
-[01:37:52.632] Container has 6 items before pickup
-[01:37:52.632] Attempting to pick up Bandage (type: first aid, ID: 24)
-[01:37:52.632] Successfully picked up Bandage
-[01:37:52.632] Attempting to pick up Bandage (type: first aid, ID: 25)
-[01:37:52.632] Successfully picked up Bandage
-[01:37:52.632] Attempting to pick up Bandage (type: first aid, ID: 26)
-[01:37:52.632] Successfully picked up Bandage
-[01:37:52.632] Attempting to pick up Miner's Headlamp (type: headgear, ID: 27)
-[01:37:52.632] Successfully picked up Miner's Headlamp
-[01:37:52.632] Attempting to pick up Rusty Spanner (type: weapon, ID: 28)
-[01:37:52.632] Successfully picked up Rusty Spanner
-[01:37:52.632] Attempting to pick up Tattered Jumpsuit (type: armor, ID: 29)
-[01:37:52.632] Successfully picked up Tattered Jumpsuit
-[01:37:52.632] Container has 0 items after pickup
-[01:37:52.632] Emitted examine event for container at (32,23)
-[01:37:54.431] Equipping item 27 in slot head
-[01:37:54.431] Item has 4 effects:
-[01:37:54.431]   - Effect: equipment add 3 on FOV.Range
-[01:37:54.431]   - Effect: equipment set 1 on FOV.LightSource
-[01:37:54.431]   - Effect: equipment set 5 on FOV.LightRange
-[01:37:54.431]   - Effect: equipment add 1 on Stats.Defense
-[01:37:54.431] Current stats before equip:
-[01:37:54.431]   - Health: 100/100
-[01:37:54.431]   - Attack: 5
-[01:37:54.431]   - Defense: 1
-[01:37:54.431] Current stats before equip:
-[01:37:54.431]   - Health: 100/100
-[01:37:54.431]   - Attack: 5
-[01:37:54.431]   - Defense: 1
-[01:37:54.431] Stats after equip:
-[01:37:54.431]   - Health: 100/100
-[01:37:54.431]   - Attack: 5
-[01:37:54.431]   - Defense: 2
-[01:37:54.431] Current stats before equip:
-[01:37:54.431]   - Health: 100/100
-[01:37:54.431]   - Attack: 5
-[01:37:54.431]   - Defense: 2
-[01:37:54.431] Stats after equip:
-[01:37:54.431]   - Health: 100/100
-[01:37:54.431]   - Attack: 5
-[01:37:54.431]   - Defense: 2
-[01:37:54.431] Equipment change detected: Equipped item 27 in slot head
-[01:37:54.431] Stats after equip:
-[01:37:54.431]   - Health: 100/100
-[01:37:54.431]   - Attack: 5
-[01:37:54.431]   - Defense: 2
-[01:37:54.995] Equipping item 28 in slot mainhand
-[01:37:54.995] Item has 1 effects:
-[01:37:54.995]   - Effect: equipment add 1 on Stats.Attack
-[01:37:54.995] Current stats before equip:
-[01:37:54.995]   - Health: 100/100
-[01:37:54.995]   - Attack: 5
-[01:37:54.995]   - Defense: 2
-[01:37:54.995] Current stats before equip:
-[01:37:54.995]   - Health: 100/100
-[01:37:54.995]   - Attack: 5
-[01:37:54.995]   - Defense: 2
-[01:37:54.995] Stats after equip:
-[01:37:54.995]   - Health: 100/100
-[01:37:54.995]   - Attack: 6
-[01:37:54.995]   - Defense: 2
-[01:37:54.995] Current stats before equip:
-[01:37:54.995]   - Health: 100/100
-[01:37:54.995]   - Attack: 6
-[01:37:54.995]   - Defense: 2
-[01:37:54.995] Stats after equip:
-[01:37:54.995]   - Health: 100/100
-[01:37:54.995]   - Attack: 6
-[01:37:54.995]   - Defense: 2
-[01:37:54.995] Equipment change detected: Equipped item 28 in slot mainhand
-[01:37:54.995] Stats after equip:
-[01:37:54.995]   - Health: 100/100
-[01:37:54.995]   - Attack: 6
-[01:37:54.995]   - Defense: 2
-[01:37:55.404] Equipping item 29 in slot body
-[01:37:55.404] Item has 1 effects:
-[01:37:55.404]   - Effect: equipment add 1 on Stats.Defense
-[01:37:55.404] Current stats before equip:
-[01:37:55.404]   - Health: 100/100
-[01:37:55.404]   - Attack: 6
-[01:37:55.404]   - Defense: 2
-[01:37:55.404] Current stats before equip:
-[01:37:55.404]   - Health: 100/100
-[01:37:55.404]   - Attack: 6
-[01:37:55.404]   - Defense: 2
-[01:37:55.404] Stats after equip:
-[01:37:55.404]   - Health: 100/100
-[01:37:55.404]   - Attack: 6
-[01:37:55.404]   - Defense: 3
-[01:37:55.404] Current stats before equip:
-[01:37:55.404]   - Health: 100/100
-[01:37:55.404]   - Attack: 6
-[01:37:55.404]   - Defense: 3
-[01:37:55.404] Stats after equip:
-[01:37:55.404]   - Health: 100/100
-[01:37:55.404]   - Attack: 6
-[01:37:55.404]   - Defense: 3
-[01:37:55.404] Equipment change detected: Equipped item 29 in slot body
-[01:37:55.404] Stats after equip:
-[01:37:55.404]   - Health: 100/100
-[01:37:55.404]   - Attack: 6
-[01:37:55.404]   - Defense: 3
-[01:37:56.678] DEBUG: Player moved to: 31,22 AI can now recalculate paths
-[01:37:56.678] DEBUG: AI attacked player (AP: 1)
-[01:37:56.898] MonsterAbilitySystem: Received combat attack event - Player attacking Scavenger Beetle
-[01:37:56.898] MonsterAbilitySystem: Player has no abilities
-[01:37:57.085] DEBUG: Player moved to: 31,21 AI can now recalculate paths
-[01:37:57.288] DEBUG: Player moved to: 30,21 AI can now recalculate paths
-[01:37:57.502] DEBUG: Player moved to: 30,20 AI can now recalculate paths
-[01:37:57.669] DEBUG: Player moved to: 30,19 AI can now recalculate paths
-[01:37:57.815] DEBUG: Player moved to: 30,18 AI can now recalculate paths
-[01:37:57.983] DEBUG: Player moved to: 30,17 AI can now recalculate paths
-[01:37:58.135] DEBUG: Player moved to: 30,16 AI can now recalculate paths
-[01:37:58.301] DEBUG: Player moved to: 30,15 AI can now recalculate paths
-[01:37:58.454] DEBUG: Player moved to: 30,14 AI can now recalculate paths
-[01:37:58.802] DEBUG: Player moved to: 31,14 AI can now recalculate paths
-[01:37:59.006] DEBUG: Player moved to: 32,14 AI can now recalculate paths
-[01:37:59.136] DEBUG: Player moved to: 33,14 AI can now recalculate paths
-[01:37:59.324] DEBUG: Player moved to: 34,14 AI can now recalculate paths
-[01:37:59.482] DEBUG: Player moved to: 35,14 AI can now recalculate paths
-[01:37:59.650] DEBUG: Player moved to: 36,14 AI can now recalculate paths
-[01:37:59.804] DEBUG: Player moved to: 36,13 AI can now recalculate paths
-[01:38:00.067] DEBUG: Player moved to: 36,12 AI can now recalculate paths
-[01:38:00.185] DEBUG: Player moved to: 36,11 AI can now recalculate paths
-[01:38:00.303] DEBUG: Player moved to: 36,10 AI can now recalculate paths
-[01:38:00.415] DEBUG: Player moved to: 36,9 AI can now recalculate paths
-[01:38:00.534] DEBUG: Player moved to: 36,8 AI can now recalculate paths
-[01:38:00.650] DEBUG: Player moved to: 36,7 AI can now recalculate paths
-[01:38:00.768] DEBUG: Player moved to: 36,6 AI can now recalculate paths
-[01:38:00.887] DEBUG: Player moved to: 36,5 AI can now recalculate paths
-[01:38:00.998] DEBUG: Player moved to: 36,4 AI can now recalculate paths
-[01:38:01.067] DEBUG: Player moved to: 35,4 AI can now recalculate paths
-[01:38:01.338] DEBUG: Player moved to: 34,4 AI can now recalculate paths
-[01:38:01.449] DEBUG: Player moved to: 33,4 AI can now recalculate paths
-[01:38:01.567] DEBUG: Player moved to: 32,4 AI can now recalculate paths
-[01:38:01.686] DEBUG: Player moved to: 31,4 AI can now recalculate paths
-[01:38:01.804] DEBUG: Player moved to: 30,4 AI can now recalculate paths
-[01:38:01.915] DEBUG: Player moved to: 29,4 AI can now recalculate paths
-[01:38:02.035] DEBUG: Player moved to: 28,4 AI can now recalculate paths
-[01:38:02.151] DEBUG: Player moved to: 27,4 AI can now recalculate paths
-[01:38:02.269] DEBUG: Player moved to: 26,4 AI can now recalculate paths
-[01:38:02.388] DEBUG: Player moved to: 25,4 AI can now recalculate paths
-[01:38:02.500] DEBUG: Player moved to: 24,4 AI can now recalculate paths
-[01:38:02.616] DEBUG: Player moved to: 23,4 AI can now recalculate paths
-[01:38:02.735] DEBUG: Player moved to: 23,5 AI can now recalculate paths
-[01:38:02.902] DEBUG: Player moved to: 22,5 AI can now recalculate paths
-[01:38:03.082] DEBUG: Player moved to: 21,5 AI can now recalculate paths
-[01:38:03.354] DEBUG: Player moved to: 20,5 AI can now recalculate paths
-[01:38:03.354] DEBUG: AI turn processor - Next step: 13,7, AP: 6
-[01:38:03.354] DEBUG: AI moved from 12,7 to 13,7 (AP: 4)
-[01:38:03.464] DEBUG: Player moved to: 19,5 AI can now recalculate paths
-[01:38:03.464] DEBUG: AI turn processor - Next step: 14,7, AP: 4
-[01:38:03.464] DEBUG: AI moved from 13,7 to 14,7 (AP: 2)
-[01:38:03.583] DEBUG: Player moved to: 18,5 AI can now recalculate paths
-[01:38:03.583] DEBUG: AI turn processor - Next step: 15,7, AP: 2
-[01:38:03.583] DEBUG: AI moved from 14,7 to 15,7 (AP: 0)
-[01:38:03.700] DEBUG: Player moved to: 17,5 AI can now recalculate paths
-[01:38:03.701] DEBUG: AI turn processor - Next step: 16,7, AP: 0
-[01:38:03.701] DEBUG: AI recovering 3 points (AP: 3)
-[01:38:04.084] DEBUG: Player moved to: 16,5 AI can now recalculate paths
-[01:38:04.084] DEBUG: AI turn processor - Next step: 16,7, AP: 3
-[01:38:04.084] DEBUG: AI moved from 15,7 to 16,7 (AP: 1)
-[01:38:04.285] DEBUG: Player moved to: 15,5 AI can now recalculate paths
-[01:38:04.285] DEBUG: AI turn processor - Next step: 15,7, AP: 1
-[01:38:04.285] DEBUG: AI waiting (AP: 0)
-[01:38:04.701] DEBUG: Player moved to: 15,6 AI can now recalculate paths
-[01:38:04.701] DEBUG: AI turn processor - Next step: 15,7, AP: 0
-[01:38:04.701] DEBUG: AI recovering 3 points (AP: 3)
-[01:38:05.167] DEBUG: Player moved to: 15,7 AI can now recalculate paths
-[01:38:05.167] MonsterAbilitySystem: Received combat attack event - Wire Spider attacking Player
-[01:38:05.167] MonsterAbilitySystem: Wire Spider has 1 abilities
-[01:38:05.167] MonsterAbilitySystem: Wire Spider has 3 action points
-[01:38:05.167] MonsterAbilitySystem: Checking ability 'Bleeding Bite' (trigger: on_attack, cooldown: 0/3, cost: 2)
-[01:38:05.167] MonsterAbilitySystem: Triggering 'Bleeding Bite' ability
-[01:38:05.167] Applying 1 effects to entity 22:
-[01:38:05.167]   - Effect: periodic subtract 1d10 on Stats.Health
-[01:38:05.167] Current stats before effects:
-[01:38:05.167]   - Health: 97/100
-[01:38:05.167]   - Attack: 6
-[01:38:05.167]   - Defense: 3
-[01:38:05.167]   - Added new effect
-[01:38:05.167] Stats after effects:
-[01:38:05.167]   - Health: 97/100
-[01:38:05.167]   - Attack: 6
-[01:38:05.167]   - Defense: 3
-[01:38:05.167] MonsterAbilitySystem: Applied effect - type: periodic, operation: subtract, value: 1d10, duration: 4
-[01:38:05.167] MonsterAbilitySystem: Deducted 2 action points from Wire Spider
-[01:38:05.167] MonsterAbilitySystem: Set 'Bleeding Bite' cooldown to 3
-[01:38:05.167] DEBUG: Aggressive AI attacked player (AP: -2)
-[01:38:05.952] DEBUG: Player moved to: 15,6 AI can now recalculate paths
-[01:38:05.952] Processing periodic effect on entity 22 - Duration: 4
-[01:38:05.952] Keeping periodic effect, new duration: 3
-[01:38:05.952] Processing periodic effect on entity 22 - Duration: 3
-[01:38:05.952] Keeping periodic effect, new duration: 2
-[01:38:05.952] DEBUG: AI turn processor - Next step: 15,7, AP: -2
-[01:38:05.952] DEBUG: AI recovering 3 points (AP: 1)
-[01:38:06.466] DEBUG: Player moved to: 15,5 AI can now recalculate paths
-[01:38:06.466] Processing periodic effect on entity 22 - Duration: 2
-[01:38:06.466] Keeping periodic effect, new duration: 1
-[01:38:06.466] Processing periodic effect on entity 22 - Duration: 1
-[01:38:06.466] Keeping periodic effect, new duration: 0
-[01:38:06.466] DEBUG: AI turn processor - Next step: 15,7, AP: 1
-[01:38:06.466] DEBUG: AI waiting (AP: 0)
-[01:38:06.737] DEBUG: Player moved to: 15,4 AI can now recalculate paths
-[01:38:06.737] Processing periodic effect on entity 22 - Duration: 0
-[01:38:06.737] Removing periodic effect - duration expired
-[01:38:06.737] DEBUG: AI turn processor - Next step: 15,7, AP: 0
-[01:38:06.737] DEBUG: AI recovering 3 points (AP: 3)
-[01:38:06.974] DEBUG: Player moved to: 16,4 AI can now recalculate paths
-[01:38:06.974] DEBUG: AI turn processor - Next step: 16,6, AP: 3
-[01:38:06.975] DEBUG: AI moved from 16,7 to 16,6 (AP: 1)
-[01:38:07.417] DEBUG: Player moved to: 16,5 AI can now recalculate paths
-[01:38:07.418] DEBUG: AI turn processor - Next step: 16,5, AP: 1
-[01:38:07.418] DEBUG: AI waiting (AP: 0)
-[01:38:07.654] MonsterAbilitySystem: Received combat attack event - Player attacking Wire Spider
-[01:38:07.654] MonsterAbilitySystem: Player has no abilities
-[01:38:08.168] MonsterAbilitySystem: Received combat attack event - Player attacking Wire Spider
-[01:38:08.168] MonsterAbilitySystem: Player has no abilities
-[01:38:13.554] Applying 1 effects to entity 22:
-[01:38:13.554]   - Effect: instant add 20 on Stats.Health
-[01:38:13.554] Current stats before effects:
-[01:38:13.554]   - Health: 67/100
-[01:38:13.554]   - Attack: 6
-[01:38:13.554]   - Defense: 3
-[01:38:13.554]   - Added new effect
-[01:38:13.554] Stats after effects:
-[01:38:13.554]   - Health: 87/100
-[01:38:13.554]   - Attack: 6
-[01:38:13.554]   - Defense: 3
-===== DEBUG LOG STARTED AT 2025-04-19 01:39:19 =====
-[01:39:22.413] Clearing world and map registry...
-[01:39:22.413] World and map registry cleared
-[01:39:22.460] Created world map with ID: 2
-[01:39:22.460] REGISTRY: Registered worldmap (Level 0) with ID: 2
-[01:39:22.462] Populating dungeon with map ID 4
-[01:39:22.462] Map has 687 floor tiles
-[01:39:22.462] Found area with 687 floor tiles at (2,1), counting as 6 rooms
-[01:39:22.462] Total floor tiles: 687, Found 6 rooms
-[01:39:22.462] Found 6 rooms in dungeon
-[01:39:22.462] Placing 3 monsters (rooms: 6 * density: 0.50)
-[01:39:22.462] Found 2 eligible monster templates
-[01:39:22.462] - wire_spider (level 1, tags: [enemy insect ai])
-[01:39:22.462] - scav_beetle (level 1, tags: [enemy insect ai])
-[01:39:22.462] Found 2 eligible monster templates
-[01:39:22.462] - Eligible monster: wire_spider (level 1, tags: [enemy insect ai])
-[01:39:22.462] - Eligible monster: scav_beetle (level 1, tags: [enemy insect ai])
-[01:39:22.462] DEBUG: Creating enemy with MapContext ID: 4
-[01:39:22.462] Created monster wire_spider at 10,6 (1/3)
-[01:39:22.462] DEBUG: Creating enemy with MapContext ID: 4
-[01:39:22.462] Created monster scav_beetle at 11,21 (2/3)
-[01:39:22.463] DEBUG: Creating enemy with MapContext ID: 4
-[01:39:22.463] Created monster wire_spider at 6,1 (3/3)
-[01:39:22.463] Finished populating dungeon. Placed 3/3 monsters
-[01:39:22.464] Populating dungeon with map ID 8
-[01:39:22.464] Map has 637 floor tiles
-[01:39:22.464] Found area with 637 floor tiles at (12,1), counting as 6 rooms
-[01:39:22.464] Total floor tiles: 637, Found 6 rooms
-[01:39:22.464] Found 6 rooms in dungeon
-[01:39:22.464] Placing 3 monsters (rooms: 6 * density: 0.50)
-[01:39:22.464] Found 2 eligible monster templates
-[01:39:22.464] - scav_beetle (level 1, tags: [enemy insect ai])
-[01:39:22.464] - wire_spider (level 1, tags: [enemy insect ai])
-[01:39:22.464] Found 2 eligible monster templates
-[01:39:22.464] - Eligible monster: scav_beetle (level 1, tags: [enemy insect ai])
-[01:39:22.464] - Eligible monster: wire_spider (level 1, tags: [enemy insect ai])
-[01:39:22.464] DEBUG: Creating enemy with MapContext ID: 8
-[01:39:22.464] Created monster wire_spider at 31,18 (1/3)
-[01:39:22.464] DEBUG: Creating enemy with MapContext ID: 8
-[01:39:22.464] Created monster wire_spider at 7,3 (2/3)
-[01:39:22.464] DEBUG: Creating enemy with MapContext ID: 8
-[01:39:22.464] Created monster wire_spider at 13,24 (3/3)
-[01:39:22.464] Finished populating dungeon. Placed 3/3 monsters
-[01:39:22.465] Populating dungeon with map ID 12
-[01:39:22.465] Map has 666 floor tiles
-[01:39:22.465] Found area with 325 floor tiles at (2,1), counting as 3 rooms
-[01:39:22.465] Found area with 218 floor tiles at (30,1), counting as 2 rooms
-[01:39:22.465] Found area with 122 floor tiles at (23,15), counting as 1 rooms
-[01:39:22.465] Total floor tiles: 666, Found 6 rooms
-[01:39:22.465] Found 6 rooms in dungeon
-[01:39:22.465] Placing 3 monsters (rooms: 6 * density: 0.50)
-[01:39:22.465] Found 2 eligible monster templates
-[01:39:22.465] - scav_beetle (level 1, tags: [enemy insect ai])
-[01:39:22.465] - wire_spider (level 1, tags: [enemy insect ai])
-[01:39:22.465] Found 2 eligible monster templates
-[01:39:22.465] - Eligible monster: scav_beetle (level 1, tags: [enemy insect ai])
-[01:39:22.465] - Eligible monster: wire_spider (level 1, tags: [enemy insect ai])
-[01:39:22.465] DEBUG: Creating enemy with MapContext ID: 12
-[01:39:22.465] Created monster wire_spider at 2,5 (1/3)
-[01:39:22.465] DEBUG: Creating enemy with MapContext ID: 12
-[01:39:22.465] Created monster wire_spider at 24,2 (2/3)
-[01:39:22.465] DEBUG: Creating enemy with MapContext ID: 12
-[01:39:22.465] Created monster wire_spider at 29,20 (3/3)
-[01:39:22.465] Finished populating dungeon. Placed 3/3 monsters
-[01:39:22.466] Populating dungeon with map ID 16
-[01:39:22.466] Map has 630 floor tiles
-[01:39:22.466] Found area with 630 floor tiles at (26,1), counting as 6 rooms
-[01:39:22.466] Total floor tiles: 630, Found 6 rooms
-[01:39:22.466] Found 6 rooms in dungeon
-[01:39:22.466] Placing 3 monsters (rooms: 6 * density: 0.50)
-[01:39:22.466] Found 2 eligible monster templates
-[01:39:22.466] - wire_spider (level 1, tags: [enemy insect ai])
-[01:39:22.466] - scav_beetle (level 1, tags: [enemy insect ai])
-[01:39:22.466] Found 2 eligible monster templates
-[01:39:22.466] - Eligible monster: wire_spider (level 1, tags: [enemy insect ai])
-[01:39:22.466] - Eligible monster: scav_beetle (level 1, tags: [enemy insect ai])
-[01:39:22.466] DEBUG: Creating enemy with MapContext ID: 16
-[01:39:22.466] Created monster wire_spider at 9,15 (1/3)
-[01:39:22.466] DEBUG: Creating enemy with MapContext ID: 16
-[01:39:22.466] Created monster wire_spider at 21,22 (2/3)
-[01:39:22.466] DEBUG: Creating enemy with MapContext ID: 16
-[01:39:22.466] Created monster wire_spider at 5,22 (3/3)
-[01:39:22.466] Finished populating dungeon. Placed 3/3 monsters
-[01:39:22.467] Populating dungeon with map ID 20
-[01:39:22.467] Map has 558 floor tiles
-[01:39:22.467] Found area with 557 floor tiles at (31,1), counting as 5 rooms
-[01:39:22.467] Total floor tiles: 558, Found 5 rooms
-[01:39:22.467] Found 5 rooms in dungeon
-[01:39:22.467] Placing 2 monsters (rooms: 5 * density: 0.50)
-[01:39:22.467] Found 2 eligible monster templates
-[01:39:22.467] - wire_spider (level 1, tags: [enemy insect ai])
-[01:39:22.467] - scav_beetle (level 1, tags: [enemy insect ai])
-[01:39:22.467] Found 2 eligible monster templates
-[01:39:22.467] - Eligible monster: wire_spider (level 1, tags: [enemy insect ai])
-[01:39:22.467] - Eligible monster: scav_beetle (level 1, tags: [enemy insect ai])
-[01:39:22.467] DEBUG: Creating enemy with MapContext ID: 20
-[01:39:22.467] Created monster wire_spider at 9,16 (1/2)
-[01:39:22.467] DEBUG: Creating enemy with MapContext ID: 20
-[01:39:22.467] Created monster scav_beetle at 7,8 (2/2)
-[01:39:22.467] Finished populating dungeon. Placed 2/2 monsters
-[01:39:22.467] Created dungeon floor 1 with ID: 4
-[01:39:22.467] REGISTRY: Registered dungeon (Level 1) with ID: 4
-[01:39:22.467] Created dungeon floor 2 with ID: 8
-[01:39:22.467] REGISTRY: Registered dungeon (Level 2) with ID: 8
-[01:39:22.467] Created dungeon floor 3 with ID: 12
-[01:39:22.467] REGISTRY: Registered dungeon (Level 3) with ID: 12
-[01:39:22.467] Created dungeon floor 4 with ID: 16
-[01:39:22.467] REGISTRY: Registered dungeon (Level 4) with ID: 16
-[01:39:22.467] Created dungeon floor 5 with ID: 20
-[01:39:22.467] REGISTRY: Registered dungeon (Level 5) with ID: 20
-[01:39:22.467] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 4)
-[01:39:22.467] SET ACTIVE MAP: Propagated to MapSystem
-[01:39:22.467] Set active map to dungeon floor 1 with ID: 4
-[01:39:22.467] Processing initial item entry: template_id=bandage, count=3
-[01:39:22.467] Successfully added item bandage (ID: 25) to container
-[01:39:22.467] Successfully added item bandage (ID: 26) to container
-[01:39:22.467] Successfully added item bandage (ID: 27) to container
-[01:39:22.467] Processing initial item entry: template_id=miners_headlamp, count=1
-[01:39:22.467] Successfully added item miners_headlamp (ID: 28) to container
-[01:39:22.467] Processing initial item entry: template_id=rusty_spanner, count=1
-[01:39:22.467] Successfully added item rusty_spanner (ID: 29) to container
-[01:39:22.467] Processing initial item entry: template_id=tattered_jumpsuit, count=1
-[01:39:22.467] Successfully added item tattered_jumpsuit (ID: 30) to container
-[01:39:22.467] Created container with 6 items total
-[01:39:22.467] --- MAP SUMMARY ---
-[01:39:22.467] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[01:39:22.467] Map: worldmap (Level 0, ID: 2, Size: 200x200)
-[01:39:22.467] Active map ID: 4
-[01:39:23.477] Examining container at (23,10)
-[01:39:23.477] Starting item pickup from container
-[01:39:23.477] Container has 6 items before pickup
-[01:39:23.477] Attempting to pick up Bandage (type: first aid, ID: 25)
-[01:39:23.477] Successfully picked up Bandage
-[01:39:23.477] Attempting to pick up Bandage (type: first aid, ID: 26)
-[01:39:23.477] Successfully picked up Bandage
-[01:39:23.477] Attempting to pick up Bandage (type: first aid, ID: 27)
-[01:39:23.477] Successfully picked up Bandage
-[01:39:23.477] Attempting to pick up Miner's Headlamp (type: headgear, ID: 28)
-[01:39:23.477] Successfully picked up Miner's Headlamp
-[01:39:23.477] Attempting to pick up Rusty Spanner (type: weapon, ID: 29)
-[01:39:23.477] Successfully picked up Rusty Spanner
-[01:39:23.477] Attempting to pick up Tattered Jumpsuit (type: armor, ID: 30)
-[01:39:23.477] Successfully picked up Tattered Jumpsuit
-[01:39:23.477] Container has 0 items after pickup
-[01:39:23.477] Emitted examine event for container at (23,10)
-[01:39:25.512] Equipping item 28 in slot head
-[01:39:25.512] Item has 4 effects:
-[01:39:25.512]   - Effect: equipment add 3 on FOV.Range
-[01:39:25.512]   - Effect: equipment set 1 on FOV.LightSource
-[01:39:25.512]   - Effect: equipment set 5 on FOV.LightRange
-[01:39:25.512]   - Effect: equipment add 1 on Stats.Defense
-[01:39:25.512] Current stats before equip:
-[01:39:25.512]   - Health: 100/100
-[01:39:25.512]   - Attack: 5
-[01:39:25.512]   - Defense: 1
-[01:39:25.512] Current stats before equip:
-[01:39:25.512]   - Health: 100/100
-[01:39:25.512]   - Attack: 5
-[01:39:25.512]   - Defense: 1
-[01:39:25.512] Stats after equip:
-[01:39:25.512]   - Health: 100/100
-[01:39:25.512]   - Attack: 5
-[01:39:25.512]   - Defense: 2
-[01:39:25.512] Current stats before equip:
-[01:39:25.512]   - Health: 100/100
-[01:39:25.512]   - Attack: 5
-[01:39:25.512]   - Defense: 2
-[01:39:25.512] Stats after equip:
-[01:39:25.512]   - Health: 100/100
-[01:39:25.512]   - Attack: 5
-[01:39:25.512]   - Defense: 2
-[01:39:25.512] Equipment change detected: Equipped item 28 in slot head
-[01:39:25.512] Stats after equip:
-[01:39:25.512]   - Health: 100/100
-[01:39:25.512]   - Attack: 5
-[01:39:25.512]   - Defense: 2
-[01:39:25.909] Equipping item 29 in slot mainhand
-[01:39:25.909] Item has 1 effects:
-[01:39:25.909]   - Effect: equipment add 1 on Stats.Attack
-[01:39:25.909] Current stats before equip:
-[01:39:25.909]   - Health: 100/100
-[01:39:25.909]   - Attack: 5
-[01:39:25.909]   - Defense: 2
-[01:39:25.909] Current stats before equip:
-[01:39:25.909]   - Health: 100/100
-[01:39:25.909]   - Attack: 5
-[01:39:25.909]   - Defense: 2
-[01:39:25.909] Stats after equip:
-[01:39:25.909]   - Health: 100/100
-[01:39:25.909]   - Attack: 6
-[01:39:25.909]   - Defense: 2
-[01:39:25.909] Current stats before equip:
-[01:39:25.909]   - Health: 100/100
-[01:39:25.909]   - Attack: 6
-[01:39:25.909]   - Defense: 2
-[01:39:25.909] Stats after equip:
-[01:39:25.909]   - Health: 100/100
-[01:39:25.909]   - Attack: 6
-[01:39:25.909]   - Defense: 2
-[01:39:25.909] Equipment change detected: Equipped item 29 in slot mainhand
-[01:39:25.909] Stats after equip:
-[01:39:25.909]   - Health: 100/100
-[01:39:25.909]   - Attack: 6
-[01:39:25.909]   - Defense: 2
-[01:39:26.292] Equipping item 30 in slot body
-[01:39:26.292] Item has 1 effects:
-[01:39:26.292]   - Effect: equipment add 1 on Stats.Defense
-[01:39:26.292] Current stats before equip:
-[01:39:26.292]   - Health: 100/100
-[01:39:26.292]   - Attack: 6
-[01:39:26.292]   - Defense: 2
-[01:39:26.292] Current stats before equip:
-[01:39:26.292]   - Health: 100/100
-[01:39:26.292]   - Attack: 6
-[01:39:26.292]   - Defense: 2
-[01:39:26.292] Stats after equip:
-[01:39:26.292]   - Health: 100/100
-[01:39:26.292]   - Attack: 6
-[01:39:26.292]   - Defense: 3
-[01:39:26.292] Current stats before equip:
-[01:39:26.292]   - Health: 100/100
-[01:39:26.292]   - Attack: 6
-[01:39:26.292]   - Defense: 3
-[01:39:26.292] Stats after equip:
-[01:39:26.292]   - Health: 100/100
-[01:39:26.292]   - Attack: 6
-[01:39:26.292]   - Defense: 3
-[01:39:26.292] Equipment change detected: Equipped item 30 in slot body
-[01:39:26.292] Stats after equip:
-[01:39:26.292]   - Health: 100/100
-[01:39:26.292]   - Attack: 6
-[01:39:26.292]   - Defense: 3
-[01:39:27.433] DEBUG: Player moved to: 21,10 AI can now recalculate paths
-[01:39:27.596] DEBUG: Player moved to: 20,10 AI can now recalculate paths
-[01:39:27.743] DEBUG: Player moved to: 19,10 AI can now recalculate paths
-[01:39:27.979] DEBUG: Player moved to: 19,9 AI can now recalculate paths
-[01:39:28.243] DEBUG: Player moved to: 18,9 AI can now recalculate paths
-[01:39:28.507] DEBUG: Player moved to: 17,9 AI can now recalculate paths
-[01:39:28.624] DEBUG: Player moved to: 16,9 AI can now recalculate paths
-[01:39:28.743] DEBUG: Player moved to: 15,9 AI can now recalculate paths
-[01:39:28.862] DEBUG: Player moved to: 14,9 AI can now recalculate paths
-[01:39:28.862] DEBUG: AI turn processor - Next step: 11,6, AP: 6
-[01:39:28.862] DEBUG: AI moved from 10,6 to 11,6 (AP: 4)
-[01:39:28.973] DEBUG: Player moved to: 13,9 AI can now recalculate paths
-[01:39:28.973] DEBUG: AI turn processor - Next step: 12,6, AP: 4
-[01:39:28.973] DEBUG: AI moved from 11,6 to 12,6 (AP: 2)
-[01:39:29.092] DEBUG: Player moved to: 12,9 AI can now recalculate paths
-[01:39:29.092] DEBUG: AI turn processor - Next step: 12,7, AP: 2
-[01:39:29.092] DEBUG: AI moved from 12,6 to 12,7 (AP: 0)
-[01:39:29.577] DEBUG: Player moved to: 12,8 AI can now recalculate paths
-[01:39:29.577] DEBUG: AI turn processor - Next step: 12,8, AP: 0
-[01:39:29.577] DEBUG: AI recovering 3 points (AP: 3)
-[01:39:29.924] DEBUG: Player moved to: 11,8 AI can now recalculate paths
-[01:39:29.924] MonsterAbilitySystem: Received combat attack event - Wire Spider attacking Player
-[01:39:29.924] MonsterAbilitySystem: Wire Spider has 1 abilities
-[01:39:29.924] MonsterAbilitySystem: Wire Spider has 3 action points
-[01:39:29.924] MonsterAbilitySystem: Checking ability 'Bleeding Bite' (trigger: on_attack, cooldown: 0/3, cost: 2)
-[01:39:29.924] MonsterAbilitySystem: Triggering 'Bleeding Bite' ability
-[01:39:29.924] Applying 1 effects to entity 23:
-[01:39:29.924]   - Effect: periodic subtract 1d10 on Stats.Health
-[01:39:29.924] Current stats before effects:
-[01:39:29.924]   - Health: 88/100
-[01:39:29.924]   - Attack: 6
-[01:39:29.924]   - Defense: 3
-[01:39:29.924]   - Added new effect
-[01:39:29.924] Stats after effects:
-[01:39:29.924]   - Health: 88/100
-[01:39:29.924]   - Attack: 6
-[01:39:29.924]   - Defense: 3
-[01:39:29.924] MonsterAbilitySystem: Applied effect - type: periodic, operation: subtract, value: 1d10, duration: 4
-[01:39:29.924] MonsterAbilitySystem: Deducted 2 action points from Wire Spider
-[01:39:29.925] MonsterAbilitySystem: Set 'Bleeding Bite' cooldown to 3
-[01:39:29.925] DEBUG: Aggressive AI attacked player (AP: -2)
-[01:39:29.925] DEBUG: AI turn processor - Next step: 6,2, AP: 6
-[01:39:29.925] DEBUG: AI moved from 6,1 to 6,2 (AP: 4)
-[01:39:30.577] DEBUG: Player moved to: 11,7 AI can now recalculate paths
-[01:39:30.577] Processing periodic effect on entity 23 - Duration: 4
-[01:39:30.577] Keeping periodic effect, new duration: 3
-[01:39:30.577] Processing periodic effect on entity 23 - Duration: 3
-[01:39:30.577] Keeping periodic effect, new duration: 2
-[01:39:30.577] DEBUG: AI turn processor - Next step: 11,7, AP: -2
-[01:39:30.577] DEBUG: AI recovering 3 points (AP: 1)
-[01:39:30.578] DEBUG: AI turn processor - Next step: 7,2, AP: 4
-[01:39:30.578] DEBUG: AI moved from 6,2 to 7,2 (AP: 2)
-[01:39:30.793] MonsterAbilitySystem: Received combat attack event - Player attacking Wire Spider
-[01:39:30.793] MonsterAbilitySystem: Player has no abilities
-[01:39:30.793] Processing periodic effect on entity 23 - Duration: 2
-[01:39:30.793] Keeping periodic effect, new duration: 1
-[01:39:30.793] Processing periodic effect on entity 23 - Duration: 1
-[01:39:30.793] Keeping periodic effect, new duration: 0
-[01:39:31.307] DEBUG: Player moved to: 10,7 AI can now recalculate paths
-[01:39:31.307] Processing periodic effect on entity 23 - Duration: 0
-[01:39:31.307] Removing periodic effect - duration expired
-[01:39:31.307] DEBUG: AI turn processor - Next step: 8,2, AP: 2
-[01:39:31.307] DEBUG: AI moved from 7,2 to 8,2 (AP: 0)
-[01:39:31.829] DEBUG: Player moved to: 9,7 AI can now recalculate paths
-[01:39:31.829] DEBUG: AI turn processor - Next step: 9,2, AP: 0
-[01:39:31.829] DEBUG: AI recovering 3 points (AP: 3)
-[01:39:32.341] DEBUG: Player moved to: 8,7 AI can now recalculate paths
-[01:39:32.341] DEBUG: AI turn processor - Next step: 8,3, AP: 3
-[01:39:32.341] DEBUG: AI moved from 8,2 to 8,3 (AP: 1)
-[01:39:33.058] DEBUG: Player moved to: 8,8 AI can now recalculate paths
-[01:39:33.058] DEBUG: AI turn processor - Next step: 8,4, AP: 1
-[01:39:33.058] DEBUG: AI waiting (AP: 0)
-[01:39:33.299] DEBUG: Player moved to: 8,9 AI can now recalculate paths
-[01:39:33.300] DEBUG: AI turn processor - Next step: 8,4, AP: 0
-[01:39:33.300] DEBUG: AI recovering 3 points (AP: 3)
-[01:39:33.475] DEBUG: Player moved to: 8,10 AI can now recalculate paths
-[01:39:33.475] DEBUG: AI turn processor - Next step: 8,4, AP: 3
-[01:39:33.475] DEBUG: AI moved from 8,3 to 8,4 (AP: 1)
-[01:39:33.642] DEBUG: Player moved to: 8,11 AI can now recalculate paths
-[01:39:33.642] DEBUG: AI turn processor - Next step: 8,5, AP: 1
-[01:39:33.642] DEBUG: AI waiting (AP: 0)
-[01:39:33.809] DEBUG: Player moved to: 8,12 AI can now recalculate paths
-[01:39:33.809] DEBUG: AI turn processor - Next step: 8,5, AP: 0
-[01:39:33.809] DEBUG: AI recovering 3 points (AP: 3)
-[01:39:33.976] DEBUG: Player moved to: 8,13 AI can now recalculate paths
-[01:39:33.976] DEBUG: AI turn processor - Next step: 11,20, AP: 6
-[01:39:33.976] DEBUG: AI moved from 11,21 to 11,20 (AP: 4)
-[01:39:33.976] DEBUG: AI turn processor - Next step: 8,5, AP: 3
-[01:39:33.976] DEBUG: AI moved from 8,4 to 8,5 (AP: 1)
-[01:39:37.625] Applying 1 effects to entity 23:
-[01:39:37.625]   - Effect: instant add 20 on Stats.Health
-[01:39:37.625] Current stats before effects:
-[01:39:37.625]   - Health: 49/100
-[01:39:37.625]   - Attack: 6
-[01:39:37.625]   - Defense: 3
-[01:39:37.625]   - Added new effect
-[01:39:37.625] Stats after effects:
-[01:39:37.625]   - Health: 49/100
-[01:39:37.625]   - Attack: 6
-[01:39:37.625]   - Defense: 3
-[01:39:39.062] DEBUG: Player moved to: 8,12 AI can now recalculate paths
-[01:39:39.062] DEBUG: AI turn processor - Next step: 8,6, AP: 1
-[01:39:39.062] DEBUG: AI waiting (AP: 0)
-[01:39:39.062] DEBUG: AI turn processor - Next step: 11,19, AP: 4
-[01:39:39.062] DEBUG: AI moved from 11,20 to 11,19 (AP: 2)
-[01:39:39.229] DEBUG: Player moved to: 8,11 AI can now recalculate paths
-[01:39:39.229] DEBUG: AI turn processor - Next step: 11,18, AP: 2
-[01:39:39.229] DEBUG: AI moved from 11,19 to 11,18 (AP: 0)
-[01:39:39.229] DEBUG: AI turn processor - Next step: 8,6, AP: 0
-[01:39:39.229] DEBUG: AI recovering 3 points (AP: 3)
-[01:39:39.396] DEBUG: Player moved to: 8,10 AI can now recalculate paths
-[01:39:39.396] DEBUG: AI turn processor - Next step: 8,6, AP: 3
-[01:39:39.396] DEBUG: AI moved from 8,5 to 8,6 (AP: 1)
-[01:39:39.396] DEBUG: AI turn processor - Next step: 11,17, AP: 0
-[01:39:39.396] DEBUG: AI recovering 3 points (AP: 3)
-[01:39:39.576] DEBUG: Player moved to: 8,9 AI can now recalculate paths
-[01:39:39.577] DEBUG: AI turn processor - Next step: 11,17, AP: 3
-[01:39:39.577] DEBUG: AI moved from 11,18 to 11,17 (AP: 1)
-[01:39:39.577] DEBUG: AI turn processor - Next step: 8,7, AP: 1
-[01:39:39.577] DEBUG: AI waiting (AP: 0)
-[01:39:39.723] DEBUG: Player moved to: 8,8 AI can now recalculate paths
-[01:39:39.723] DEBUG: AI turn processor - Next step: 8,7, AP: 0
-[01:39:39.723] DEBUG: AI recovering 3 points (AP: 3)
-[01:39:39.723] DEBUG: AI turn processor - Next step: 11,16, AP: 1
-[01:39:39.723] DEBUG: AI waiting (AP: 0)
-[01:39:39.896] DEBUG: Player moved to: 8,7 AI can now recalculate paths
-[01:39:39.896] DEBUG: AI turn processor - Next step: 11,16, AP: 0
-[01:39:39.896] DEBUG: AI recovering 3 points (AP: 3)
-[01:39:39.896] MonsterAbilitySystem: Received combat attack event - Wire Spider attacking Player
-[01:39:39.896] MonsterAbilitySystem: Wire Spider has 1 abilities
-[01:39:39.896] MonsterAbilitySystem: Wire Spider has 3 action points
-[01:39:39.896] MonsterAbilitySystem: Checking ability 'Bleeding Bite' (trigger: on_attack, cooldown: 0/3, cost: 2)
-[01:39:39.896] MonsterAbilitySystem: Triggering 'Bleeding Bite' ability
-[01:39:39.896] Applying 1 effects to entity 23:
-[01:39:39.896]   - Effect: periodic subtract 1d10 on Stats.Health
-[01:39:39.896] Current stats before effects:
-[01:39:39.896]   - Health: 58/100
-[01:39:39.896]   - Attack: 6
-[01:39:39.896]   - Defense: 3
-[01:39:39.896]   - Added new effect
-[01:39:39.896] Stats after effects:
-[01:39:39.896]   - Health: 58/100
-[01:39:39.896]   - Attack: 6
-[01:39:39.896]   - Defense: 3
-[01:39:39.896] MonsterAbilitySystem: Applied effect - type: periodic, operation: subtract, value: 1d10, duration: 4
-[01:39:39.896] MonsterAbilitySystem: Deducted 2 action points from Wire Spider
-[01:39:39.896] MonsterAbilitySystem: Set 'Bleeding Bite' cooldown to 3
-[01:39:39.896] DEBUG: Aggressive AI attacked player (AP: -2)
-[01:39:40.445] MonsterAbilitySystem: Received combat attack event - Player attacking Wire Spider
-[01:39:40.445] MonsterAbilitySystem: Player has no abilities
-[01:39:40.445] Processing periodic effect on entity 23 - Duration: 4
-[01:39:40.445] Keeping periodic effect, new duration: 3
-[01:39:40.445] Processing periodic effect on entity 23 - Duration: 3
-[01:39:40.445] Keeping periodic effect, new duration: 2
-[01:39:40.827] MonsterAbilitySystem: Received combat attack event - Player attacking Wire Spider
-[01:39:40.827] MonsterAbilitySystem: Player has no abilities
-[01:39:40.827] Processing periodic effect on entity 23 - Duration: 2
-[01:39:40.827] Keeping periodic effect, new duration: 1
-[01:39:40.827] Processing periodic effect on entity 23 - Duration: 1
-[01:39:40.827] Keeping periodic effect, new duration: 0
-[01:39:41.945] DEBUG: Player moved to: 8,6 AI can now recalculate paths
-[01:39:41.946] Processing periodic effect on entity 23 - Duration: 0
-[01:39:41.946] Removing periodic effect - duration expired
-[01:39:41.946] DEBUG: AI turn processor - Next step: 11,16, AP: 3
-[01:39:41.946] DEBUG: AI moved from 11,17 to 11,16 (AP: 1)
-[01:39:45.892] Applying 1 effects to entity 23:
-[01:39:45.892]   - Effect: instant add 20 on Stats.Health
-[01:39:45.892] Current stats before effects:
-[01:39:45.892]   - Health: 32/100
-[01:39:45.892]   - Attack: 6
-[01:39:45.892]   - Defense: 3
-[01:39:45.892]   - Added new effect
-[01:39:45.892] Stats after effects:
-[01:39:45.892]   - Health: 32/100
-[01:39:45.892]   - Attack: 6
-[01:39:45.892]   - Defense: 3
-[01:39:50.374] Applying 1 effects to entity 23:
-[01:39:50.374]   - Effect: instant add 20 on Stats.Health
-[01:39:50.374] Current stats before effects:
-[01:39:50.374]   - Health: 52/100
-[01:39:50.374]   - Attack: 6
-[01:39:50.374]   - Defense: 3
-[01:39:50.374]   - Added new effect
-[01:39:50.374] Stats after effects:
-[01:39:50.374]   - Health: 52/100
-[01:39:50.374]   - Attack: 6
-[01:39:50.374]   - Defense: 3
-[01:39:51.359] DEBUG: Player moved to: 8,7 AI can now recalculate paths
-[01:39:51.360] DEBUG: AI turn processor - Next step: 11,15, AP: 1
-[01:39:51.360] DEBUG: AI waiting (AP: 0)
-[01:39:51.493] DEBUG: Player moved to: 8,8 AI can now recalculate paths
-[01:39:51.493] DEBUG: AI turn processor - Next step: 11,15, AP: 0
-[01:39:51.493] DEBUG: AI recovering 3 points (AP: 3)
-[01:39:51.640] DEBUG: Player moved to: 8,9 AI can now recalculate paths
-[01:39:51.641] DEBUG: AI turn processor - Next step: 11,15, AP: 3
-[01:39:51.641] DEBUG: AI moved from 11,16 to 11,15 (AP: 1)
-[01:39:51.792] DEBUG: Player moved to: 8,10 AI can now recalculate paths
-[01:39:51.792] DEBUG: AI turn processor - Next step: 11,14, AP: 1
-[01:39:51.792] DEBUG: AI waiting (AP: 0)
+===== DEBUG LOG STARTED AT 2025-04-19 17:12:57 =====
+[17:12:58.665] Clearing world and map registry...
+[17:12:58.665] World and map registry cleared
+[17:12:58.713] Created world map with ID: 2
+[17:12:58.713] REGISTRY: Registered worldmap (Level 0) with ID: 2
+[17:12:58.715] Populating dungeon with map ID 4
+[17:12:58.716] Map has 649 floor tiles
+[17:12:58.716] Found area with 441 floor tiles at (1,1), counting as 4 rooms
+[17:12:58.716] Found area with 17 floor tiles at (34,3), counting as 1 rooms
+[17:12:58.716] Found area with 182 floor tiles at (31,13), counting as 1 rooms
+[17:12:58.716] Total floor tiles: 649, Found 6 rooms
+[17:12:58.716] Found 6 rooms in dungeon
+[17:12:58.716] Placing 3 monsters (rooms: 6 * density: 0.50)
+[17:12:58.716] Found 2 eligible monster templates
+[17:12:58.716] - scav_beetle (level 1, tags: [enemy insect ai])
+[17:12:58.716] - wire_spider (level 1, tags: [enemy insect ai])
+[17:12:58.716] Found 2 eligible monster templates
+[17:12:58.716] - Eligible monster: scav_beetle (level 1, tags: [enemy insect ai])
+[17:12:58.716] - Eligible monster: wire_spider (level 1, tags: [enemy insect ai])
+[17:12:58.716] DEBUG: Creating enemy with MapContext ID: 4
+[17:12:58.716] Created monster wire_spider at 33,21 (1/3)
+[17:12:58.716] DEBUG: Creating enemy with MapContext ID: 4
+[17:12:58.716] Created monster wire_spider at 6,2 (2/3)
+[17:12:58.716] DEBUG: Creating enemy with MapContext ID: 4
+[17:12:58.716] Created monster scav_beetle at 24,5 (3/3)
+[17:12:58.716] Finished populating dungeon. Placed 3/3 monsters
+[17:12:58.717] Populating dungeon with map ID 8
+[17:12:58.717] Map has 628 floor tiles
+[17:12:58.717] Found area with 627 floor tiles at (32,1), counting as 6 rooms
+[17:12:58.717] Total floor tiles: 628, Found 6 rooms
+[17:12:58.717] Found 6 rooms in dungeon
+[17:12:58.717] Placing 3 monsters (rooms: 6 * density: 0.50)
+[17:12:58.717] Found 2 eligible monster templates
+[17:12:58.717] - scav_beetle (level 1, tags: [enemy insect ai])
+[17:12:58.717] - wire_spider (level 1, tags: [enemy insect ai])
+[17:12:58.717] Found 2 eligible monster templates
+[17:12:58.717] - Eligible monster: scav_beetle (level 1, tags: [enemy insect ai])
+[17:12:58.717] - Eligible monster: wire_spider (level 1, tags: [enemy insect ai])
+[17:12:58.717] DEBUG: Creating enemy with MapContext ID: 8
+[17:12:58.717] Created monster scav_beetle at 5,8 (1/3)
+[17:12:58.717] DEBUG: Creating enemy with MapContext ID: 8
+[17:12:58.717] Created monster scav_beetle at 16,22 (2/3)
+[17:12:58.717] DEBUG: Creating enemy with MapContext ID: 8
+[17:12:58.717] Created monster wire_spider at 33,6 (3/3)
+[17:12:58.717] Finished populating dungeon. Placed 3/3 monsters
+[17:12:58.718] Populating dungeon with map ID 12
+[17:12:58.718] Map has 713 floor tiles
+[17:12:58.718] Found area with 710 floor tiles at (3,1), counting as 7 rooms
+[17:12:58.718] Total floor tiles: 713, Found 7 rooms
+[17:12:58.718] Found 7 rooms in dungeon
+[17:12:58.718] Placing 3 monsters (rooms: 7 * density: 0.50)
+[17:12:58.718] Found 2 eligible monster templates
+[17:12:58.718] - wire_spider (level 1, tags: [enemy insect ai])
+[17:12:58.718] - scav_beetle (level 1, tags: [enemy insect ai])
+[17:12:58.718] Found 2 eligible monster templates
+[17:12:58.718] - Eligible monster: wire_spider (level 1, tags: [enemy insect ai])
+[17:12:58.718] - Eligible monster: scav_beetle (level 1, tags: [enemy insect ai])
+[17:12:58.718] DEBUG: Creating enemy with MapContext ID: 12
+[17:12:58.718] Created monster wire_spider at 5,11 (1/3)
+[17:12:58.718] DEBUG: Creating enemy with MapContext ID: 12
+[17:12:58.718] Created monster wire_spider at 17,10 (2/3)
+[17:12:58.718] DEBUG: Creating enemy with MapContext ID: 12
+[17:12:58.718] Created monster wire_spider at 6,4 (3/3)
+[17:12:58.718] Finished populating dungeon. Placed 3/3 monsters
+[17:12:58.719] Populating dungeon with map ID 16
+[17:12:58.719] Map has 662 floor tiles
+[17:12:58.719] Found area with 662 floor tiles at (1,3), counting as 6 rooms
+[17:12:58.719] Total floor tiles: 662, Found 6 rooms
+[17:12:58.719] Found 6 rooms in dungeon
+[17:12:58.719] Placing 3 monsters (rooms: 6 * density: 0.50)
+[17:12:58.719] Found 2 eligible monster templates
+[17:12:58.719] - scav_beetle (level 1, tags: [enemy insect ai])
+[17:12:58.719] - wire_spider (level 1, tags: [enemy insect ai])
+[17:12:58.719] Found 2 eligible monster templates
+[17:12:58.719] - Eligible monster: scav_beetle (level 1, tags: [enemy insect ai])
+[17:12:58.719] - Eligible monster: wire_spider (level 1, tags: [enemy insect ai])
+[17:12:58.719] DEBUG: Creating enemy with MapContext ID: 16
+[17:12:58.719] Created monster scav_beetle at 12,21 (1/3)
+[17:12:58.719] DEBUG: Creating enemy with MapContext ID: 16
+[17:12:58.719] Created monster scav_beetle at 37,20 (2/3)
+[17:12:58.719] DEBUG: Creating enemy with MapContext ID: 16
+[17:12:58.719] Created monster wire_spider at 32,4 (3/3)
+[17:12:58.719] Finished populating dungeon. Placed 3/3 monsters
+[17:12:58.720] Populating dungeon with map ID 20
+[17:12:58.720] Map has 726 floor tiles
+[17:12:58.720] Found area with 637 floor tiles at (1,1), counting as 6 rooms
+[17:12:58.720] Found area with 88 floor tiles at (5,18), counting as 1 rooms
+[17:12:58.720] Total floor tiles: 726, Found 7 rooms
+[17:12:58.720] Found 7 rooms in dungeon
+[17:12:58.720] Placing 3 monsters (rooms: 7 * density: 0.50)
+[17:12:58.720] Found 2 eligible monster templates
+[17:12:58.720] - scav_beetle (level 1, tags: [enemy insect ai])
+[17:12:58.720] - wire_spider (level 1, tags: [enemy insect ai])
+[17:12:58.720] Found 2 eligible monster templates
+[17:12:58.720] - Eligible monster: scav_beetle (level 1, tags: [enemy insect ai])
+[17:12:58.720] - Eligible monster: wire_spider (level 1, tags: [enemy insect ai])
+[17:12:58.720] DEBUG: Creating enemy with MapContext ID: 20
+[17:12:58.720] Created monster scav_beetle at 16,9 (1/3)
+[17:12:58.720] DEBUG: Creating enemy with MapContext ID: 20
+[17:12:58.720] Created monster wire_spider at 31,19 (2/3)
+[17:12:58.720] DEBUG: Creating enemy with MapContext ID: 20
+[17:12:58.720] Created monster scav_beetle at 31,15 (3/3)
+[17:12:58.720] Finished populating dungeon. Placed 3/3 monsters
+[17:12:58.720] Created dungeon floor 1 with ID: 4
+[17:12:58.720] REGISTRY: Registered dungeon (Level 1) with ID: 4
+[17:12:58.720] Created dungeon floor 2 with ID: 8
+[17:12:58.720] REGISTRY: Registered dungeon (Level 2) with ID: 8
+[17:12:58.720] Created dungeon floor 3 with ID: 12
+[17:12:58.720] REGISTRY: Registered dungeon (Level 3) with ID: 12
+[17:12:58.720] Created dungeon floor 4 with ID: 16
+[17:12:58.720] REGISTRY: Registered dungeon (Level 4) with ID: 16
+[17:12:58.720] Created dungeon floor 5 with ID: 20
+[17:12:58.720] REGISTRY: Registered dungeon (Level 5) with ID: 20
+[17:12:58.720] SET ACTIVE MAP: Setting active map to dungeon (Level 1, ID: 4)
+[17:12:58.720] SET ACTIVE MAP: Propagated to MapSystem
+[17:12:58.720] Set active map to dungeon floor 1 with ID: 4
+[17:12:58.720] Processing initial item entry: template_id=bandage, count=3
+[17:12:58.720] Successfully added item bandage (ID: 26) to container
+[17:12:58.720] Successfully added item bandage (ID: 27) to container
+[17:12:58.720] Successfully added item bandage (ID: 28) to container
+[17:12:58.720] Processing initial item entry: template_id=miners_headlamp, count=1
+[17:12:58.720] Successfully added item miners_headlamp (ID: 29) to container
+[17:12:58.720] Processing initial item entry: template_id=rusty_spanner, count=1
+[17:12:58.720] Successfully added item rusty_spanner (ID: 30) to container
+[17:12:58.720] Processing initial item entry: template_id=tattered_jumpsuit, count=1
+[17:12:58.720] Successfully added item tattered_jumpsuit (ID: 31) to container
+[17:12:58.720] Created container with 6 items total
+[17:12:58.720] --- MAP SUMMARY ---
+[17:12:58.720] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[17:12:58.720] Map: worldmap (Level 0, ID: 2, Size: 200x200)
+[17:12:58.720] Active map ID: 4
+[17:12:58.721] DEBUG: AI turn processor - Next step: 5,2, AP: 6
+[17:12:58.721] DEBUG: AI moved from 6,2 to 5,2 (AP: 4)
+[17:12:59.381] DEBUG: Player moved to: 4,5 AI can now recalculate paths
+[17:12:59.381] DEBUG: AI turn processor - Next step: 4,2, AP: 4
+[17:12:59.381] DEBUG: AI moved from 5,2 to 4,2 (AP: 2)
+[17:12:59.534] DEBUG: Player moved to: 4,6 AI can now recalculate paths
+[17:12:59.534] DEBUG: AI turn processor - Next step: 4,3, AP: 2
+[17:12:59.534] DEBUG: AI moved from 4,2 to 4,3 (AP: 0)
+[17:12:59.701] DEBUG: Player moved to: 4,7 AI can now recalculate paths
+[17:12:59.701] DEBUG: AI turn processor - Next step: 4,4, AP: 0
+[17:12:59.701] DEBUG: AI recovering 3 points (AP: 3)
+[17:12:59.832] DEBUG: Player moved to: 5,7 AI can now recalculate paths
+[17:12:59.833] DEBUG: AI turn processor - Next step: 5,3, AP: 3
+[17:12:59.833] DEBUG: AI moved from 4,3 to 5,3 (AP: 1)
+[17:12:59.999] DEBUG: Player moved to: 6,7 AI can now recalculate paths
+[17:12:59.999] DEBUG: AI turn processor - Next step: 6,3, AP: 1
+[17:12:59.999] DEBUG: AI waiting (AP: 0)
+[17:13:00.145] DEBUG: Player moved to: 7,7 AI can now recalculate paths
+[17:13:00.145] DEBUG: AI turn processor - Next step: 6,3, AP: 0
+[17:13:00.145] DEBUG: AI recovering 3 points (AP: 3)
+[17:13:00.312] DEBUG: Player moved to: 7,6 AI can now recalculate paths
+[17:13:00.312] DEBUG: AI turn processor - Next step: 6,3, AP: 3
+[17:13:00.312] DEBUG: AI moved from 5,3 to 6,3 (AP: 1)
+[17:13:00.464] DEBUG: Player moved to: 7,5 AI can now recalculate paths
+[17:13:00.464] DEBUG: AI turn processor - Next step: 7,3, AP: 1
+[17:13:00.464] DEBUG: AI waiting (AP: 0)
+[17:13:00.632] DEBUG: Player moved to: 7,4 AI can now recalculate paths
+[17:13:00.632] DEBUG: AI turn processor - Next step: 7,3, AP: 0
+[17:13:00.632] DEBUG: AI recovering 3 points (AP: 3)
+[17:13:00.764] DEBUG: Player moved to: 7,3 AI can now recalculate paths
+[17:13:00.764] MonsterAbilitySystem: Received combat attack event - Wire Spider attacking Player
+[17:13:00.764] MonsterAbilitySystem: Wire Spider has 1 abilities
+[17:13:00.764] MonsterAbilitySystem: Wire Spider has 3 action points
+[17:13:00.764] MonsterAbilitySystem: Checking ability 'Bleeding Bite' (trigger: on_attack, cooldown: 0/3, cost: 2)
+[17:13:00.764] MonsterAbilitySystem: Triggering 'Bleeding Bite' ability
+[17:13:00.764] Applying 1 effects to entity 24:
+[17:13:00.764]   - Effect: periodic subtract 1d10 on Stats.Health
+[17:13:00.764] Current stats before effects:
+[17:13:00.764]   - Health: 85/100
+[17:13:00.764]   - Attack: 5
+[17:13:00.764]   - Defense: 1
+[17:13:00.764]   - Added new effect
+[17:13:00.764] Stats after effects:
+[17:13:00.764]   - Health: 85/100
+[17:13:00.764]   - Attack: 5
+[17:13:00.764]   - Defense: 1
+[17:13:00.764] MonsterAbilitySystem: Applied effect - type: periodic, operation: subtract, value: 1d10, duration: 4
+[17:13:00.764] MonsterAbilitySystem: Deducted 2 action points from Wire Spider
+[17:13:00.764] MonsterAbilitySystem: Set 'Bleeding Bite' cooldown to 3
+[17:13:00.764] DEBUG: Aggressive AI attacked player (AP: -2)
+[17:13:00.916] DEBUG: Player moved to: 7,2 AI can now recalculate paths
+[17:13:00.916] Processing periodic effect on entity 24 - Duration: 4
+[17:13:00.916] Keeping periodic effect, new duration: 3
+[17:13:00.916] Processing periodic effect on entity 24 - Duration: 3
+[17:13:00.916] Keeping periodic effect, new duration: 2
+[17:13:00.917] DEBUG: AI turn processor - Next step: 7,3, AP: -2
+[17:13:00.917] DEBUG: AI recovering 3 points (AP: 1)
+[17:13:01.063] DEBUG: Player moved to: 7,1 AI can now recalculate paths
+[17:13:01.063] Processing periodic effect on entity 24 - Duration: 2
+[17:13:01.063] Keeping periodic effect, new duration: 1
+[17:13:01.063] Processing periodic effect on entity 24 - Duration: 1
+[17:13:01.063] Keeping periodic effect, new duration: 0
+[17:13:01.063] DEBUG: AI turn processor - Next step: 7,3, AP: 1
+[17:13:01.063] DEBUG: AI waiting (AP: 0)
+[17:13:01.785] DEBUG: Player moved to: 7,2 AI can now recalculate paths
+[17:13:01.785] Processing periodic effect on entity 24 - Duration: 0
+[17:13:01.785] Removing periodic effect - duration expired
+[17:13:01.785] DEBUG: AI turn processor - Next step: 7,3, AP: 0
+[17:13:01.785] DEBUG: AI recovering 3 points (AP: 3)
+[17:13:02.003] DEBUG: Player moved to: 7,3 AI can now recalculate paths
+[17:13:02.003] MonsterAbilitySystem: Received combat attack event - Wire Spider attacking Player
+[17:13:02.003] MonsterAbilitySystem: Wire Spider has 1 abilities
+[17:13:02.003] MonsterAbilitySystem: Wire Spider has 3 action points
+[17:13:02.003] MonsterAbilitySystem: Checking ability 'Bleeding Bite' (trigger: on_attack, cooldown: 0/3, cost: 2)
+[17:13:02.003] MonsterAbilitySystem: Triggering 'Bleeding Bite' ability
+[17:13:02.003] Applying 1 effects to entity 24:
+[17:13:02.003]   - Effect: periodic subtract 1d10 on Stats.Health
+[17:13:02.003] Current stats before effects:
+[17:13:02.003]   - Health: 49/100
+[17:13:02.004]   - Attack: 5
+[17:13:02.004]   - Defense: 1
+[17:13:02.004]   - Added new effect
+[17:13:02.004] Stats after effects:
+[17:13:02.004]   - Health: 49/100
+[17:13:02.004]   - Attack: 5
+[17:13:02.004]   - Defense: 1
+[17:13:02.004] MonsterAbilitySystem: Applied effect - type: periodic, operation: subtract, value: 1d10, duration: 4
+[17:13:02.004] MonsterAbilitySystem: Deducted 2 action points from Wire Spider
+[17:13:02.004] MonsterAbilitySystem: Set 'Bleeding Bite' cooldown to 3
+[17:13:02.004] DEBUG: Aggressive AI attacked player (AP: -2)
+[17:13:02.216] MonsterAbilitySystem: Received combat attack event - Player attacking Wire Spider
+[17:13:02.216] MonsterAbilitySystem: Player has no abilities
+[17:13:02.216] Processing periodic effect on entity 24 - Duration: 4
+[17:13:02.216] Keeping periodic effect, new duration: 3
+[17:13:02.216] Processing periodic effect on entity 24 - Duration: 3
+[17:13:02.216] Keeping periodic effect, new duration: 2
+[17:13:02.363] MonsterAbilitySystem: Received combat attack event - Player attacking Wire Spider
+[17:13:02.363] MonsterAbilitySystem: Player has no abilities
+[17:13:02.363] Processing periodic effect on entity 24 - Duration: 2
+[17:13:02.363] Keeping periodic effect, new duration: 1
+[17:13:02.363] Processing periodic effect on entity 24 - Duration: 1
+[17:13:02.363] Keeping periodic effect, new duration: 0
+[17:13:02.716] MonsterAbilitySystem: Received combat attack event - Player attacking Wire Spider
+[17:13:02.716] MonsterAbilitySystem: Player has no abilities
+[17:13:02.716] Processing periodic effect on entity 24 - Duration: 0
+[17:13:02.716] Removing periodic effect - duration expired
+[17:13:03.481] DEBUG: Player moved to: 8,3 AI can now recalculate paths
+[17:13:03.663] DEBUG: Player moved to: 9,3 AI can now recalculate paths
+[17:13:03.912] DEBUG: Player moved to: 9,4 AI can now recalculate paths
+[17:13:04.064] DEBUG: Player moved to: 9,5 AI can now recalculate paths
+[17:13:04.211] DEBUG: Player moved to: 9,6 AI can now recalculate paths
+[17:13:04.350] DEBUG: Player moved to: 9,7 AI can now recalculate paths
+[17:13:04.685] DEBUG: Player moved to: 8,7 AI can now recalculate paths
+[17:13:04.981] DEBUG: Player moved to: 7,7 AI can now recalculate paths
+[17:13:05.114] DEBUG: Player moved to: 6,7 AI can now recalculate paths
+[17:13:05.266] DEBUG: Player moved to: 5,7 AI can now recalculate paths
+[17:13:05.412] DEBUG: Player moved to: 5,6 AI can now recalculate paths
+[17:13:05.566] DEBUG: Player moved to: 5,5 AI can now recalculate paths
+[17:13:05.772] Examining container at (5,4)
+[17:13:05.773] Starting item pickup from container
+[17:13:05.773] Container has 6 items before pickup
+[17:13:05.773] Attempting to pick up Bandage (type: first aid, ID: 26)
+[17:13:05.773] Successfully picked up Bandage
+[17:13:05.773] Attempting to pick up Bandage (type: first aid, ID: 27)
+[17:13:05.773] Successfully picked up Bandage
+[17:13:05.773] Attempting to pick up Bandage (type: first aid, ID: 28)
+[17:13:05.773] Successfully picked up Bandage
+[17:13:05.773] Attempting to pick up Miner's Headlamp (type: headgear, ID: 29)
+[17:13:05.773] Successfully picked up Miner's Headlamp
+[17:13:05.773] Attempting to pick up Rusty Spanner (type: weapon, ID: 30)
+[17:13:05.773] Successfully picked up Rusty Spanner
+[17:13:05.773] Attempting to pick up Tattered Jumpsuit (type: armor, ID: 31)
+[17:13:05.773] Successfully picked up Tattered Jumpsuit
+[17:13:05.773] Container has 0 items after pickup
+[17:13:05.773] Emitted examine event for container at (5,4)
+[17:13:08.247] Equipping item 29 in slot head
+[17:13:08.247] Item has 4 effects:
+[17:13:08.247]   - Effect: equipment add 3 on FOV.Range
+[17:13:08.247]   - Effect: equipment set 1 on FOV.LightSource
+[17:13:08.247]   - Effect: equipment set 5 on FOV.LightRange
+[17:13:08.247]   - Effect: equipment add 1 on Stats.Defense
+[17:13:08.247] Current stats before equip:
+[17:13:08.247]   - Health: 24/100
+[17:13:08.247]   - Attack: 5
+[17:13:08.247]   - Defense: 1
+[17:13:08.247] Current stats before equip:
+[17:13:08.247]   - Health: 24/100
+[17:13:08.247]   - Attack: 5
+[17:13:08.247]   - Defense: 1
+[17:13:08.247] Stats after equip:
+[17:13:08.247]   - Health: 24/100
+[17:13:08.247]   - Attack: 5
+[17:13:08.247]   - Defense: 2
+[17:13:08.247] Current stats before equip:
+[17:13:08.247]   - Health: 24/100
+[17:13:08.247]   - Attack: 5
+[17:13:08.247]   - Defense: 2
+[17:13:08.247] Stats after equip:
+[17:13:08.247]   - Health: 24/100
+[17:13:08.247]   - Attack: 5
+[17:13:08.247]   - Defense: 2
+[17:13:08.247] Equipment change detected: Equipped item 29 in slot head
+[17:13:08.247] Stats after equip:
+[17:13:08.247]   - Health: 24/100
+[17:13:08.247]   - Attack: 5
+[17:13:08.247]   - Defense: 2
+[17:13:08.645] Equipping item 30 in slot mainhand
+[17:13:08.645] Item has 1 effects:
+[17:13:08.645]   - Effect: equipment add 1 on Stats.Attack
+[17:13:08.645] Current stats before equip:
+[17:13:08.645]   - Health: 24/100
+[17:13:08.645]   - Attack: 5
+[17:13:08.645]   - Defense: 2
+[17:13:08.645] Current stats before equip:
+[17:13:08.645]   - Health: 24/100
+[17:13:08.645]   - Attack: 5
+[17:13:08.645]   - Defense: 2
+[17:13:08.645] Stats after equip:
+[17:13:08.645]   - Health: 24/100
+[17:13:08.645]   - Attack: 6
+[17:13:08.645]   - Defense: 2
+[17:13:08.645] Current stats before equip:
+[17:13:08.645]   - Health: 24/100
+[17:13:08.645]   - Attack: 6
+[17:13:08.645]   - Defense: 2
+[17:13:08.645] Stats after equip:
+[17:13:08.645]   - Health: 24/100
+[17:13:08.645]   - Attack: 6
+[17:13:08.645]   - Defense: 2
+[17:13:08.645] Equipment change detected: Equipped item 30 in slot mainhand
+[17:13:08.645] Stats after equip:
+[17:13:08.645]   - Health: 24/100
+[17:13:08.645]   - Attack: 6
+[17:13:08.645]   - Defense: 2
+[17:13:08.962] Equipping item 31 in slot body
+[17:13:08.962] Item has 1 effects:
+[17:13:08.962]   - Effect: equipment add 1 on Stats.Defense
+[17:13:08.962] Current stats before equip:
+[17:13:08.962]   - Health: 24/100
+[17:13:08.962]   - Attack: 6
+[17:13:08.962]   - Defense: 2
+[17:13:08.962] Current stats before equip:
+[17:13:08.962]   - Health: 24/100
+[17:13:08.962]   - Attack: 6
+[17:13:08.962]   - Defense: 2
+[17:13:08.962] Stats after equip:
+[17:13:08.962]   - Health: 24/100
+[17:13:08.962]   - Attack: 6
+[17:13:08.962]   - Defense: 3
+[17:13:08.962] Current stats before equip:
+[17:13:08.962]   - Health: 24/100
+[17:13:08.962]   - Attack: 6
+[17:13:08.962]   - Defense: 3
+[17:13:08.962] Stats after equip:
+[17:13:08.962]   - Health: 24/100
+[17:13:08.962]   - Attack: 6
+[17:13:08.962]   - Defense: 3
+[17:13:08.962] Equipment change detected: Equipped item 31 in slot body
+[17:13:08.962] Stats after equip:
+[17:13:08.962]   - Health: 24/100
+[17:13:08.962]   - Attack: 6
+[17:13:08.962]   - Defense: 3
+[17:13:09.665] DEBUG: Player moved to: 6,5 AI can now recalculate paths
+[17:13:09.831] DEBUG: Player moved to: 7,5 AI can now recalculate paths
+[17:13:09.984] DEBUG: Player moved to: 7,6 AI can now recalculate paths
+[17:13:10.130] DEBUG: Player moved to: 7,7 AI can now recalculate paths
+[17:13:10.283] DEBUG: Player moved to: 7,8 AI can now recalculate paths
+[17:13:10.419] DEBUG: Player moved to: 7,9 AI can now recalculate paths
+[17:13:10.498] DEBUG: Player moved to: 6,9 AI can now recalculate paths
+[17:13:10.749] DEBUG: Player moved to: 6,10 AI can now recalculate paths
+[17:13:10.881] DEBUG: Player moved to: 6,11 AI can now recalculate paths
+[17:13:11.013] DEBUG: Player moved to: 6,12 AI can now recalculate paths
+[17:13:11.165] DEBUG: Player moved to: 6,13 AI can now recalculate paths
+[17:13:11.284] DEBUG: Player moved to: 6,14 AI can now recalculate paths
+[17:13:11.395] DEBUG: Player moved to: 6,15 AI can now recalculate paths
+[17:13:11.548] DEBUG: Player moved to: 6,16 AI can now recalculate paths
+[17:13:11.695] DEBUG: Player moved to: 6,17 AI can now recalculate paths
+[17:13:11.862] DEBUG: Player moved to: 6,18 AI can now recalculate paths
+[17:13:12.396] DEBUG: Player moved to: 5,18 AI can now recalculate paths
+[17:13:12.564] DEBUG: Player moved to: 4,18 AI can now recalculate paths
+[17:13:12.716] DEBUG: Player moved to: 5,18 AI can now recalculate paths
+[17:13:12.983] DEBUG: Player moved to: 6,18 AI can now recalculate paths
+[17:13:13.098] DEBUG: Player moved to: 7,18 AI can now recalculate paths
+[17:13:13.215] DEBUG: Player moved to: 8,18 AI can now recalculate paths
+[17:13:13.327] DEBUG: Player moved to: 9,18 AI can now recalculate paths
+[17:13:13.445] DEBUG: Player moved to: 10,18 AI can now recalculate paths
+[17:13:13.563] DEBUG: Player moved to: 11,18 AI can now recalculate paths
+[17:13:13.681] DEBUG: Player moved to: 12,18 AI can now recalculate paths
+[17:13:13.802] DEBUG: Player moved to: 13,18 AI can now recalculate paths
+[17:13:13.911] DEBUG: Player moved to: 14,18 AI can now recalculate paths
+[17:13:14.028] DEBUG: Player moved to: 15,18 AI can now recalculate paths
+[17:13:14.147] DEBUG: Player moved to: 16,18 AI can now recalculate paths
+[17:13:14.265] DEBUG: Player moved to: 17,18 AI can now recalculate paths
+[17:13:14.377] DEBUG: Player moved to: 18,18 AI can now recalculate paths
+[17:13:14.432] DEBUG: Player moved to: 18,17 AI can now recalculate paths
+[17:13:14.550] DEBUG: Player moved to: 18,16 AI can now recalculate paths
+[17:13:14.849] DEBUG: Player moved to: 19,16 AI can now recalculate paths
+[17:13:14.982] DEBUG: Player moved to: 20,16 AI can now recalculate paths
+[17:13:15.134] DEBUG: Player moved to: 19,16 AI can now recalculate paths
+[17:13:15.328] DEBUG: Player moved to: 18,16 AI can now recalculate paths
+[17:13:17.427] DEBUG: Player moved to: 18,17 AI can now recalculate paths
+[17:13:17.546] DEBUG: Player moved to: 18,18 AI can now recalculate paths
+[17:13:17.700] DEBUG: Player moved to: 18,19 AI can now recalculate paths
+[17:13:17.816] DEBUG: Player moved to: 18,20 AI can now recalculate paths
+[17:13:17.963] DEBUG: Player moved to: 18,21 AI can now recalculate paths
+[17:13:18.115] DEBUG: Player moved to: 18,22 AI can now recalculate paths
+[17:13:18.262] DEBUG: Player moved to: 18,23 AI can now recalculate paths
+[17:13:18.413] DEBUG: Player moved to: 18,24 AI can now recalculate paths

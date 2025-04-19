@@ -13,6 +13,10 @@ const (
 	GameScreenWidth  = 50 // Game area width in tiles (reduced from 54 to give more space to stats)
 	GameScreenHeight = 40 // Game area height in tiles
 
+	// Message window configuration
+	MessageWindowHeight = 8                                  // Reduced from full height to 8 tiles
+	MessageWindowStartY = ScreenHeight - MessageWindowHeight // Start position of message window
+
 	// Window dimensions in pixels (derived from tile dimensions)
 	WindowWidth  = ScreenWidth * TileSize
 	WindowHeight = ScreenHeight * TileSize

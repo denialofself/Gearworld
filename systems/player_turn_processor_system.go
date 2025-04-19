@@ -64,8 +64,8 @@ func NewPlayerTurnProcessorSystem() *PlayerTurnProcessorSystem {
 	system.movementKeys[ebiten.KeyY] = DirUpLeft
 	// Don't map U to movement to avoid conflicts with item usage
 	// system.movementKeys[ebiten.KeyU] = DirUpRight
-	// Use Page Up key for up-right movement instead
-	system.movementKeys[ebiten.KeyPageUp] = DirUpRight
+	// Use Home key for up-right movement instead
+	system.movementKeys[ebiten.KeyHome] = DirUpRight
 	system.movementKeys[ebiten.KeyB] = DirDownLeft
 	system.movementKeys[ebiten.KeyN] = DirDownRight
 
@@ -108,6 +108,9 @@ func (s *PlayerTurnProcessorSystem) Update(world *ecs.World, dt float64) {
 			}
 		}
 	}
+
+	// Handle message scrolling and other non-turn inputs first
+	s.processInput(world)
 
 	// Update movement timer
 	s.moveDelayTimer -= dt
@@ -622,4 +625,17 @@ func (s *PlayerTurnProcessorSystem) isAdjacent(x1, y1, x2, y2 int) bool {
 	dx := x1 - x2
 	dy := y1 - y2
 	return dx >= -1 && dx <= 1 && dy >= -1 && dy <= 1
+}
+
+// Handle message window scrolling
+func (s *PlayerTurnProcessorSystem) processInput(world *ecs.World) {
+	// Handle message window scrolling
+	if inpututil.IsKeyJustPressed(ebiten.KeyPageUp) {
+		s.renderSystem.ScrollMessagesUp()
+		return
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyPageDown) {
+		s.renderSystem.ScrollMessagesDown()
+		return
+	}
 }

@@ -43,10 +43,10 @@ func (s *CameraSystem) Update(world *ecs.World, dt float64) {
 		}
 		targetPos := targetPosComp.(*components.PositionComponent)
 
-		// Update camera position
+		// Update camera position to center the player in the map panel
 		oldX, oldY := camera.X, camera.Y
-		camera.X = targetPos.X - config.ScreenWidth/2
-		camera.Y = targetPos.Y - config.ScreenHeight/2
+		camera.X = targetPos.X - config.GameScreenWidth/2
+		camera.Y = targetPos.Y - config.GameScreenHeight/2
 
 		// If the camera position changed, emit an event
 		if oldX != camera.X || oldY != camera.Y {
