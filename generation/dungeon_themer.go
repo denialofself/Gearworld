@@ -561,8 +561,8 @@ func (t *DungeonThemer) placeFeaturePools(mapComp *components.MapComponent, feat
 
 		// Create a small pool (3x3 to 5x5)
 		poolSize := 3 + t.rng.Intn(3)
-		for y := poolY; y < poolY+poolSize && y < mapComp.Height-1; y++ {
-			for x := poolX; x < poolX+poolSize && x < mapComp.Width-1; x++ {
+		for y := poolY; y < poolY+poolSize && y < mapComp.Height; y++ {
+			for x := poolX; x < poolX+poolSize && x < mapComp.Width; x++ {
 				if !mapComp.IsWall(x, y) && t.rng.Intn(100) < 70 { // Make pools irregular
 					mapComp.SetTile(x, y, featureType)
 				}

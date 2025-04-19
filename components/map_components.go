@@ -68,6 +68,8 @@ const (
 	TileRailwayTeeTop      = 114
 	TileRailwayTeeBottom   = 115
 	TileRailwayCross       = 116
+	// Special entity tiles
+	TileTrainSprite = 117 // Train sprite for player on world map
 )
 
 // TileDefinition describes the visual appearance of a tile type
@@ -163,6 +165,10 @@ func NewTileMappingComponent() *TileMappingComponent {
 	mapping.Definitions[TileRailwayTeeTop] = NewTileDefinitionByPos(2, 12, railwayColor)      // Box drawing tee up
 	mapping.Definitions[TileRailwayTeeBottom] = NewTileDefinitionByPos(1, 12, railwayColor)   // Box drawing tee down
 	mapping.Definitions[TileRailwayCross] = NewTileDefinitionByPos(5, 12, railwayColor)       // Box drawing cross
+
+	// Special entity tiles
+	trainColor := color.RGBA{200, 200, 200, 255}                                     // Bright metallic color
+	mapping.Definitions[TileTrainSprite] = NewTileDefinitionByPos(13, 3, trainColor) // Train sprite
 
 	return mapping
 }

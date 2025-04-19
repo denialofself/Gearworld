@@ -40,6 +40,7 @@ type Game struct {
 	audioSystem               *systems.AudioSystem
 	containerSystem           *systems.ContainerSystem
 	deathSystem               *systems.DeathSystem
+	monsterAbilitySystem      *systems.MonsterAbilitySystem
 }
 
 // NewGame creates a new game instance
@@ -67,6 +68,7 @@ func NewGame() *Game {
 	fovSystem := systems.NewFOVSystem()
 	containerSystem := systems.NewContainerSystem(world)
 	deathSystem := systems.NewDeathSystem()
+	monsterAbilitySystem := systems.NewMonsterAbilitySystem()
 
 	// Initialize the entity template manager
 	templateManager := data.NewEntityTemplateManager()
@@ -113,6 +115,7 @@ func NewGame() *Game {
 	world.AddSystem(fovSystem)
 	world.AddSystem(containerSystem)
 	world.AddSystem(deathSystem)
+	world.AddSystem(monsterAbilitySystem)
 	world.AddSystem(renderSystem) // Render system should be last to see all changes
 
 	// Create the game instance
@@ -138,6 +141,7 @@ func NewGame() *Game {
 		audioSystem:               audioSystem,
 		containerSystem:           containerSystem,
 		deathSystem:               deathSystem,
+		monsterAbilitySystem:      monsterAbilitySystem,
 	}
 
 	// Initialize event listeners
@@ -152,6 +156,7 @@ func NewGame() *Game {
 	renderSystem.Initialize(world)
 	containerSystem.Initialize(world)
 	deathSystem.Initialize(world)
+	monsterAbilitySystem.Initialize(world)
 
 	// Push the start screen onto the stack
 	game.screenStack.Push(screens.NewStartScreen(audioSystem))

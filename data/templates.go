@@ -36,6 +36,32 @@ type EntityTemplate struct {
 	Tags        []string `json:"tags"`        // Tags for categorization (e.g. "enemy", "npc", "boss")
 	BlocksPath  bool     `json:"blocksPath"`  // Whether it blocks movement
 	SpawnWeight int      `json:"spawnWeight"` // Relative chance of spawning (higher = more common)
+
+	// Components
+	Components struct {
+		MonsterAbility struct {
+			Abilities []struct {
+				Name        string `json:"name"`
+				Description string `json:"description"`
+				Type        string `json:"type"`
+				Cooldown    int    `json:"cooldown"`
+				CurrentCD   int    `json:"currentCD"`
+				Range       int    `json:"range"`
+				Cost        int    `json:"cost"`
+				Trigger     string `json:"trigger"`
+				Effects     []struct {
+					Type      string      `json:"type"`
+					Operation string      `json:"operation"`
+					Value     interface{} `json:"value"` // Can be float64 or string for dice roll notation
+					Duration  int         `json:"duration"`
+					Target    struct {
+						Component string `json:"component"`
+						Property  string `json:"property"`
+					} `json:"target"`
+				} `json:"effects"`
+			} `json:"abilities"`
+		} `json:"monsterAbility"`
+	} `json:"components"`
 }
 
 // EntityTemplateManager manages all entity templates

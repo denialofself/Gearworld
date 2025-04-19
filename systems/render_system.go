@@ -306,7 +306,7 @@ func (s *RenderSystem) drawStandardMap(world *ecs.World, screen *ebiten.Image, m
 			if tileDef.UseTilePos {
 				// Use position-based tile reference
 				tileID := NewTileID(tileDef.TileX, tileDef.TileY)
-				s.tileset.DrawTileByID(screen, tileID, x, y, fg)
+				s.tileset.DrawTileByID(screen, tileID, x, y, fg, 0)
 			} else {
 				// Use character-based reference
 				s.tileset.DrawTile(screen, tileDef.Glyph, x, y, fg)
@@ -317,60 +317,72 @@ func (s *RenderSystem) drawStandardMap(world *ecs.World, screen *ebiten.Image, m
 
 // drawEntities draws all visible entities
 func (s *RenderSystem) drawEntities(world *ecs.World, screen *ebiten.Image, cameraX, cameraY int) {
-	// Find the active map - always use MapRegistrySystem for consistency
-	var activeMapID ecs.EntityID
-	var activeMapRegistrySystem interface {
-		GetActiveMap() *ecs.Entity
+	// Get active map
+	activeMap := s.getActiveMap(world)
+	if activeMap == nil {
+		return
+	}
+	activeMapID := activeMap.ID
+
+	// Get map component
+	mapComp, exists := world.GetComponent(activeMapID, components.MapComponentID)
+	if !exists {
+		return
+	}
+	mapComponent := mapComp.(*components.MapComponent)
+
+	// Get map type
+	var activeMapType string
+	if typeComp, exists := world.GetComponent(activeMapID, components.MapType); exists {
+		mapTypeComp := typeComp.(*components.MapTypeComponent)
+		activeMapType = mapTypeComp.MapType
 	}
 
-	// Find the MapRegistrySystem
-	for _, system := range world.GetSystems() {
-		if mapRegistry, ok := system.(interface{ GetActiveMap() *ecs.Entity }); ok {
-			// Check if this is the MapRegistrySystem by checking the type name
-			if fmt.Sprintf("%T", system) == "*systems.MapRegistrySystem" {
-				activeMapRegistrySystem = mapRegistry
-				break
+	entitiesRendered := 0
+
+	// First, draw the player if we're on the world map
+	if activeMapType == "worldmap" {
+		for _, entity := range world.GetEntitiesWithTag("player") {
+			// Get position and renderable components
+			posComp, hasPos := world.GetComponent(entity.ID, components.Position)
+			rendComp, hasRend := world.GetComponent(entity.ID, components.Renderable)
+
+			if hasPos && hasRend {
+				pos := posComp.(*components.PositionComponent)
+				rend := rendComp.(*components.RenderableComponent)
+
+				// Use camera system to convert world position to screen position
+				screenX := pos.X - cameraX
+				screenY := pos.Y - cameraY
+
+				// Only draw if within the visible game screen
+				if screenX >= 0 && screenX < config.GameScreenWidth &&
+					screenY >= 0 && screenY < config.GameScreenHeight {
+
+					// Get rotation if entity has a RotationComponent
+					var rotation float64
+					if rotComp, exists := world.GetComponent(entity.ID, components.Rotation); exists {
+						rotation = rotComp.(*components.RotationComponent).Angle
+					}
+
+					// Use the train sprite for the player on world map
+					tileID := NewTileID(4, 14) // Train sprite position
+					s.tileset.DrawTileByID(screen, tileID, screenX, screenY, rend.FG, rotation)
+					entitiesRendered++
+				}
 			}
 		}
 	}
 
-	// Get the active map from the registry system
-	if activeMapRegistrySystem != nil {
-		if activeMap := activeMapRegistrySystem.GetActiveMap(); activeMap != nil {
-			activeMapID = activeMap.ID
-		}
-	}
-
-	// If no active map found, we can't properly filter entities
-	if activeMapID == 0 {
-		GetDebugLog().Add("RenderSystem: No active map found for entity rendering")
-		return
-	}
-
-	// Get active map type for additional filtering
-	var activeMapType string
-	activeMapEntity := world.GetEntity(activeMapID)
-	if activeMapEntity != nil && world.HasComponent(activeMapID, components.MapType) {
-		mapTypeComp, _ := world.GetComponent(activeMapID, components.MapType)
-		activeMapType = mapTypeComp.(*components.MapTypeComponent).MapType
-	}
-
-	// Get the map component to check visibility
-	var mapComponent *components.MapComponent
-	if comp, exists := world.GetComponent(activeMapID, components.MapComponentID); exists {
-		mapComponent = comp.(*components.MapComponent)
-	} else {
-		GetDebugLog().Add("RenderSystem: No map component found for visibility checks")
-		return
-	}
-
-	// Track entities rendered for debugging
-	entitiesRendered := 0
-
-	// Get all entities to render
+	// Then draw all other entities
 	for _, entity := range world.GetAllEntities() {
 		// Skip map and tilemap entities since we handle those separately
 		if entity.HasTag("map") || entity.HasTag("tilemap") {
+			continue
+		}
+
+		// Skip player on world map since we already drew it
+		if activeMapType == "worldmap" && entity.HasTag("player") {
 			continue
 		}
 
@@ -456,11 +468,17 @@ func (s *RenderSystem) drawEntities(world *ecs.World, screen *ebiten.Image, came
 			// Only draw entities within the visible game screen
 			if screenX >= 0 && screenX < config.GameScreenWidth &&
 				screenY >= 0 && screenY < config.GameScreenHeight {
+				// Get rotation if entity has a RotationComponent
+				var rotation float64
+				if rotComp, exists := world.GetComponent(entity.ID, components.Rotation); exists {
+					rotation = rotComp.(*components.RotationComponent).Angle
+				}
+
 				// Draw the entity using either position or glyph based approach
 				if rend.UseTilePos {
 					// Use position-based reference
 					tileID := NewTileID(rend.TileX, rend.TileY)
-					s.tileset.DrawTileByID(screen, tileID, screenX, screenY, entityColor)
+					s.tileset.DrawTileByID(screen, tileID, screenX, screenY, entityColor, rotation)
 				} else {
 					// Use character-based reference
 					s.tileset.DrawTile(screen, rend.Char, screenX, screenY, entityColor)
@@ -527,11 +545,11 @@ func (s *RenderSystem) drawStatsPanel(world *ecs.World, screen *ebiten.Image) {
 		// Draw the filled portion of the bar
 		tileID := NewTileID(12, 13)
 		for x := 0; x < filledWidth; x++ {
-			s.tileset.DrawTileByID(screen, tileID, config.GameScreenWidth+2+x, 7, color.RGBA{200, 0, 0, 255})
+			s.tileset.DrawTileByID(screen, tileID, config.GameScreenWidth+2+x, 7, color.RGBA{200, 0, 0, 255}, 0)
 		}
 		// Draw the dark portion of the bar
 		for x := filledWidth; x < healthBarWidth; x++ {
-			s.tileset.DrawTileByID(screen, tileID, config.GameScreenWidth+2+x, 7, color.RGBA{100, 0, 0, 255})
+			s.tileset.DrawTileByID(screen, tileID, config.GameScreenWidth+2+x, 7, color.RGBA{100, 0, 0, 255}, 0)
 		}
 
 		// Other stats
@@ -554,13 +572,42 @@ func (s *RenderSystem) drawStatsPanel(world *ecs.World, screen *ebiten.Image) {
 		s.tileset.DrawTile(screen, '-', x, 14, color.RGBA{180, 180, 180, 255})
 	}
 
+	// Draw status section
+	s.tileset.DrawString(screen, "STATUS", config.GameScreenWidth+2, 16, color.RGBA{255, 230, 150, 255})
+
+	// Get player's active effects
+	if effectComp, exists := world.GetComponent(playerID, components.Effect); exists {
+		if effects, ok := effectComp.(*components.EffectComponent); ok {
+			if len(effects.Effects) == 0 {
+				s.tileset.DrawString(screen, "No active effects", config.GameScreenWidth+2, 18, color.RGBA{200, 200, 200, 255})
+			} else {
+				y := 18
+				for _, effect := range effects.Effects {
+					effectDesc := s.formatGameEffect(effect)
+					// Use red color for negative effects like bleeding
+					effectColor := color.RGBA{200, 200, 200, 255}
+					if effect.Operation == components.EffectOpSubtract {
+						effectColor = color.RGBA{255, 100, 100, 255}
+					}
+					s.tileset.DrawString(screen, effectDesc, config.GameScreenWidth+2, y, effectColor)
+					y++
+				}
+			}
+		}
+	}
+
+	// Draw a separator
+	for x := config.GameScreenWidth + 1; x < config.ScreenWidth-1; x++ {
+		s.tileset.DrawTile(screen, '-', x, 22, color.RGBA{180, 180, 180, 255})
+	}
+
 	// Get player position
 	var position *components.PositionComponent
 	if comp, exists := world.GetComponent(playerID, components.Position); exists {
 		position = comp.(*components.PositionComponent)
 
 		// Display position information
-		s.tileset.DrawString(screen, "LOCATION", config.GameScreenWidth+2, 16, color.RGBA{255, 230, 150, 255})
+		s.tileset.DrawString(screen, "LOCATION", config.GameScreenWidth+2, 24, color.RGBA{255, 230, 150, 255})
 
 		// Get current map type and level
 		var mapType string = "Unknown"
@@ -576,15 +623,15 @@ func (s *RenderSystem) drawStatsPanel(world *ecs.World, screen *ebiten.Image) {
 
 		// Display map information
 		if mapType == "worldmap" {
-			s.tileset.DrawString(screen, "Surface", config.GameScreenWidth+2, 18, color.RGBA{200, 200, 255, 255})
+			s.tileset.DrawString(screen, "Surface", config.GameScreenWidth+2, 26, color.RGBA{200, 200, 255, 255})
 		} else {
-			s.tileset.DrawString(screen, fmt.Sprintf("Dungeon Level %d", mapLevel), config.GameScreenWidth+2, 18, color.RGBA{200, 200, 255, 255})
+			s.tileset.DrawString(screen, fmt.Sprintf("Dungeon Level %d", mapLevel), config.GameScreenWidth+2, 26, color.RGBA{200, 200, 255, 255})
 		}
 
 		// Display coordinates
 		s.tileset.DrawString(screen,
 			"Pos: "+strconv.Itoa(position.X)+","+strconv.Itoa(position.Y),
-			config.GameScreenWidth+2, 19, color.RGBA{200, 200, 255, 255})
+			config.GameScreenWidth+2, 27, color.RGBA{200, 200, 255, 255})
 	}
 
 	// Draw equipped items section
@@ -738,7 +785,7 @@ func (s *RenderSystem) drawInventoryListView(world *ecs.World, screen *ebiten.Im
 				itemColor = color.RGBA{255, 255, 100, 255}
 				// Draw a selection indicator
 				arrowTileID := NewTileID(0, 1)
-				s.tileset.DrawTileByID(screen, arrowTileID, config.GameScreenWidth+1, 6+i, itemColor)
+				s.tileset.DrawTileByID(screen, arrowTileID, config.GameScreenWidth+1, 6+i, itemColor, 0)
 			}
 
 			s.tileset.DrawString(screen,
@@ -868,14 +915,13 @@ func (s *RenderSystem) drawItemDetailsView(world *ecs.World, screen *ebiten.Imag
 			s.tileset.DrawString(screen, "Effects:", config.GameScreenWidth+2, y, color.RGBA{255, 230, 150, 255})
 			y += 1
 
-			if effects, ok := itemComp.Data.([]components.ItemEffect); ok {
+			if effects, ok := itemComp.Data.([]components.GameEffect); ok {
 				if len(effects) == 0 {
 					s.tileset.DrawString(screen, "None", config.GameScreenWidth+2, y, color.RGBA{200, 200, 200, 255})
 					y += 1
 				} else {
 					for _, effect := range effects {
-						// Format the effect in a user-friendly way
-						effectDesc := s.formatItemEffect(effect)
+						effectDesc := s.formatGameEffect(effect)
 						s.tileset.DrawString(screen, effectDesc, config.GameScreenWidth+2, y, color.RGBA{200, 200, 200, 255})
 						y += 1
 					}
@@ -894,34 +940,20 @@ func (s *RenderSystem) drawItemDetailsView(world *ecs.World, screen *ebiten.Imag
 	s.tileset.DrawString(screen, "Up/Down: Previous/Next item", config.GameScreenWidth+2, config.GameScreenHeight-1, color.RGBA{200, 200, 200, 255})
 }
 
-// formatItemEffect formats an item effect in a user-friendly way
-func (s *RenderSystem) formatItemEffect(effect components.ItemEffect) string {
-	// Set operation symbol
-	var changeSymbol string
-	if effect.Operation == "add" {
-		changeSymbol = "+"
-	} else {
-		changeSymbol = "="
+// formatGameEffect formats a game effect in a user-friendly way
+func (s *RenderSystem) formatGameEffect(effect components.GameEffect) string {
+	var effectDesc string
+	switch effect.Type {
+	case components.EffectTypeInstant:
+		effectDesc = fmt.Sprintf("Instantly %s by %.1f", effect.Operation, effect.Value)
+	case components.EffectTypeDuration:
+		effectDesc = fmt.Sprintf("%s by %.1f for %d turns", effect.Operation, effect.Value, effect.Duration)
+	case components.EffectTypePeriodic:
+		effectDesc = fmt.Sprintf("%s by %.1f every %d turns", effect.Operation, effect.Value, effect.Duration)
+	case components.EffectTypeConditional:
+		effectDesc = fmt.Sprintf("When condition met: %s by %.1f", effect.Operation, effect.Value)
 	}
-
-	// Convert value to string
-	var valueStr string
-	if value, ok := effect.Value.(float64); ok {
-		valueStr = fmt.Sprintf("%d", int(value))
-	} else if value, ok := effect.Value.(int); ok {
-		valueStr = fmt.Sprintf("%d", value)
-	} else if value, ok := effect.Value.(bool); ok {
-		if value {
-			valueStr = "Yes"
-		} else {
-			valueStr = "No"
-		}
-	} else {
-		valueStr = fmt.Sprintf("%v", effect.Value)
-	}
-
-	// Format the effect in a consistent way
-	return fmt.Sprintf("%s %s%s%s", effect.Property, changeSymbol, valueStr, effect.Component)
+	return effectDesc
 }
 
 // drawMessagesPanel draws the message log panel

@@ -4,17 +4,12 @@ import (
 	"ebiten-rogue/components"
 	"ebiten-rogue/ecs"
 	"fmt"
+	"math/rand"
 	"strconv"
+	"strings"
 )
 
-// Effect operation types
-const (
-	EffectAdd    = "add"
-	EffectSet    = "set"
-	EffectToggle = "toggle"
-)
-
-// EffectsSystem handles all types of effects (passive, active, temporary) in a unified way
+// EffectsSystem handles all types of effects in a unified way
 type EffectsSystem struct {
 	initialized bool
 	world       *ecs.World
@@ -27,550 +22,578 @@ func NewEffectsSystem() *EffectsSystem {
 	}
 }
 
-// Initialize sets up event listeners for the effects system
+// Initialize sets up the effects system
 func (s *EffectsSystem) Initialize(world *ecs.World) {
 	if s.initialized {
 		return
 	}
 
 	s.world = world
-	// Subscribe to rest events for passive healing
-	world.GetEventManager().Subscribe(EventRest, func(event ecs.Event) {
-		restEvent := event.(RestEvent)
-		s.handleRest(world, restEvent)
+
+	// Subscribe to equipment events
+	world.GetEventManager().Subscribe("item_equipped", func(event ecs.Event) {
+		if equipEvent, ok := event.(ItemEquippedEvent); ok {
+			s.HandleItemEquipped(world, equipEvent.EntityID, equipEvent.ItemID)
+		}
+	})
+
+	world.GetEventManager().Subscribe("item_unequipped", func(event ecs.Event) {
+		if unequipEvent, ok := event.(ItemUnequippedEvent); ok {
+			s.HandleItemUnequipped(world, unequipEvent.EntityID, unequipEvent.ItemID)
+		}
 	})
 
 	// Subscribe to effects events
 	world.GetEventManager().Subscribe(EventEffects, func(event ecs.Event) {
-		effectEvent := event.(EffectsEvent)
-		s.handleEffect(world, effectEvent)
+		if effectEvent, ok := event.(EffectsEvent); ok {
+			// Get the item component to access its effects
+			if itemComp, exists := world.GetComponent(effectEvent.Source, components.Item); exists {
+				if item, ok := itemComp.(*components.ItemComponent); ok {
+					if effects, ok := item.Data.([]components.GameEffect); ok {
+						// Get or create the effect component to track applied effects
+						effectComp, exists := world.GetComponent(effectEvent.EntityID, components.Effect)
+						if !exists {
+							effectComp = &components.EffectComponent{
+								Effects: make([]components.GameEffect, 0),
+							}
+							world.AddComponent(effectEvent.EntityID, components.Effect, effectComp)
+						}
+						effectComponent := effectComp.(*components.EffectComponent)
+
+						// Check if these effects have already been applied
+						alreadyApplied := false
+						for _, existing := range effectComponent.Effects {
+							if existing.Source == effectEvent.Source {
+								alreadyApplied = true
+								break
+							}
+						}
+
+						if !alreadyApplied {
+							// Apply the item's effects
+							s.ApplyEntityEffects(world, effectEvent.EntityID, effects)
+						}
+					}
+				}
+			}
+		}
+	})
+
+	// Subscribe to turn completed events
+	world.GetEventManager().Subscribe("turn_completed", func(event ecs.Event) {
+		if _, ok := event.(TurnCompletedEvent); ok {
+			// Process effects for all entities with the Effect component
+			for _, entity := range world.GetEntitiesWithComponent(components.Effect) {
+				s.ProcessEffects(world, entity.ID)
+			}
+		}
 	})
 
 	s.initialized = true
 }
 
-// Update ensures the system is initialized
+// Update ensures the system is initialized but doesn't process effects every frame
 func (s *EffectsSystem) Update(world *ecs.World, dt float64) {
-	// Ensure system is initialized with event handlers
 	if !s.initialized {
 		s.Initialize(world)
 	}
 }
 
-// handleRest processes rest events and applies healing
-func (s *EffectsSystem) handleRest(world *ecs.World, event RestEvent) {
-	entityID := event.EntityID
-
-	// Get stats component
-	statsComp, hasStats := world.GetComponent(entityID, components.Stats)
-	if !hasStats {
-		return
+// ApplyEntityEffects applies a list of effects to an entity
+func (s *EffectsSystem) ApplyEntityEffects(world *ecs.World, entityID ecs.EntityID, effects []components.GameEffect) error {
+	entity := world.GetEntity(entityID)
+	if entity == nil {
+		return nil
 	}
 
+	// Get or create the effect component
+	effectComp, exists := world.GetComponent(entityID, components.Effect)
+	if !exists {
+		effectComp = &components.EffectComponent{
+			Effects: make([]components.GameEffect, 0),
+		}
+		world.AddComponent(entityID, components.Effect, effectComp)
+	}
+	effectComponent := effectComp.(*components.EffectComponent)
+
+	// Get the stats component for applying effects
+	statsComp, exists := world.GetComponent(entityID, components.Stats)
+	if !exists {
+		return nil
+	}
 	stats := statsComp.(*components.StatsComponent)
 
-	// Calculate healing amount based on healing factor
-	healAmount := stats.HealingFactor
-
-	// Store original health to calculate actual healing
-	originalHealth := stats.Health
-
-	// Use the reflection-based component system to apply the healing
-	err := ApplyEntityEffect(
-		world,
-		entityID,
-		"Stats",
-		"Health",
-		EffectAdd,
-		healAmount,
-	)
-
-	if err != nil {
-		GetMessageLog().Add(fmt.Sprintf("Error applying healing effect: %v", err))
-		return
+	// Log the effects being applied
+	GetDebugLog().Add(fmt.Sprintf("Applying %d effects to entity %d:", len(effects), entityID))
+	for _, effect := range effects {
+		GetDebugLog().Add(fmt.Sprintf("  - Effect: %s %s %v on %s.%s",
+			effect.Type, effect.Operation, effect.Value,
+			effect.Target.Component, effect.Target.Property))
 	}
 
-	// Get current health after healing to determine how much was actually healed
-	currentHealth, _ := components.GetComponentProperty(statsComp, "Health")
-	currentMaxHealth, _ := components.GetComponentProperty(statsComp, "MaxHealth")
+	// Log current stats before effects
+	GetDebugLog().Add(fmt.Sprintf("Current stats before effects:"))
+	GetDebugLog().Add(fmt.Sprintf("  - Health: %d/%d", stats.Health, stats.MaxHealth))
+	GetDebugLog().Add(fmt.Sprintf("  - Attack: %d", stats.Attack))
+	GetDebugLog().Add(fmt.Sprintf("  - Defense: %d", stats.Defense))
 
-	// Calculate actual healing
-	actualHealing := currentHealth.(int) - originalHealth
+	// Apply each effect
+	for _, effect := range effects {
+		// Check for duplicate effects
+		isDuplicate := false
+		for i, existing := range effectComponent.Effects {
+			if existing.Type == effect.Type &&
+				existing.Operation == effect.Operation &&
+				existing.Target.Component == effect.Target.Component &&
+				existing.Target.Property == effect.Target.Property &&
+				existing.Source == effect.Source {
+				// Update existing effect
+				effectComponent.Effects[i] = effect
+				isDuplicate = true
+				GetDebugLog().Add(fmt.Sprintf("  - Updated existing effect"))
+				break
+			}
+		}
 
-	// Show appropriate message based on healing result
-	if actualHealing > 0 {
-		GetMessageLog().Add("You rest for a moment and recover " + strconv.Itoa(actualHealing) + " health.")
-	} else if currentHealth.(int) == currentMaxHealth.(int) {
-		GetMessageLog().Add("You rest for a moment, but you're already at full health.")
+		if !isDuplicate {
+			// Add new effect
+			effectComponent.Effects = append(effectComponent.Effects, effect)
+			GetDebugLog().Add(fmt.Sprintf("  - Added new effect"))
+		}
+
+		// Don't apply instant effects here since they are handled by the event system
+		// if effect.Type == components.EffectTypeInstant && !isDuplicate {
+		// 	s.applyEffect(world, entityID, effect)
+		// }
 	}
+
+	// Log stats after effects
+	GetDebugLog().Add(fmt.Sprintf("Stats after effects:"))
+	GetDebugLog().Add(fmt.Sprintf("  - Health: %d/%d", stats.Health, stats.MaxHealth))
+	GetDebugLog().Add(fmt.Sprintf("  - Attack: %d", stats.Attack))
+	GetDebugLog().Add(fmt.Sprintf("  - Defense: %d", stats.Defense))
+
+	return nil
 }
 
-// handleEffect processes all types of effects
-func (s *EffectsSystem) handleEffect(world *ecs.World, event EffectsEvent) {
-	entityID := event.EntityID
-
-	// Debug logging
-	GetMessageLog().Add(fmt.Sprintf("DEBUG: Processing effect: %s on property %s with value %v",
-		event.EffectType, event.Property, event.Value))
-
-	switch event.EffectType {
-	case EffectTypeHeal:
-		s.applyHealingEffect(world, entityID, event)
-	case EffectTypeDamage:
-		s.applyDamageEffect(world, entityID, event)
-	case EffectTypeStatBoost:
-		s.applyStatBoostEffect(world, entityID, event)
-	case EffectTypeFOVModify, EffectTypeLightSource:
-		s.applyFOVEffect(world, entityID, event)
-	}
-}
-
-// applyHealingEffect handles healing effects
-func (s *EffectsSystem) applyHealingEffect(world *ecs.World, entityID ecs.EntityID, event EffectsEvent) {
-	// Get stats component
-	statsComp, hasStats := world.GetComponent(entityID, components.Stats)
-	if !hasStats {
-		return
+// RemoveEntityEffects removes a list of effects from an entity
+func (s *EffectsSystem) RemoveEntityEffects(world *ecs.World, entityID ecs.EntityID, effects []components.GameEffect) error {
+	entity := world.GetEntity(entityID)
+	if entity == nil {
+		return nil
 	}
 
+	// Get the effect component
+	effectComp, exists := world.GetComponent(entityID, components.Effect)
+	if !exists {
+		return nil
+	}
+	effectComponent := effectComp.(*components.EffectComponent)
+
+	// Get the stats component for removing effects
+	statsComp, exists := world.GetComponent(entityID, components.Stats)
+	if !exists {
+		return nil
+	}
 	stats := statsComp.(*components.StatsComponent)
 
-	// Get healing amount
-	var healAmount int
-	switch v := event.Value.(type) {
-	case int:
-		healAmount = v
-	case float64:
-		healAmount = int(v)
-	default:
-		return // Unsupported value type
+	// Log the effects being removed
+	GetDebugLog().Add(fmt.Sprintf("Removing %d effects from entity %d:", len(effects), entityID))
+	for _, effect := range effects {
+		GetDebugLog().Add(fmt.Sprintf("  - Effect: %s %s %v on %s.%s",
+			effect.Type, effect.Operation, effect.Value,
+			effect.Target.Component, effect.Target.Property))
 	}
 
-	// Apply healing (don't exceed max health)
-	oldHealth := stats.Health
-	stats.Health += healAmount
-	if stats.Health > stats.MaxHealth {
-		stats.Health = stats.MaxHealth
-	}
+	// Log current stats before removal
+	GetDebugLog().Add(fmt.Sprintf("Current stats before removal:"))
+	GetDebugLog().Add(fmt.Sprintf("  - Health: %d/%d", stats.Health, stats.MaxHealth))
+	GetDebugLog().Add(fmt.Sprintf("  - Attack: %d", stats.Attack))
+	GetDebugLog().Add(fmt.Sprintf("  - Defense: %d", stats.Defense))
 
-	// Calculate actual healing done
-	actualHealing := stats.Health - oldHealth
-
-	// Handle message display
-	if actualHealing > 0 {
-		message := event.DisplayText
-		if message == "" {
-			message = "You feel better"
-		}
-
-		message += " and recover " + strconv.Itoa(actualHealing) + " health."
-		GetMessageLog().Add(message)
-	} else if stats.Health == stats.MaxHealth && event.Source == "rest" {
-		GetMessageLog().Add(event.DisplayText + ", but you're already at full health.")
-	} else if actualHealing == 0 && event.Source != "rest" {
-		GetMessageLog().Add("You're already at full health.")
-	}
-}
-
-// applyDamageEffect handles damage effects
-func (s *EffectsSystem) applyDamageEffect(world *ecs.World, entityID ecs.EntityID, event EffectsEvent) {
-	// Get stats component
-	statsComp, hasStats := world.GetComponent(entityID, components.Stats)
-	if !hasStats {
-		return
-	}
-
-	stats := statsComp.(*components.StatsComponent)
-
-	// Get damage amount
-	var damageAmount int
-	switch v := event.Value.(type) {
-	case int:
-		damageAmount = v
-	case float64:
-		damageAmount = int(v)
-	default:
-		return // Unsupported value type
-	}
-
-	// Apply damage
-	stats.Health -= damageAmount
-
-	// Handle message display
-	if event.DisplayText != "" {
-		GetMessageLog().Add(event.DisplayText)
-	} else {
-		GetMessageLog().Add("You take " + strconv.Itoa(damageAmount) + " damage.")
-	}
-
-	// Check for death
-	if stats.Health <= 0 {
-		stats.Health = 0
-		// We could emit a death event here
-		GetMessageLog().Add("You have died!")
-	}
-}
-
-// applyStatBoostEffect handles stat boost effects
-func (s *EffectsSystem) applyStatBoostEffect(world *ecs.World, entityID ecs.EntityID, event EffectsEvent) {
-	// Get stats component
-	statsComp, hasStats := world.GetComponent(entityID, components.Stats)
-	if !hasStats {
-		GetMessageLog().Add(fmt.Sprintf("DEBUG: Cannot apply stat effect - entity has no Stats component"))
-		return
-	}
-
-	stats := statsComp.(*components.StatsComponent)
-
-	// Get boost value
-	var boostValue int
-	switch v := event.Value.(type) {
-	case int:
-		boostValue = v
-	case float64:
-		boostValue = int(v)
-	default:
-		GetMessageLog().Add(fmt.Sprintf("DEBUG: Unsupported value type for stat boost: %T", event.Value))
-		return // Unsupported value type
-	}
-
-	// Debug logging - before stats
-	GetMessageLog().Add(fmt.Sprintf("DEBUG: Before stat change - %s: %d",
-		event.Property, getStatValue(stats, event.Property)))
-
-	// Apply boost based on property
-	switch event.Property {
-	case "Attack":
-		stats.Attack += boostValue
-	case "Defense":
-		stats.Defense += boostValue
-	case "MaxHealth":
-		stats.MaxHealth += boostValue
-		// If increasing max health, also increase current health
-		if boostValue > 0 {
-			stats.Health += boostValue
+	// Remove each effect
+	for _, effect := range effects {
+		for i := len(effectComponent.Effects) - 1; i >= 0; i-- {
+			existing := effectComponent.Effects[i]
+			if existing.Type == effect.Type &&
+				existing.Operation == effect.Operation &&
+				existing.Target.Component == effect.Target.Component &&
+				existing.Target.Property == effect.Target.Property &&
+				existing.Source == effect.Source {
+				// Remove the effect
+				effectComponent.Effects = append(effectComponent.Effects[:i], effectComponent.Effects[i+1:]...)
+				GetDebugLog().Add(fmt.Sprintf("  - Removed effect"))
+				break
+			}
 		}
 	}
 
-	// Debug logging - after stats
-	GetMessageLog().Add(fmt.Sprintf("DEBUG: After stat change - %s: %d",
-		event.Property, getStatValue(stats, event.Property)))
+	// Log stats after removal
+	GetDebugLog().Add(fmt.Sprintf("Stats after removal:"))
+	GetDebugLog().Add(fmt.Sprintf("  - Health: %d/%d", stats.Health, stats.MaxHealth))
+	GetDebugLog().Add(fmt.Sprintf("  - Attack: %d", stats.Attack))
+	GetDebugLog().Add(fmt.Sprintf("  - Defense: %d", stats.Defense))
 
-	// Handle message display
-	if event.DisplayText != "" {
-		GetMessageLog().Add(event.DisplayText)
-	} else {
-		changeVerb := "decreases"
-		if boostValue > 0 {
-			changeVerb = "increases"
-		}
-		GetMessageLog().Add("Your " + event.Property + " " +
-			changeVerb + " by " +
-			strconv.Itoa(abs(boostValue)) + ".")
-	}
+	return nil
 }
 
-// Helper function to get stat value by property name
-func getStatValue(stats *components.StatsComponent, property string) int {
-	switch property {
-	case "Attack":
-		return stats.Attack
-	case "Defense":
-		return stats.Defense
-	case "MaxHealth":
-		return stats.MaxHealth
-	case "Health":
-		return stats.Health
-	default:
-		return 0
-	}
-}
-
-// Helper function for absolute value
-func abs(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
-}
-
-// applyFOVEffect handles FOV-related effects
-func (s *EffectsSystem) applyFOVEffect(world *ecs.World, entityID ecs.EntityID, event EffectsEvent) {
-	// Get FOV component
-	fovComp, hasFOV := world.GetComponent(entityID, components.FOV)
-	if !hasFOV {
-		GetMessageLog().Add(fmt.Sprintf("DEBUG: Cannot apply FOV effect - entity has no FOV component"))
-		return
-	}
-
-	fov := fovComp.(*components.FOVComponent)
-
-	// Debug logging - before FOV changes
-	GetMessageLog().Add(fmt.Sprintf("DEBUG: Before FOV change - Range: %d, LightSource: %v, LightRange: %d",
-		fov.Range, fov.LightSource, fov.LightRange))
-
-	// Get effect value
-	var effectValue int
-	switch v := event.Value.(type) {
-	case int:
-		effectValue = v
-	case float64:
-		effectValue = int(v)
-	case bool:
-		if event.Property == "LightSource" {
-			fov.LightSource = v
-			GetMessageLog().Add(fmt.Sprintf("DEBUG: Set LightSource to %v", v))
-		}
-		return
-	default:
-		GetMessageLog().Add(fmt.Sprintf("DEBUG: Unsupported value type for FOV effect: %T", event.Value))
-		return // Unsupported value type
-	}
-
-	// Apply effect based on property
-	switch event.Property {
-	case "Range":
-		fov.Range += effectValue
-		GetMessageLog().Add(fmt.Sprintf("DEBUG: Added %d to FOV Range, now %d", effectValue, fov.Range))
-	case "LightRange":
-		fov.LightRange += effectValue
-		GetMessageLog().Add(fmt.Sprintf("DEBUG: Added %d to LightRange, now %d", effectValue, fov.LightRange))
-		if effectValue > 0 {
-			fov.LightSource = true
-			GetMessageLog().Add("DEBUG: Set LightSource to true due to positive LightRange")
-		} else if fov.LightRange <= 0 {
-			fov.LightSource = false
-			GetMessageLog().Add("DEBUG: Set LightSource to false due to non-positive LightRange")
-		}
-	}
-
-	// Debug logging - after FOV changes
-	GetMessageLog().Add(fmt.Sprintf("DEBUG: After FOV change - Range: %d, LightSource: %v, LightRange: %d",
-		fov.Range, fov.LightSource, fov.LightRange))
-
-	// Handle message display
-	if event.DisplayText != "" {
-		GetMessageLog().Add(event.DisplayText)
-	} else if event.Property == "LightRange" && effectValue > 0 {
-		GetMessageLog().Add("The area around you is illuminated.")
-	} else if event.Property == "Range" && effectValue > 0 {
-		GetMessageLog().Add("Your vision range has increased.")
-	}
-}
-
-// CreateItemEffect creates a new ItemEffect from parameters
-func CreateItemEffect(componentName, propertyName, operation string, value interface{}) components.ItemEffect {
-	return components.ItemEffect{
-		Component: componentName,
-		Property:  propertyName,
+// CreateGameEffect creates a new effect with the given parameters
+func (s *EffectsSystem) CreateGameEffect(effectType components.EffectType, operation components.EffectOperation, value interface{}, duration int, source ecs.EntityID, targetComponent string, targetProperty string) components.GameEffect {
+	return components.GameEffect{
+		Type:      effectType,
 		Operation: operation,
 		Value:     value,
+		Duration:  duration,
+		Source:    source,
+		Target: struct {
+			Component string
+			Property  string
+		}{
+			Component: targetComponent,
+			Property:  targetProperty,
+		},
 	}
 }
 
-// ApplyEntityEffects applies multiple effects to an entity at once
-func ApplyEntityEffects(world *ecs.World, entityID ecs.EntityID, effects []components.ItemEffect) error {
-	if len(effects) == 0 {
-		return nil // No effects to apply
-	}
+// ProcessEffects processes all active effects on an entity
+func (s *EffectsSystem) ProcessEffects(world *ecs.World, entityID ecs.EntityID) {
+	if comp, exists := world.GetComponent(entityID, components.Effect); exists {
+		if effectComp, ok := comp.(*components.EffectComponent); ok {
+			// Create a new slice to store effects that should remain
+			remainingEffects := make([]components.GameEffect, 0)
 
-	for _, effect := range effects {
-		err := ApplyEntityEffect(world, entityID, effect.Component, effect.Property, effect.Operation, effect.Value)
-		if err != nil {
-			return fmt.Errorf("failed to apply effect to %s.%s: %v", effect.Component, effect.Property, err)
-		}
-	}
+			for _, effect := range effectComp.Effects {
+				switch effect.Type {
+				case components.EffectTypeInstant:
+					// Apply instant effect and don't keep it
+					s.applyEffect(world, entityID, effect)
 
-	return nil
-}
+				case components.EffectTypeDuration:
+					// Apply effect and keep it if duration remains
+					s.applyEffect(world, entityID, effect)
+					if effect.Duration > 0 {
+						effect.Duration--
+						remainingEffects = append(remainingEffects, effect)
+					}
 
-// RemoveEntityEffects removes (reverses) multiple effects from an entity
-func RemoveEntityEffects(world *ecs.World, entityID ecs.EntityID, effects []components.ItemEffect) error {
-	if len(effects) == 0 {
-		return nil // No effects to remove
-	}
+				case components.EffectTypePeriodic:
+					// Apply periodic effect and keep it if duration remains
+					GetDebugLog().Add(fmt.Sprintf("Processing periodic effect on entity %d - Duration: %d", entityID, effect.Duration))
+					s.applyEffect(world, entityID, effect)
+					if effect.Duration > 0 {
+						effect.Duration--
+						remainingEffects = append(remainingEffects, effect)
+						GetDebugLog().Add(fmt.Sprintf("Keeping periodic effect, new duration: %d", effect.Duration))
+					} else {
+						GetDebugLog().Add("Removing periodic effect - duration expired")
+					}
 
-	for _, effect := range effects {
-		inverseOp, inverseVal, err := CreateInverseEffect(effect.Component, effect.Property, effect.Operation, effect.Value)
-		if err != nil {
-			return fmt.Errorf("failed to create inverse effect for %s.%s: %v", effect.Component, effect.Property, err)
-		}
-
-		err = ApplyEntityEffect(world, entityID, effect.Component, effect.Property, inverseOp, inverseVal)
-		if err != nil {
-			return fmt.Errorf("failed to apply inverse effect to %s.%s: %v", effect.Component, effect.Property, err)
-		}
-	}
-
-	return nil
-}
-
-// ApplyEntityEffect applies an effect to an entity's component
-func ApplyEntityEffect(world *ecs.World, entityID ecs.EntityID, componentName string,
-	propertyName string, operation string, value interface{}) error {
-
-	// Get component ID
-	compID, exists := components.GetComponentIDByName(componentName)
-	if !exists {
-		return fmt.Errorf("unknown component type: %s", componentName)
-	}
-
-	// Get the component
-	comp, hasComp := world.GetComponent(entityID, compID)
-	if !hasComp {
-		return fmt.Errorf("entity %d lacks %s component", entityID, componentName)
-	}
-
-	// Apply the effect to the component
-	return ApplyComponentEffect(comp, propertyName, operation, value)
-}
-
-// ApplyComponentEffect applies an effect to a component's property
-func ApplyComponentEffect(comp interface{}, propertyName string, operation string, value interface{}) error {
-	// Get current value
-	currentValue, err := components.GetComponentProperty(comp, propertyName)
-	if err != nil {
-		return fmt.Errorf("error getting property: %v", err)
-	}
-
-	var newValue interface{}
-
-	// Calculate new value based on operation
-	switch operation {
-	case EffectAdd:
-		// Addition operation - supported for numeric types
-		switch current := currentValue.(type) {
-		case int:
-			switch v := value.(type) {
-			case int:
-				newValue = current + v
-			case float64:
-				newValue = current + int(v)
-			default:
-				return fmt.Errorf("cannot add %T to int", value)
+				case components.EffectTypeConditional:
+					// Keep conditional effects
+					remainingEffects = append(remainingEffects, effect)
+				}
 			}
-		case int64:
-			switch v := value.(type) {
-			case int:
-				newValue = current + int64(v)
-			case float64:
-				newValue = current + int64(v)
-			case int64:
-				newValue = current + v
-			default:
-				return fmt.Errorf("cannot add %T to int64", value)
-			}
-		case float64:
-			switch v := value.(type) {
-			case int:
-				newValue = current + float64(v)
-			case float64:
-				newValue = current + v
-			default:
-				return fmt.Errorf("cannot add %T to float64", value)
-			}
-		default:
-			return fmt.Errorf("addition not supported for %T", currentValue)
+
+			// Update the effects list
+			effectComp.Effects = remainingEffects
 		}
-
-	case EffectSet:
-		// Set operation - just use the new value
-		newValue = value
-
-	case EffectToggle:
-		// Toggle operation - only for booleans
-		if current, ok := currentValue.(bool); ok {
-			newValue = !current
-		} else {
-			return fmt.Errorf("toggle operation only supports boolean values, got %T", currentValue)
-		}
-
-	default:
-		return fmt.Errorf("unknown operation: %s", operation)
-	}
-
-	// Set the new value
-	err = components.SetComponentProperty(comp, propertyName, newValue)
-	if err != nil {
-		return fmt.Errorf("error setting property: %v", err)
-	}
-
-	// Special cases for component interactions
-	HandleSpecialCases(comp, propertyName)
-
-	return nil
-}
-
-// HandleSpecialCases handles special interactions between component properties
-func HandleSpecialCases(comp interface{}, propertyName string) {
-	// Check StatsComponent - cap Health at MaxHealth
-	if statsComp, ok := comp.(*components.StatsComponent); ok && propertyName == "Health" {
-		if statsComp.Health > statsComp.MaxHealth {
-			statsComp.Health = statsComp.MaxHealth
-		}
-	}
-
-	// Check FOVComponent - light source based on light range
-	if fovComp, ok := comp.(*components.FOVComponent); ok && propertyName == "LightRange" {
-		fovComp.LightSource = fovComp.LightRange > 0
 	}
 }
 
-// GetDefaultValueForProperty returns the default value for a given component and property
-func GetDefaultValueForProperty(componentName, propertyName string) (interface{}, error) {
-	switch componentName {
+// applyEffect applies a single effect to an entity
+func (s *EffectsSystem) applyEffect(world *ecs.World, entityID ecs.EntityID, effect components.GameEffect) {
+	// Get the target component based on the effect's target info
+	var componentID ecs.ComponentID
+	switch effect.Target.Component {
 	case "Stats":
-		switch propertyName {
-		case "Health", "MaxHealth":
-			return 10, nil // Default health and max health
-		case "Attack":
-			return 1, nil // Default attack
-		case "Defense":
-			return 0, nil // Default defense
-		}
+		componentID = components.Stats
 	case "FOV":
-		switch propertyName {
-		case "Range":
-			return 8, nil // Default FOV range
-		case "LightRange":
-			return 0, nil // Default light range
-		case "LightSource":
-			return false, nil // Default light source state
-		}
+		componentID = components.FOV
+	default:
+		GetMessageLog().Add(fmt.Sprintf("Unknown component type: %s", effect.Target.Component))
+		return
 	}
 
-	return nil, fmt.Errorf("no default value defined for %s.%s", componentName, propertyName)
+	if comp, exists := world.GetComponent(entityID, componentID); exists {
+		switch effect.Target.Component {
+		case "Stats":
+			if stats, ok := comp.(*components.StatsComponent); ok {
+				// Calculate the effect value, handling dice roll notation
+				value := s.calculateEffectValue(effect.Value)
+
+				// Apply effect based on the target property
+				switch effect.Target.Property {
+				case "Health":
+					switch effect.Operation {
+					case components.EffectOpAdd:
+						stats.Health += int(value)
+						// Cap health at max health
+						if stats.Health > stats.MaxHealth {
+							stats.Health = stats.MaxHealth
+						}
+					case components.EffectOpSubtract:
+						stats.Health -= int(value)
+						if stats.Health < 0 {
+							stats.Health = 0
+						}
+					case components.EffectOpMultiply:
+						stats.Health = int(float64(stats.Health) * value)
+					case components.EffectOpSet:
+						stats.Health = int(value)
+					}
+				case "Attack":
+					switch effect.Operation {
+					case components.EffectOpAdd:
+						stats.Attack += int(value)
+					case components.EffectOpSubtract:
+						stats.Attack -= int(value)
+					case components.EffectOpMultiply:
+						stats.Attack = int(float64(stats.Attack) * value)
+					case components.EffectOpSet:
+						stats.Attack = int(value)
+					}
+				case "Defense":
+					switch effect.Operation {
+					case components.EffectOpAdd:
+						stats.Defense += int(value)
+					case components.EffectOpSubtract:
+						stats.Defense -= int(value)
+					case components.EffectOpMultiply:
+						stats.Defense = int(float64(stats.Defense) * value)
+					case components.EffectOpSet:
+						stats.Defense = int(value)
+					}
+				case "MaxHealth":
+					switch effect.Operation {
+					case components.EffectOpAdd:
+						stats.MaxHealth += int(value)
+						// Also increase current health if max health increases
+						stats.Health += int(value)
+					case components.EffectOpSubtract:
+						stats.MaxHealth -= int(value)
+						// Cap current health at new max health
+						if stats.Health > stats.MaxHealth {
+							stats.Health = stats.MaxHealth
+						}
+					case components.EffectOpMultiply:
+						stats.MaxHealth = int(float64(stats.MaxHealth) * value)
+						// Adjust current health proportionally
+						stats.Health = int(float64(stats.Health) * value)
+					case components.EffectOpSet:
+						stats.MaxHealth = int(value)
+						// Cap current health at new max health
+						if stats.Health > stats.MaxHealth {
+							stats.Health = stats.MaxHealth
+						}
+					}
+				}
+			}
+		case "FOV":
+			if fov, ok := comp.(*components.FOVComponent); ok {
+				// Calculate the effect value, handling dice roll notation
+				value := s.calculateEffectValue(effect.Value)
+
+				switch effect.Target.Property {
+				case "Range":
+					switch effect.Operation {
+					case components.EffectOpAdd:
+						fov.Range += int(value)
+					case components.EffectOpSubtract:
+						fov.Range -= int(value)
+					case components.EffectOpMultiply:
+						fov.Range = int(float64(fov.Range) * value)
+					case components.EffectOpSet:
+						fov.Range = int(value)
+					}
+				case "LightRange":
+					switch effect.Operation {
+					case components.EffectOpAdd:
+						fov.LightRange += int(value)
+						fov.LightSource = fov.LightRange > 0
+					case components.EffectOpSubtract:
+						fov.LightRange -= int(value)
+						fov.LightSource = fov.LightRange > 0
+					case components.EffectOpMultiply:
+						fov.LightRange = int(float64(fov.LightRange) * value)
+						fov.LightSource = fov.LightRange > 0
+					case components.EffectOpSet:
+						fov.LightRange = int(value)
+						fov.LightSource = fov.LightRange > 0
+					}
+				}
+			}
+		}
+	}
 }
 
-// CreateInverseEffect creates the inverse of an effect for removal
-func CreateInverseEffect(componentName, propertyName, operation string, value interface{}) (string, interface{}, error) {
-	switch operation {
-	case EffectAdd:
-		// For numeric values, negate them
-		switch v := value.(type) {
-		case int:
-			return EffectAdd, -v, nil
-		case float64:
-			return EffectAdd, -v, nil
-		case int64:
-			return EffectAdd, -v, nil
-		default:
-			return "", nil, fmt.Errorf("cannot create inverse for type %T with add operation", value)
+// calculateEffectValue calculates the effect value, handling dice roll notation
+func (s *EffectsSystem) calculateEffectValue(value interface{}) float64 {
+	switch v := value.(type) {
+	case float64:
+		return v
+	case string:
+		// Handle dice roll notation (e.g., "1d4", "2d6", etc.)
+		if strings.Contains(v, "d") {
+			parts := strings.Split(v, "d")
+			if len(parts) != 2 {
+				return 0
+			}
+			numDice, err1 := strconv.Atoi(parts[0])
+			diceSize, err2 := strconv.Atoi(parts[1])
+			if err1 != nil || err2 != nil {
+				return 0
+			}
+			var total int
+			for i := 0; i < numDice; i++ {
+				total += rand.Intn(diceSize) + 1
+			}
+			return float64(total)
 		}
-
-	case EffectSet:
-		// For "set" operations, use defaults based on property
-		defaultValue, err := GetDefaultValueForProperty(componentName, propertyName)
-		if err != nil {
-			return "", nil, err
+		// Try to parse as a regular number
+		if num, err := strconv.ParseFloat(v, 64); err == nil {
+			return num
 		}
-		return EffectSet, defaultValue, nil
-
-	case EffectToggle:
-		// For toggle operations, just toggle again
-		return EffectToggle, nil, nil
-
-	default:
-		return "", nil, fmt.Errorf("unknown operation: %s", operation)
 	}
+	return 0
+}
+
+// HandleItemEquipped processes equipment effects when an item is equipped
+func (s *EffectsSystem) HandleItemEquipped(world *ecs.World, entityID ecs.EntityID, itemID ecs.EntityID) error {
+	// Get the item's effects
+	itemComp, exists := world.GetComponent(itemID, components.Item)
+	if !exists {
+		return fmt.Errorf("item %d does not have an Item component", itemID)
+	}
+
+	item, ok := itemComp.(*components.ItemComponent)
+	if !ok {
+		return fmt.Errorf("item %d has invalid Item component type", itemID)
+	}
+
+	effects, ok := item.Data.([]components.GameEffect)
+	if !ok {
+		return fmt.Errorf("item %d has invalid effects data", itemID)
+	}
+
+	// Get the stats component for applying effects
+	statsComp, exists := world.GetComponent(entityID, components.Stats)
+	if !exists {
+		return fmt.Errorf("entity %d does not have a Stats component", entityID)
+	}
+	stats := statsComp.(*components.StatsComponent)
+
+	// Get the effect component to track applied effects
+	effectComp, exists := world.GetComponent(entityID, components.Effect)
+	if !exists {
+		effectComp = &components.EffectComponent{
+			Effects: make([]components.GameEffect, 0),
+		}
+		world.AddComponent(entityID, components.Effect, effectComp)
+	}
+	effectComponent := effectComp.(*components.EffectComponent)
+
+	// Log current stats before effects
+	GetDebugLog().Add(fmt.Sprintf("Current stats before equip:"))
+	GetDebugLog().Add(fmt.Sprintf("  - Health: %d/%d", stats.Health, stats.MaxHealth))
+	GetDebugLog().Add(fmt.Sprintf("  - Attack: %d", stats.Attack))
+	GetDebugLog().Add(fmt.Sprintf("  - Defense: %d", stats.Defense))
+
+	// Apply each effect only if it hasn't been applied yet
+	for _, effect := range effects {
+		if effect.Type == components.EffectTypeEquipment {
+			// Check if this effect is already applied
+			isDuplicate := false
+			for _, existing := range effectComponent.Effects {
+				if existing.Type == effect.Type &&
+					existing.Operation == effect.Operation &&
+					existing.Target.Component == effect.Target.Component &&
+					existing.Target.Property == effect.Target.Property &&
+					existing.Source == effect.Source {
+					isDuplicate = true
+					break
+				}
+			}
+
+			if !isDuplicate {
+				s.applyEffect(world, entityID, effect)
+				// Add the effect to the component to track it
+				effectComponent.Effects = append(effectComponent.Effects, effect)
+			}
+		}
+	}
+
+	// Log stats after effects
+	GetDebugLog().Add(fmt.Sprintf("Stats after equip:"))
+	GetDebugLog().Add(fmt.Sprintf("  - Health: %d/%d", stats.Health, stats.MaxHealth))
+	GetDebugLog().Add(fmt.Sprintf("  - Attack: %d", stats.Attack))
+	GetDebugLog().Add(fmt.Sprintf("  - Defense: %d", stats.Defense))
+
+	return nil
+}
+
+// HandleItemUnequipped processes equipment effects when an item is unequipped
+func (s *EffectsSystem) HandleItemUnequipped(world *ecs.World, entityID ecs.EntityID, itemID ecs.EntityID) error {
+	// Get the item's effects
+	itemComp, exists := world.GetComponent(itemID, components.Item)
+	if !exists {
+		return fmt.Errorf("item %d does not have an Item component", itemID)
+	}
+
+	item, ok := itemComp.(*components.ItemComponent)
+	if !ok {
+		return fmt.Errorf("item %d has invalid Item component type", itemID)
+	}
+
+	effects, ok := item.Data.([]components.GameEffect)
+	if !ok {
+		return fmt.Errorf("item %d has invalid effects data", itemID)
+	}
+
+	// Get the stats component for removing effects
+	statsComp, exists := world.GetComponent(entityID, components.Stats)
+	if !exists {
+		return fmt.Errorf("entity %d does not have a Stats component", entityID)
+	}
+	stats := statsComp.(*components.StatsComponent)
+
+	// Log current stats before removal
+	GetDebugLog().Add(fmt.Sprintf("Current stats before unequip:"))
+	GetDebugLog().Add(fmt.Sprintf("  - Health: %d/%d", stats.Health, stats.MaxHealth))
+	GetDebugLog().Add(fmt.Sprintf("  - Attack: %d", stats.Attack))
+	GetDebugLog().Add(fmt.Sprintf("  - Defense: %d", stats.Defense))
+
+	// Remove each effect
+	for _, effect := range effects {
+		if effect.Type == components.EffectTypeEquipment {
+			// Invert the operation to remove the effect
+			invertedEffect := effect
+			switch effect.Operation {
+			case components.EffectOpAdd:
+				invertedEffect.Operation = components.EffectOpSubtract
+			case components.EffectOpSubtract:
+				invertedEffect.Operation = components.EffectOpAdd
+			case components.EffectOpMultiply:
+				// For multiply operations, we'll use subtract since we don't have divide
+				invertedEffect.Operation = components.EffectOpSubtract
+				// Adjust the value to approximate the inverse of multiplication
+				if val, ok := invertedEffect.Value.(float64); ok {
+					invertedEffect.Value = val - 1
+				}
+			case components.EffectOpSet:
+				// For set operations, we need to restore the original value
+				// This would require storing the original value somewhere
+				// For now, we'll just skip set operations
+				continue
+			}
+			s.applyEffect(world, entityID, invertedEffect)
+		}
+	}
+
+	// Log stats after removal
+	GetDebugLog().Add(fmt.Sprintf("Stats after unequip:"))
+	GetDebugLog().Add(fmt.Sprintf("  - Health: %d/%d", stats.Health, stats.MaxHealth))
+	GetDebugLog().Add(fmt.Sprintf("  - Attack: %d", stats.Attack))
+	GetDebugLog().Add(fmt.Sprintf("  - Defense: %d", stats.Defense))
+
+	return nil
 }

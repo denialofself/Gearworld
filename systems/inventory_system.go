@@ -216,78 +216,50 @@ func (s *InventorySystem) checkItemEquipped(entityID, itemID ecs.EntityID) bool 
 // UseItem attempts to use the item at the given index in the player's inventory
 func (s *InventorySystem) UseItem(world *ecs.World, playerID ecs.EntityID, itemIndex int) bool {
 	// Get player inventory
-	invComp, hasInv := world.GetComponent(playerID, components.Inventory)
-	if !hasInv {
+	invComp, exists := world.GetComponent(playerID, components.Inventory)
+	if !exists {
 		return false
 	}
-
 	inventory := invComp.(*components.InventoryComponent)
 
-	// Check if the index is valid
+	// Check if index is valid
 	if itemIndex < 0 || itemIndex >= inventory.Size() {
 		return false
 	}
 
-	// Get the item ID from inventory
+	// Get item ID
 	itemID := inventory.GetItemByIndex(itemIndex)
 	if itemID == 0 {
 		return false
 	}
 
-	// Get the item component
-	itemComp, hasItem := world.GetComponent(itemID, components.Item)
-	if !hasItem {
+	// Get item component
+	itemComp, exists := world.GetComponent(itemID, components.Item)
+	if !exists {
 		return false
 	}
-
 	item := itemComp.(*components.ItemComponent)
 
-	// Find out if it's consumable
-	isConsumable := s.IsItemConsumable(world, itemID)
-
-	if isConsumable || item.ItemType == "potion" || item.ItemType == "scroll" ||
-		item.ItemType == "first aid" || item.ItemType == "bandage" {
-		// This is a consumable item - apply its effects
-		itemName := s.getItemName(world, itemID)
-
-		// Different use messages based on item type
-		switch item.ItemType {
-		case "potion":
-			GetMessageLog().Add(fmt.Sprintf("You drink the %s.", itemName))
-		case "scroll":
-			GetMessageLog().Add(fmt.Sprintf("You read the %s.", itemName))
-		default:
-			GetMessageLog().Add(fmt.Sprintf("You use the %s.", itemName))
-		}
-
-		// Apply effects directly using our new system
+	// Check item type and handle accordingly
+	if item.ItemType == "potion" || item.ItemType == "scroll" || item.ItemType == "food" || item.ItemType == "first aid" {
+		// This is a consumable item
 		if item.Data != nil {
-			if effects, ok := item.Data.([]components.ItemEffect); ok {
-				// Apply all effects at once
-				err := ApplyEntityEffects(world, playerID, effects)
-				if err != nil {
-					GetMessageLog().Add(fmt.Sprintf("Error applying effects: %v", err))
-				} else {
-					// Different effect messages based on primary effect
-					hasPrimaryEffectMessage := false
-					for _, effect := range effects {
-						if effect.Component == "Stats" && effect.Property == "Health" {
-							GetMessageLog().Add(fmt.Sprintf("The %s heals your wounds.", itemName))
-							hasPrimaryEffectMessage = true
-							break
-						}
-					}
-
-					// Generic message if no specific effect message was shown
-					if !hasPrimaryEffectMessage && len(effects) > 0 {
-						GetMessageLog().Add(fmt.Sprintf("You feel the effects of the %s.", itemName))
-					}
-				}
+			if _, ok := item.Data.([]components.GameEffect); ok {
+				// Emit a single effects event for the item
+				world.EmitEvent(EffectsEvent{
+					EntityID:    playerID,
+					EffectType:  "item",
+					Property:    "",  // Not used when applying item effects
+					Value:       nil, // Not used when applying item effects
+					Source:      itemID,
+					DisplayText: fmt.Sprintf("Used %s", s.getItemName(world, itemID)),
+				})
 			}
 		}
 
-		// Remove from inventory after use (it's consumable)
+		// Remove the item from inventory
 		inventory.RemoveItem(itemID)
+		GetMessageLog().Add(fmt.Sprintf("You used the %s.", s.getItemName(world, itemID)))
 		return true
 	} else if item.ItemType == "weapon" || item.ItemType == "armor" || item.ItemType == "headgear" ||
 		item.ItemType == "shield" || item.ItemType == "ring" || item.ItemType == "amulet" {
@@ -368,8 +340,8 @@ func (s *InventorySystem) IsItemConsumable(world *ecs.World, itemID ecs.EntityID
 		}
 	}
 
-	// Check if data is directly an array of ItemEffect
-	if effects, ok := item.Data.([]components.ItemEffect); ok && len(effects) > 0 {
+	// Check if data is directly an array of GameEffect
+	if effects, ok := item.Data.([]components.GameEffect); ok && len(effects) > 0 {
 		// If item has effects and isn't equippable, it's likely consumable
 		equippable := item.ItemType == "weapon" || item.ItemType == "armor" ||
 			item.ItemType == "headgear" || item.ItemType == "shield" ||

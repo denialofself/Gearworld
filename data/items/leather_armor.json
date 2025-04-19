@@ -8,5 +8,19 @@
   "color": "#895129",
   "value": 8,
   "weight": 3,
-  "tags": ["armor", "light"]
+  "tags": ["armor", "light"],
+  "equip_slot": "body",
+  "effects": [
+    {
+      "type": "duration",
+      "operation": "add",
+      "value": 2.0,
+      "duration": -1,
+      "source": "leather_armor",
+      "target": {
+        "component": "Stats",
+        "property": "Defense"
+      }
+    }
+  ]
 } 

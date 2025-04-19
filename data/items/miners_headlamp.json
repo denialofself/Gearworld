@@ -12,28 +12,48 @@
   "equip_slot": "head",
   "effects": [
     {
-      "component": "FOV",
-      "property": "Range",
+      "type": "duration",
       "operation": "add",
-      "value": 3
+      "value": 3.0,
+      "duration": -1,
+      "source": "miners_headlamp",
+      "target": {
+        "component": "FOV",
+        "property": "Range"
+      }
     },
     {
-      "component": "FOV",
-      "property": "LightSource",
+      "type": "duration",
       "operation": "set",
-      "value": true
+      "value": 1.0,
+      "duration": -1,
+      "source": "miners_headlamp",
+      "target": {
+        "component": "FOV",
+        "property": "LightSource"
+      }
     },
     {
-      "component": "FOV",
-      "property": "LightRange",
+      "type": "duration",
       "operation": "set",
-      "value": 5
-    },    
+      "value": 5.0,
+      "duration": -1,
+      "source": "miners_headlamp",
+      "target": {
+        "component": "FOV",
+        "property": "LightRange"
+      }
+    },
     {
-      "component": "Stats",
-      "property": "Defense",
+      "type": "duration",
       "operation": "add",
-      "value": 1
+      "value": 1.0,
+      "duration": -1,
+      "source": "miners_headlamp",
+      "target": {
+        "component": "Stats",
+        "property": "Defense"
+      }
     }
   ]
 } 

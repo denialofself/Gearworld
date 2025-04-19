@@ -41,6 +41,18 @@ func NewRenderableComponentByPos(tileX, tileY int, fg color.Color) *RenderableCo
 	}
 }
 
+// RotationComponent tracks an entity's rotation in degrees
+type RotationComponent struct {
+	Angle float64 // Rotation angle in degrees
+}
+
+// NewRotationComponent creates a new rotation component
+func NewRotationComponent(angle float64) *RotationComponent {
+	return &RotationComponent{
+		Angle: angle,
+	}
+}
+
 // PlayerComponent indicates that an entity is controlled by the player
 type PlayerComponent struct{}
 
@@ -226,25 +238,96 @@ const (
 	SlotAccessory EquipmentSlot = "accessory"
 )
 
-// ItemEffect represents an effect that an item can have on an entity
-type ItemEffect struct {
-	Component string      // Component name to affect
-	Property  string      // Property name within the component
-	Operation string      // Operation to perform: "add", "multiply", "set", etc.
-	Value     interface{} // Value to apply in the operation
+// GameEffect struct represents a game effect that can be applied to entities
+type GameEffect struct {
+	Type      EffectType
+	Operation EffectOperation
+	Value     interface{}
+	Duration  int
+	Source    ecs.EntityID
+	Target    struct {
+		Component string // Which component to affect (e.g., "Stats")
+		Property  string // Which property to modify (e.g., "Health")
+	}
+}
+
+// NewGameEffect creates a new effect with the given parameters
+func NewGameEffect(effectType EffectType, operation EffectOperation, value interface{}, duration int, source ecs.EntityID, targetComponent string, targetProperty string) GameEffect {
+	return GameEffect{
+		Type:      effectType,
+		Operation: operation,
+		Value:     value,
+		Duration:  duration,
+		Source:    source,
+		Target: struct {
+			Component string
+			Property  string
+		}{
+			Component: targetComponent,
+			Property:  targetProperty,
+		},
+	}
+}
+
+// EffectComponent stores active effects on an entity
+type EffectComponent struct {
+	Effects []GameEffect
+}
+
+// AddEffect adds a new effect to the component
+func (c *EffectComponent) AddEffect(effect GameEffect) {
+	// For periodic effects, we want to keep the original duration
+	if effect.Type == EffectTypePeriodic {
+		c.Effects = append(c.Effects, effect)
+		return
+	}
+
+	// For equipment and other effects, check if a similar effect already exists
+	for i, existing := range c.Effects {
+		if existing.Type == effect.Type &&
+			existing.Operation == effect.Operation &&
+			existing.Target.Component == effect.Target.Component &&
+			existing.Target.Property == effect.Target.Property &&
+			existing.Source == effect.Source { // Also check source for equipment effects
+			// Update the existing effect
+			c.Effects[i] = effect
+			return
+		}
+	}
+
+	// If no similar effect exists, add the new one
+	c.Effects = append(c.Effects, effect)
+}
+
+// RemoveEffect removes an effect at the given index
+func (c *EffectComponent) RemoveEffect(index int) {
+	if index < 0 || index >= len(c.Effects) {
+		return
+	}
+	c.Effects = append(c.Effects[:index], c.Effects[index+1:]...)
+}
+
+// GetEffects returns all active effects
+func (c *EffectComponent) GetEffects() []GameEffect {
+	return c.Effects
+}
+
+// ClearEffects removes all effects
+func (c *EffectComponent) ClearEffects() {
+	c.Effects = make([]GameEffect, 0)
 }
 
 // EquipmentComponent represents equipped items
 type EquipmentComponent struct {
 	EquippedItems map[EquipmentSlot]ecs.EntityID // Map of slot to item entity ID
-	ActiveEffects map[ecs.EntityID][]ItemEffect  // Map of item entity ID to active effects
+	ActiveEffects map[ecs.EntityID][]GameEffect  // Map of item entity ID to active effects
 }
 
 // NewEquipmentComponent creates a new equipment component
 func NewEquipmentComponent() *EquipmentComponent {
 	return &EquipmentComponent{
 		EquippedItems: make(map[EquipmentSlot]ecs.EntityID),
-		ActiveEffects: make(map[ecs.EntityID][]ItemEffect),
+		ActiveEffects: make(map[ecs.EntityID][]GameEffect),
 	}
 }
 
@@ -277,9 +360,9 @@ func (e *EquipmentComponent) UnequipItem(slot EquipmentSlot) ecs.EntityID {
 }
 
 // AddEffect adds an effect for an item
-func (e *EquipmentComponent) AddEffect(itemID ecs.EntityID, effect ItemEffect) {
+func (e *EquipmentComponent) AddEffect(itemID ecs.EntityID, effect GameEffect) {
 	if _, ok := e.ActiveEffects[itemID]; !ok {
-		e.ActiveEffects[itemID] = make([]ItemEffect, 0)
+		e.ActiveEffects[itemID] = make([]GameEffect, 0)
 	}
 	e.ActiveEffects[itemID] = append(e.ActiveEffects[itemID], effect)
 }
@@ -290,8 +373,8 @@ func (e *EquipmentComponent) RemoveEffects(itemID ecs.EntityID) {
 }
 
 // GetAllEffects returns all active effects
-func (e *EquipmentComponent) GetAllEffects() []ItemEffect {
-	allEffects := make([]ItemEffect, 0)
+func (e *EquipmentComponent) GetAllEffects() []GameEffect {
+	allEffects := make([]GameEffect, 0)
 	for _, effects := range e.ActiveEffects {
 		allEffects = append(allEffects, effects...)
 	}
@@ -336,4 +419,112 @@ func (c *ContainerComponent) RemoveItem(itemID ecs.EntityID) bool {
 		}
 	}
 	return false
+}
+
+// EffectType defines the type of effect
+type EffectType string
+
+const (
+	EffectTypeInstant     EffectType = "instant"     // Immediate effect
+	EffectTypeDuration    EffectType = "duration"    // Effect with duration
+	EffectTypePeriodic    EffectType = "periodic"    // Effect that ticks at intervals
+	EffectTypeConditional EffectType = "conditional" // Effect that applies under conditions
+	EffectTypeEquipment   EffectType = "equipment"   // Effect from equipped items
+)
+
+// EffectOperation defines how the effect modifies the target
+type EffectOperation string
+
+const (
+	EffectOpAdd      EffectOperation = "add"      // Add to current value
+	EffectOpSubtract EffectOperation = "subtract" // Subtract from current value
+	EffectOpMultiply EffectOperation = "multiply" // Multiply current value
+	EffectOpSet      EffectOperation = "set"      // Set to new value
+	EffectOpToggle   EffectOperation = "toggle"   // Toggle boolean value
+)
+
+// MonsterAbilityType defines the type of monster ability
+type MonsterAbilityType string
+
+const (
+	AbilityTypeActive  MonsterAbilityType = "active"
+	AbilityTypePassive MonsterAbilityType = "passive"
+)
+
+// MonsterAbilityTrigger defines when an ability should be triggered
+type MonsterAbilityTrigger string
+
+const (
+	TriggerOnAttack    MonsterAbilityTrigger = "on_attack"
+	TriggerOnHit       MonsterAbilityTrigger = "on_hit"
+	TriggerOnTurnStart MonsterAbilityTrigger = "on_turn_start"
+	TriggerOnTurnEnd   MonsterAbilityTrigger = "on_turn_end"
+)
+
+// MonsterAbilityDef represents a single ability that a monster can use
+type MonsterAbilityDef struct {
+	Name        string
+	Description string
+	Type        MonsterAbilityType
+	Cooldown    int
+	CurrentCD   int
+	Range       int
+	Cost        int
+	Effects     []GameEffect
+	Trigger     MonsterAbilityTrigger
+}
+
+// MonsterAbilityComponent stores a monster's abilities
+type MonsterAbilityComponent struct {
+	Abilities []MonsterAbilityDef
+}
+
+// NewMonsterAbilityComponent creates a new monster ability component
+func NewMonsterAbilityComponent() *MonsterAbilityComponent {
+	return &MonsterAbilityComponent{
+		Abilities: make([]MonsterAbilityDef, 0),
+	}
+}
+
+// AddAbility adds a new ability to the monster
+func (m *MonsterAbilityComponent) AddAbility(ability MonsterAbilityDef) {
+	m.Abilities = append(m.Abilities, ability)
+}
+
+// GetAbilityByName returns the ability with the given name, or nil if not found
+func (m *MonsterAbilityComponent) GetAbilityByName(name string) *MonsterAbilityDef {
+	for i := range m.Abilities {
+		if m.Abilities[i].Name == name {
+			return &m.Abilities[i]
+		}
+	}
+	return nil
+}
+
+// UpdateCooldowns decrements all ability cooldowns by 1
+func (m *MonsterAbilityComponent) UpdateCooldowns() {
+	for i := range m.Abilities {
+		if m.Abilities[i].CurrentCD > 0 {
+			m.Abilities[i].CurrentCD--
+		}
+	}
+}
+
+// CanUseAbility checks if an ability can be used (cooldown is 0)
+func (m *MonsterAbilityComponent) CanUseAbility(name string) bool {
+	ability := m.GetAbilityByName(name)
+	if ability == nil {
+		return false
+	}
+	return ability.CurrentCD == 0
+}
+
+// UseAbility marks an ability as used and starts its cooldown
+func (m *MonsterAbilityComponent) UseAbility(name string) bool {
+	ability := m.GetAbilityByName(name)
+	if ability == nil {
+		return false
+	}
+	ability.CurrentCD = ability.Cooldown
+	return true
 }

@@ -12,10 +12,15 @@
   "equip_slot": "",
   "effects": [
     {
-      "component": "Stats",
-      "property": "Health",
+      "type": "instant",
       "operation": "add",
-      "value": 20
+      "value": 20.0,
+      "duration": 0,
+      "source": "bandage",
+      "target": {
+        "component": "Stats",
+        "property": "Health"
+      }
     }
   ],
   "consumable": true,

@@ -112,20 +112,59 @@ func (s *EquipmentSystem) Initialize(world *ecs.World) {
 
 // EquipItem equips an item to a slot
 func (s *EquipmentSystem) EquipItem(entityID ecs.EntityID, itemID ecs.EntityID, slot components.EquipmentSlot) error {
-	// Get the item component
+	entity := s.world.GetEntity(entityID)
+	if entity == nil {
+		return fmt.Errorf("entity not found")
+	}
+
+	// Get the item component from the item entity
 	itemComp, exists := s.world.GetComponent(itemID, components.Item)
 	if !exists {
-		return fmt.Errorf("entity is not an item")
+		return fmt.Errorf("item doesn't have Item component")
 	}
-	item := itemComp.(*components.ItemComponent)
+	item, ok := itemComp.(*components.ItemComponent)
+	if !ok {
+		return fmt.Errorf("item component is not of type *ItemComponent")
+	}
 
-	// Get or create equipment component
+	// Get the equipment component
 	equipComp, exists := s.world.GetComponent(entityID, components.Equipment)
 	if !exists {
-		equipComp = components.NewEquipmentComponent()
-		s.world.AddComponent(entityID, components.Equipment, equipComp)
+		return fmt.Errorf("entity doesn't have Equipment component")
 	}
-	equipment := equipComp.(*components.EquipmentComponent)
+	equipment, ok := equipComp.(*components.EquipmentComponent)
+	if !ok {
+		return fmt.Errorf("invalid Equipment component type")
+	}
+
+	// Get the stats component
+	statsComp, exists := s.world.GetComponent(entityID, components.Stats)
+	if !exists {
+		return fmt.Errorf("entity lacks Stats component")
+	}
+	stats, ok := statsComp.(*components.StatsComponent)
+	if !ok {
+		return fmt.Errorf("invalid Stats component type")
+	}
+
+	// Log the equip event and effects
+	GetDebugLog().Add(fmt.Sprintf("Equipping item %d in slot %s", itemID, slot))
+	if item.Data != nil {
+		if effects, ok := item.Data.([]components.GameEffect); ok {
+			GetDebugLog().Add(fmt.Sprintf("Item has %d effects:", len(effects)))
+			for _, effect := range effects {
+				GetDebugLog().Add(fmt.Sprintf("  - Effect: %s %s %v on %s.%s",
+					effect.Type, effect.Operation, effect.Value,
+					effect.Target.Component, effect.Target.Property))
+			}
+		}
+	}
+
+	// Log current stats before equip
+	GetDebugLog().Add(fmt.Sprintf("Current stats before equip:"))
+	GetDebugLog().Add(fmt.Sprintf("  - Health: %d/%d", stats.Health, stats.MaxHealth))
+	GetDebugLog().Add(fmt.Sprintf("  - Attack: %d", stats.Attack))
+	GetDebugLog().Add(fmt.Sprintf("  - Defense: %d", stats.Defense))
 
 	// Unequip any existing item in the slot
 	if oldItemID := equipment.GetEquippedItem(slot); oldItemID != 0 {
@@ -138,21 +177,15 @@ func (s *EquipmentSystem) EquipItem(entityID ecs.EntityID, itemID ecs.EntityID, 
 
 	// Process the item effects
 	if item.Data != nil {
-		if effects, ok := item.Data.([]components.ItemEffect); ok {
-			GetMessageLog().Add(fmt.Sprintf("Applying %d effects from %s", len(effects), s.getItemName(s.world, itemID)))
-
-			// Track the effects in the equipment component
-			for _, effect := range effects {
-				equipment.AddEffect(itemID, effect)
-			}
-
-			// Apply all effects at once using our utility
-			err := ApplyEntityEffects(s.world, entityID, effects)
-			if err != nil {
-				GetMessageLog().Add(fmt.Sprintf("Error applying effects: %v", err))
-			}
+		if _, ok := item.Data.([]components.GameEffect); ok {
+			// Emit event for effects to be applied
+			s.world.EmitEvent(ItemEquippedEvent{
+				EntityID: entityID,
+				ItemID:   itemID,
+				Slot:     string(slot),
+			})
 		} else {
-			GetMessageLog().Add(fmt.Sprintf("Item data is not []ItemEffect but %T", item.Data))
+			GetMessageLog().Add(fmt.Sprintf("Item data is not []GameEffect but %T", item.Data))
 		}
 	} else {
 		GetMessageLog().Add(fmt.Sprintf("Item %s has no effects data", s.getItemName(s.world, itemID)))
@@ -161,12 +194,11 @@ func (s *EquipmentSystem) EquipItem(entityID ecs.EntityID, itemID ecs.EntityID, 
 	// Get item name for message
 	itemName := s.getItemName(s.world, itemID)
 
-	// Emit an equipment event that other systems might be interested in
-	s.world.EmitEvent(ItemEquippedEvent{
-		EntityID: entityID,
-		ItemID:   itemID,
-		Slot:     string(slot),
-	})
+	// Log stats after equip
+	GetDebugLog().Add(fmt.Sprintf("Stats after equip:"))
+	GetDebugLog().Add(fmt.Sprintf("  - Health: %d/%d", stats.Health, stats.MaxHealth))
+	GetDebugLog().Add(fmt.Sprintf("  - Attack: %d", stats.Attack))
+	GetDebugLog().Add(fmt.Sprintf("  - Defense: %d", stats.Defense))
 
 	GetMessageLog().Add(fmt.Sprintf("Equipped %s to %s slot", itemName, slot))
 	return nil
@@ -179,7 +211,10 @@ func (s *EquipmentSystem) EquipItemAuto(entityID, itemID ecs.EntityID) error {
 	if !exists {
 		return fmt.Errorf("item doesn't have Item component")
 	}
-	item := itemComp.(*components.ItemComponent)
+	item, ok := itemComp.(*components.ItemComponent)
+	if !ok {
+		return fmt.Errorf("item component is not of type *ItemComponent")
+	}
 
 	// Determine the appropriate slot based on item type
 	var slot components.EquipmentSlot
@@ -211,7 +246,10 @@ func (s *EquipmentSystem) IsItemEquipped(entityID, itemID ecs.EntityID) bool {
 	if !exists {
 		return false
 	}
-	equipment := equipComp.(*components.EquipmentComponent)
+	equipment, ok := equipComp.(*components.EquipmentComponent)
+	if !ok {
+		return false
+	}
 
 	// Check all equipment slots to see if the item is equipped in any of them
 	for _, slot := range []components.EquipmentSlot{
@@ -233,7 +271,10 @@ func (s *EquipmentSystem) UnequipItemByID(entityID, itemID ecs.EntityID) bool {
 	if !exists {
 		return false
 	}
-	equipment := equipComp.(*components.EquipmentComponent)
+	equipment, ok := equipComp.(*components.EquipmentComponent)
+	if !ok {
+		return false
+	}
 
 	// Check all equipment slots to find the item
 	for _, slot := range []components.EquipmentSlot{
@@ -257,12 +298,37 @@ func (s *EquipmentSystem) UnequipItemByID(entityID, itemID ecs.EntityID) bool {
 
 // UnequipItem removes an item from a slot and removes its effects
 func (s *EquipmentSystem) UnequipItem(entityID ecs.EntityID, slot components.EquipmentSlot) error {
-	// Get equipment component
+	entity := s.world.GetEntity(entityID)
+	if entity == nil {
+		return fmt.Errorf("entity not found")
+	}
+
+	// Get the equipment component
 	equipComp, exists := s.world.GetComponent(entityID, components.Equipment)
 	if !exists {
 		return fmt.Errorf("entity doesn't have Equipment component")
 	}
-	equipment := equipComp.(*components.EquipmentComponent)
+	equipment, ok := equipComp.(*components.EquipmentComponent)
+	if !ok {
+		return fmt.Errorf("invalid Equipment component type")
+	}
+
+	// Get the stats component
+	statsComp, exists := s.world.GetComponent(entityID, components.Stats)
+	if !exists {
+		return fmt.Errorf("entity lacks Stats component")
+	}
+	stats, ok := statsComp.(*components.StatsComponent)
+	if !ok {
+		return fmt.Errorf("invalid Stats component type")
+	}
+
+	// Log current stats before unequip
+	GetDebugLog().Add(fmt.Sprintf("Unequipping item from slot %s", slot))
+	GetDebugLog().Add(fmt.Sprintf("Current stats before unequip:"))
+	GetDebugLog().Add(fmt.Sprintf("  - Health: %d/%d", stats.Health, stats.MaxHealth))
+	GetDebugLog().Add(fmt.Sprintf("  - Attack: %d", stats.Attack))
+	GetDebugLog().Add(fmt.Sprintf("  - Defense: %d", stats.Defense))
 
 	// Get the item that's currently equipped
 	itemID := equipment.GetEquippedItem(slot)
@@ -270,15 +336,24 @@ func (s *EquipmentSystem) UnequipItem(entityID ecs.EntityID, slot components.Equ
 		return fmt.Errorf("no item equipped in slot %s", slot)
 	}
 
-	// Get the item's effects
-	effects, exists := equipment.ActiveEffects[itemID]
-	if exists {
-		GetMessageLog().Add(fmt.Sprintf("Removing %d effects from %s", len(effects), s.getItemName(s.world, itemID)))
+	// Get the item component to access its effects
+	itemComp, exists := s.world.GetComponent(entityID, components.Item)
+	if !exists {
+		return fmt.Errorf("equipped item lacks Item component")
+	}
+	item := itemComp.(components.ItemComponent)
 
-		// Remove all effects at once using our utility
-		err := RemoveEntityEffects(s.world, entityID, effects)
-		if err != nil {
-			GetMessageLog().Add(fmt.Sprintf("Error removing effects: %v", err))
+	// Remove effects if the item has any
+	if item.Data != nil {
+		if effects, ok := item.Data.([]components.GameEffect); ok {
+			GetDebugLog().Add(fmt.Sprintf("Removing %d effects from %s", len(effects), s.getItemName(s.world, itemID)))
+
+			// Emit event for effects to be removed
+			s.world.EmitEvent(ItemUnequippedEvent{
+				EntityID: entityID,
+				ItemID:   itemID,
+				Slot:     string(slot),
+			})
 		}
 	}
 
@@ -288,14 +363,12 @@ func (s *EquipmentSystem) UnequipItem(entityID ecs.EntityID, slot components.Equ
 	// Unequip the item
 	equipment.UnequipItem(slot)
 
-	// Emit an unequip event
-	s.world.EmitEvent(ItemUnequippedEvent{
-		EntityID: entityID,
-		ItemID:   itemID,
-		Slot:     string(slot),
-	})
+	// Log stats after unequip
+	GetDebugLog().Add(fmt.Sprintf("Stats after unequip:"))
+	GetDebugLog().Add(fmt.Sprintf("  - Health: %d/%d", stats.Health, stats.MaxHealth))
+	GetDebugLog().Add(fmt.Sprintf("  - Attack: %d", stats.Attack))
+	GetDebugLog().Add(fmt.Sprintf("  - Defense: %d", stats.Defense))
 
-	// Log the unequipment
 	GetMessageLog().Add(fmt.Sprintf("Unequipped %s", s.getItemName(s.world, itemID)))
 	return nil
 }
@@ -307,7 +380,10 @@ func (s *EquipmentSystem) RemoveAllEquipmentEffects(entityID ecs.EntityID) error
 	if !exists {
 		return nil // No equipment component, nothing to do
 	}
-	equipment := equipComp.(*components.EquipmentComponent)
+	equipment, ok := equipComp.(*components.EquipmentComponent)
+	if !ok {
+		return fmt.Errorf("invalid Equipment component type")
+	}
 
 	// Go through all slots and remove effects
 	for _, slot := range []components.EquipmentSlot{
@@ -316,14 +392,13 @@ func (s *EquipmentSystem) RemoveAllEquipmentEffects(entityID ecs.EntityID) error
 	} {
 		itemID := equipment.GetEquippedItem(slot)
 		if itemID != 0 {
-			effects, exists := equipment.ActiveEffects[itemID]
-			if exists {
-				// Remove effects
-				err := RemoveEntityEffects(s.world, entityID, effects)
-				if err != nil {
-					GetMessageLog().Add(fmt.Sprintf("Error removing effects from %s: %v",
-						s.getItemName(s.world, itemID), err))
-				}
+			if _, exists := equipment.ActiveEffects[itemID]; exists {
+				// Emit event for effects to be removed
+				s.world.EmitEvent(ItemUnequippedEvent{
+					EntityID: entityID,
+					ItemID:   itemID,
+					Slot:     string(slot),
+				})
 				equipment.RemoveEffects(itemID)
 			}
 		}
@@ -340,7 +415,10 @@ func (s *EquipmentSystem) RemoveEquipmentEffects(entityID ecs.EntityID, slot com
 		return false
 	}
 
-	equipment := equipComp.(*components.EquipmentComponent)
+	equipment, ok := equipComp.(*components.EquipmentComponent)
+	if !ok {
+		return false
+	}
 
 	// Get the item in the slot
 	itemID := equipment.GetEquippedItem(slot)
@@ -358,11 +436,13 @@ func (s *EquipmentSystem) RemoveEquipmentEffects(entityID ecs.EntityID, slot com
 
 	// Remove effects of the item
 	if item.Data != nil {
-		if effects, ok := item.Data.([]components.ItemEffect); ok {
-			err := RemoveEntityEffects(s.world, entityID, effects)
-			if err != nil {
-				GetMessageLog().Add(fmt.Sprintf("Error removing effects: %v", err))
-			}
+		if _, ok := item.Data.([]components.GameEffect); ok {
+			// Emit event for effects to be removed
+			s.world.EmitEvent(ItemUnequippedEvent{
+				EntityID: entityID,
+				ItemID:   itemID,
+				Slot:     string(slot),
+			})
 		}
 	}
 
@@ -370,45 +450,42 @@ func (s *EquipmentSystem) RemoveEquipmentEffects(entityID ecs.EntityID, slot com
 }
 
 // AddItemEffect adds an effect to an entity with the given parameters
-func (s *EquipmentSystem) AddItemEffect(entityID ecs.EntityID, effect components.ItemEffect) error {
-	// Use our utility function to apply the effect
-	err := ApplyEntityEffect(s.world, entityID, effect.Component, effect.Property, effect.Operation, effect.Value)
-	if err != nil {
-		return fmt.Errorf("failed to apply effect: %v", err)
+func (s *EquipmentSystem) AddItemEffect(entityID ecs.EntityID, effect components.GameEffect) error {
+	// Get or create the equipment component
+	equipComp, exists := s.world.GetComponent(entityID, components.Equipment)
+	if !exists {
+		equipComp = &components.EquipmentComponent{
+			EquippedItems: make(map[components.EquipmentSlot]ecs.EntityID),
+			ActiveEffects: make(map[ecs.EntityID][]components.GameEffect),
+		}
+		s.world.AddComponent(entityID, components.Equipment, equipComp)
 	}
+
+	equipment, ok := equipComp.(*components.EquipmentComponent)
+	if !ok {
+		return fmt.Errorf("invalid Equipment component type")
+	}
+
+	// Add the effect
+	equipment.AddEffect(effect.Source, effect)
 	return nil
 }
 
 // RemoveItemEffect removes an effect from an entity
-func (s *EquipmentSystem) RemoveItemEffect(entityID ecs.EntityID, effect components.ItemEffect) error {
-	// Get the inverse effect
-	inverseOp, inverseVal, err := CreateInverseEffect(effect.Component, effect.Property, effect.Operation, effect.Value)
-	if err != nil {
-		return fmt.Errorf("failed to create inverse effect: %v", err)
+func (s *EquipmentSystem) RemoveItemEffect(entityID ecs.EntityID, effect components.GameEffect) error {
+	if comp, exists := s.world.GetComponent(entityID, components.Equipment); exists {
+		if equipComp, ok := comp.(components.EquipmentComponent); ok {
+			equipComp.RemoveEffects(effect.Source)
+		}
 	}
-
-	// Apply the inverse effect
-	err = ApplyEntityEffect(s.world, entityID, effect.Component, effect.Property, inverseOp, inverseVal)
-	if err != nil {
-		return fmt.Errorf("failed to remove effect: %v", err)
-	}
-
 	return nil
 }
 
-// GetInverseEffect creates an inverse effect for removing effects
-func (s *EquipmentSystem) GetInverseEffect(effect components.ItemEffect) (components.ItemEffect, error) {
-	inverseOp, inverseVal, err := CreateInverseEffect(effect.Component, effect.Property, effect.Operation, effect.Value)
-	if err != nil {
-		return components.ItemEffect{}, err
-	}
-
-	return components.ItemEffect{
-		Component: effect.Component,
-		Property:  effect.Property,
-		Operation: inverseOp,
-		Value:     inverseVal,
-	}, nil
+// GetInverseEffect creates an inverse effect for removal
+func (s *EquipmentSystem) GetInverseEffect(effect components.GameEffect) (components.GameEffect, error) {
+	// For now, we'll just return a copy with the same parameters
+	// In the future, we might want to handle different operation types differently
+	return effect, nil
 }
 
 // Helper function to get the name of an item

@@ -6,6 +6,7 @@ import (
 	"ebiten-rogue/ecs"
 	"ebiten-rogue/systems"
 	"fmt"
+	"image/color"
 )
 
 // ItemSpawner handles the creation of items and containers
@@ -99,24 +100,121 @@ func (s *ItemSpawner) CreateContainer(x, y int, templateID string) (*ecs.Entity,
 }
 
 // CreateItem creates an item entity that can be collected by the player
-func (s *ItemSpawner) CreateItem(x, y int, itemTemplateID string, addToContainer bool) (*ecs.Entity, error) {
-	// Try to load the item template
-	template, exists := s.templateManager.GetItemTemplate(itemTemplateID)
-	if !exists {
-		return nil, fmt.Errorf("no item template found with ID '%s'", itemTemplateID)
-	}
-
+// If addToContainer is true, position components will not be added
+// If templateID is empty, it will create a basic item using the provided parameters
+func (s *ItemSpawner) CreateItem(x, y int, templateID string, addToContainer bool, opts ...ItemOption) (*ecs.Entity, error) {
 	// Create the item entity
 	itemEntity := s.world.CreateEntity()
 	itemEntity.AddTag("item")
 	s.world.TagEntity(itemEntity.ID, "item")
 
-	// Add any additional tags from the template
-	for _, tag := range template.Tags {
-		s.world.TagEntity(itemEntity.ID, tag)
+	var itemComp *components.ItemComponent
+	var itemColor color.Color
+	var tileX, tileY int
+	var itemName string
+
+	if templateID != "" {
+		// Try to load the item template
+		template, exists := s.templateManager.GetItemTemplate(templateID)
+		if !exists {
+			return nil, fmt.Errorf("no item template found with ID '%s'", templateID)
+		}
+
+		// Add any additional tags from the template
+		for _, tag := range template.Tags {
+			s.world.TagEntity(itemEntity.ID, tag)
+		}
+
+		// Get visual properties from template
+		itemColor = data.ParseHexColor(template.Color)
+		tileX = template.TileX
+		tileY = template.TileY
+		itemName = template.Name
+
+		// Create the item component from template
+		itemComp = components.NewItemComponentFromTemplate(
+			template.ID,
+			template.ItemType,
+			template.Value,
+			template.Weight,
+			template.Description,
+		)
+
+		// Add name component early
+		s.world.AddComponent(itemEntity.ID, components.Name, components.NewNameComponent(itemName))
+
+		// If item has effects, process them
+		if len(template.Effects) > 0 {
+			effects := make([]components.GameEffect, 0, len(template.Effects))
+
+			// Convert each effect from map to GameEffect struct
+			for _, effectMap := range template.Effects {
+				// For equipment items, always set the type to EffectTypeEquipment
+				effectType := components.EffectType(effectMap["type"].(string))
+				if itemComp.ItemType == "weapon" || itemComp.ItemType == "armor" ||
+					itemComp.ItemType == "headgear" || itemComp.ItemType == "shield" ||
+					itemComp.ItemType == "boots" || itemComp.ItemType == "accessory" {
+					effectType = components.EffectTypeEquipment
+				}
+
+				effect := components.GameEffect{
+					Type:      effectType,
+					Operation: components.EffectOperation(effectMap["operation"].(string)),
+					Value:     effectMap["value"].(float64),
+					Duration:  int(effectMap["duration"].(float64)),
+					Source:    itemEntity.ID,
+					Target: struct {
+						Component string
+						Property  string
+					}{
+						Component: effectMap["target"].(map[string]interface{})["component"].(string),
+						Property:  effectMap["target"].(map[string]interface{})["property"].(string),
+					},
+				}
+				effects = append(effects, effect)
+			}
+
+			// Store the effects in the item's Data field
+			itemComp.Data = effects
+		}
+	} else {
+		// Apply any provided options
+		options := defaultItemOptions()
+		for _, opt := range opts {
+			opt(options)
+		}
+
+		// Set visual properties based on item type
+		switch options.itemType {
+		case "weapon":
+			tileX, tileY = 15, 7 // Sword
+			itemColor = color.RGBA{220, 220, 255, 255}
+		case "armor":
+			tileX, tileY = 15, 9 // Armor
+			itemColor = color.RGBA{200, 200, 220, 255}
+		case "potion":
+			tileX, tileY = 15, 3 // Potion
+			itemColor = color.RGBA{255, 100, 100, 255}
+		case "scroll":
+			tileX, tileY = 15, 0 // Scroll
+			itemColor = color.RGBA{255, 255, 200, 255}
+		default:
+			tileX, tileY = 12, 0 // Default item
+			itemColor = color.RGBA{200, 200, 200, 255}
+		}
+
+		// Create basic item component
+		itemComp = components.NewItemComponent(
+			options.itemType,
+			options.value,
+			options.weight,
+		)
+
+		// Add name component early
+		s.world.AddComponent(itemEntity.ID, components.Name, components.NewNameComponent(options.name))
 	}
 
-	// Only add position and renderable components if the item is not being added to a container
+	// Only add position and renderable components if not being added to a container
 	if !addToContainer {
 		// Add position component
 		s.world.AddComponent(itemEntity.ID, components.Position, &components.PositionComponent{
@@ -124,47 +222,15 @@ func (s *ItemSpawner) CreateItem(x, y int, itemTemplateID string, addToContainer
 			Y: y,
 		})
 
-		// Add renderable component using template data
-		itemColor := data.ParseHexColor(template.Color)
+		// Add renderable component
 		s.world.AddComponent(itemEntity.ID, components.Renderable, components.NewRenderableComponentByPos(
-			template.TileX, template.TileY,
+			tileX, tileY,
 			itemColor,
 		))
 	}
 
-	// Create the item component
-	itemComp := components.NewItemComponentFromTemplate(
-		template.ID,
-		template.ItemType,
-		template.Value,
-		template.Weight,
-		template.Description,
-	)
-
-	// If item has effects, process them
-	if len(template.Effects) > 0 {
-		effects := make([]components.ItemEffect, 0, len(template.Effects))
-
-		// Convert each effect from map to ItemEffect struct
-		for _, effectMap := range template.Effects {
-			effect := components.ItemEffect{
-				Component: effectMap["component"].(string),
-				Property:  effectMap["property"].(string),
-				Operation: effectMap["operation"].(string),
-				Value:     effectMap["value"],
-			}
-			effects = append(effects, effect)
-		}
-
-		// Store the effects in the item's Data field
-		itemComp.Data = effects
-	}
-
 	// Add the item component
 	s.world.AddComponent(itemEntity.ID, components.Item, itemComp)
-
-	// Add name component
-	s.world.AddComponent(itemEntity.ID, components.Name, components.NewNameComponent(template.Name))
 
 	// Add map context component if spawnMapID is set
 	if s.spawnMapID != 0 {
@@ -172,4 +238,53 @@ func (s *ItemSpawner) CreateItem(x, y int, itemTemplateID string, addToContainer
 	}
 
 	return itemEntity, nil
+}
+
+// ItemOptions holds optional parameters for item creation
+type ItemOptions struct {
+	name     string
+	itemType string
+	value    int
+	weight   int
+}
+
+// ItemOption is a function that modifies ItemOptions
+type ItemOption func(*ItemOptions)
+
+// defaultItemOptions returns default item options
+func defaultItemOptions() *ItemOptions {
+	return &ItemOptions{
+		name:     "Unknown Item",
+		itemType: "miscellaneous",
+		value:    1,
+		weight:   1,
+	}
+}
+
+// WithName sets the item name
+func WithName(name string) ItemOption {
+	return func(o *ItemOptions) {
+		o.name = name
+	}
+}
+
+// WithType sets the item type
+func WithType(itemType string) ItemOption {
+	return func(o *ItemOptions) {
+		o.itemType = itemType
+	}
+}
+
+// WithValue sets the item value
+func WithValue(value int) ItemOption {
+	return func(o *ItemOptions) {
+		o.value = value
+	}
+}
+
+// WithWeight sets the item weight
+func WithWeight(weight int) ItemOption {
+	return func(o *ItemOptions) {
+		o.weight = weight
+	}
 }

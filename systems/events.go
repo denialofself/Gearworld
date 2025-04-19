@@ -23,6 +23,7 @@ const (
 	EventInventoryUI       ecs.EventType = "inventory_ui"
 	EventExamine           ecs.EventType = "examine"
 	EventGameOver          ecs.EventType = "game_over"
+	EventCombatAttack      ecs.EventType = "combat_attack"
 )
 
 // Effect type constants
@@ -41,7 +42,7 @@ type EffectsEvent struct {
 	EffectType  string       // Type of effect (heal, damage, etc.)
 	Property    string       // Property to affect (Health, Attack, etc.)
 	Value       interface{}  // Value of the effect
-	Source      string       // Source of the effect (item_id, rest, etc.)
+	Source      ecs.EntityID // Source entity of the effect (item, monster, etc.)
 	DisplayText string       // Optional text to display
 }
 
@@ -298,4 +299,14 @@ type GameOverEvent struct {
 // Type returns the event type
 func (e GameOverEvent) Type() ecs.EventType {
 	return EventGameOver
+}
+
+// CombatAttackEvent represents an attack in combat
+type CombatAttackEvent struct {
+	AttackerID ecs.EntityID
+	DefenderID ecs.EntityID
+}
+
+func (e CombatAttackEvent) Type() ecs.EventType {
+	return EventCombatAttack
 }

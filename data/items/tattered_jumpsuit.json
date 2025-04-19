@@ -12,10 +12,15 @@
   "equip_slot": "body",
   "effects": [
     {
-      "component": "Stats",
-      "property": "Defense",
+      "type": "duration",
       "operation": "add",
-      "value": 1
+      "value": 1.0,
+      "duration": -1,
+      "source": "tattered_jumpsuit",
+      "target": {
+        "component": "Stats",
+        "property": "Defense"
+      }
     }
   ]
 } 

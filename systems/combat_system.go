@@ -155,6 +155,12 @@ func (s *CombatSystem) ProcessCombat(world *ecs.World, attackerID, defenderID ec
 			attackerName, defenderName, damage, defenderName, defenderStats.Health, defenderStats.MaxHealth)
 		GetMessageLog().AddCombat(damageMsg)
 
+		// Emit combat attack event for ability system
+		world.GetEventManager().Emit(CombatAttackEvent{
+			AttackerID: attackerID,
+			DefenderID: defenderID,
+		})
+
 		// Check if defender is defeated
 		if defenderStats.Health <= 0 {
 			GetMessageLog().AddAlert(fmt.Sprintf("%s was defeated!", defenderName))

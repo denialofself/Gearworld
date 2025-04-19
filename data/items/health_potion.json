@@ -8,5 +8,20 @@
   "color": "#FF6464",
   "value": 10,
   "weight": 1,
-  "tags": ["potion", "consumable", "healing"]
+  "tags": ["potion", "consumable", "healing"],
+  "effects": [
+    {
+      "type": "instant",
+      "operation": "add",
+      "value": 50.0,
+      "duration": 0,
+      "source": "health_potion",
+      "target": {
+        "component": "Stats",
+        "property": "Health"
+      }
+    }
+  ],
+  "consumable": true,
+  "charges": 1
 } 

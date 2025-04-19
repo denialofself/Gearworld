@@ -9,12 +9,18 @@
   "value": 5,
   "weight": 2,
   "tags": ["weapon", "melee", "tool"],
+  "equip_slot": "mainhand",
   "effects": [
     {
-      "component": "Stats",
-      "property": "Attack",
+      "type": "duration",
       "operation": "add",
-      "value": 1
+      "value": 1.0,
+      "duration": -1,
+      "source": "rusty_spanner",
+      "target": {
+        "component": "Stats",
+        "property": "Attack"
+      }
     }
   ]
 } 

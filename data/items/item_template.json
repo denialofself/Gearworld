@@ -12,10 +12,52 @@
   "equip_slot": "",
   "effects": [
     {
-      "component": "Stats",
-      "property": "Health",
+      "comment": "Example of an instant healing effect",
+      "type": "instant",
       "operation": "add",
-      "value": 0
+      "value": 20.0,
+      "duration": 0,
+      "source": "healing_potion",
+      "target": {
+        "component": "Stats",
+        "property": "Health"
+      }
+    },
+    {
+      "comment": "Example of a duration-based strength buff",
+      "type": "duration",
+      "operation": "add",
+      "value": 5.0,
+      "duration": 10,
+      "source": "strength_potion",
+      "target": {
+        "component": "Stats",
+        "property": "Attack"
+      }
+    },
+    {
+      "comment": "Example of periodic health regeneration",
+      "type": "periodic",
+      "operation": "add",
+      "value": 2.0,
+      "duration": 5,
+      "source": "regeneration_ring",
+      "target": {
+        "component": "Stats",
+        "property": "Health"
+      }
+    },
+    {
+      "comment": "Example of a conditional shield effect",
+      "type": "conditional",
+      "operation": "add",
+      "value": 10.0,
+      "duration": 0,
+      "source": "reactive_shield",
+      "target": {
+        "component": "Stats",
+        "property": "Defense"
+      }
     }
   ],
   "consumable": true,

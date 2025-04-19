@@ -11,11 +11,39 @@
     "actionPoints": 6,
     "maxActionPoints": 6,
     "recovery": 3,
-    "healingfactor": 0,
+    "healingfactor": 2,
     "level": 1,
     "xp": 20,
     "aiType": "aggressive",
     "tags": ["enemy", "insect", "ai"],
     "blocksPath": true,
-    "spawnWeight": 8
-  }
+    "spawnWeight": 8,
+    "components": {
+        "monsterAbility": {
+            "abilities": [
+                {
+                    "name": "Bleeding Bite",
+                    "description": "Inflicts a bleeding wound that deals 1-4 damage per turn",
+                    "type": "active",
+                    "cooldown": 3,
+                    "currentCD": 0,
+                    "range": 1,
+                    "cost": 2,
+                    "trigger": "on_attack",
+                    "effects": [
+                        {
+                            "type": "periodic",
+                            "operation": "subtract",
+                            "value": "1d10",
+                            "duration": 4,
+                            "target": {
+                                "component": "Stats",
+                                "property": "Health"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

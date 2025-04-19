@@ -3,6 +3,7 @@ package systems
 import (
 	"image"
 	"image/color"
+	"math"
 	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -69,7 +70,7 @@ func NewTileID(x, y int) TileID {
 }
 
 // DrawTileByID draws a tile specified by its position in the tileset
-func (t *Tileset) DrawTileByID(target *ebiten.Image, tileID TileID, x, y int, clr color.Color) {
+func (t *Tileset) DrawTileByID(target *ebiten.Image, tileID TileID, x, y int, clr color.Color, rotation float64) {
 	// Ensure the tile ID is within bounds
 	if tileID.X < 0 || tileID.X >= t.Width || tileID.Y < 0 || tileID.Y >= t.Height {
 		// Draw a default "unknown" tile or return
@@ -94,6 +95,16 @@ func (t *Tileset) DrawTileByID(target *ebiten.Image, tileID TileID, x, y int, cl
 	scaleY := float64(t.TileSize) / float64(srcTileSize)
 	op.GeoM.Scale(scaleX, scaleY)
 
+	// Apply rotation if specified
+	if rotation != 0 {
+		// First translate to center of tile
+		op.GeoM.Translate(-float64(t.TileSize)/2, -float64(t.TileSize)/2)
+		// Apply rotation
+		op.GeoM.Rotate(rotation * math.Pi / 180) // Convert degrees to radians
+		// Translate back
+		op.GeoM.Translate(float64(t.TileSize)/2, float64(t.TileSize)/2)
+	}
+
 	// Apply color
 	if clr != nil {
 		r, g, b, a := clr.RGBA()
@@ -105,7 +116,7 @@ func (t *Tileset) DrawTileByID(target *ebiten.Image, tileID TileID, x, y int, cl
 		op.ColorM.Scale(rf, gf, bf, af)
 	}
 
-	// Set destination position (after scaling)
+	// Set destination position (after scaling and rotation)
 	op.GeoM.Translate(dx, dy)
 
 	// Draw the tile
@@ -116,7 +127,7 @@ func (t *Tileset) DrawTileByID(target *ebiten.Image, tileID TileID, x, y int, cl
 // DrawTile draws a single tile on the screen
 func (t *Tileset) DrawTile(target *ebiten.Image, char rune, x, y int, clr color.Color) {
 	tileX, tileY := t.GetTileCoords(char)
-	t.DrawTileByID(target, TileID{X: tileX, Y: tileY}, x, y, clr)
+	t.DrawTileByID(target, TileID{X: tileX, Y: tileY}, x, y, clr, 0)
 }
 
 // DrawString draws a string of characters
